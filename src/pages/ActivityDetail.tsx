@@ -16,10 +16,34 @@ export function ActivityDetail() {
 
   // Mock data - in a real app this would come from a database/API
   const activitiesData: Record<string, Activity> = {
+    // Dashboard activities
     "1": { title: "Morning Feed", detail: "150ml Formula", time: "08:30 AM", user: "Mom", type: "feed" },
     "2": { title: "Diaper Change", detail: "Wet", time: "10:15 AM", user: "Dad", type: "diaper" },
     "3": { title: "Afternoon Nap", detail: "2 hours", time: "01:00 PM", user: "Nanny", type: "sleep" },
     "4": { title: "Evening Feed", detail: "180ml Formula", time: "06:45 PM", user: "Mom", type: "feed" },
+    // Feed activities
+    "f1": { title: "Morning Feed", detail: "150ml Formula - Bottle", time: "06:30 AM", user: "Mom", type: "feed" },
+    "f2": { title: "Mid-Morning Feed", detail: "120ml Breast Milk", time: "09:15 AM", user: "Mom", type: "feed" },
+    "f3": { title: "Lunch Feed", detail: "180ml Formula - Bottle", time: "12:00 PM", user: "Dad", type: "feed" },
+    "f4": { title: "Afternoon Feed", detail: "150ml Formula - Bottle", time: "02:30 PM", user: "Nanny", type: "feed" },
+    "f5": { title: "Evening Feed", detail: "180ml Formula - Bottle", time: "06:00 PM", user: "Mom", type: "feed" },
+    "f6": { title: "Night Feed", detail: "120ml Breast Milk", time: "09:30 PM", user: "Mom", type: "feed" },
+    // Diaper activities
+    "d1": { title: "Morning Change", detail: "Wet", time: "06:00 AM", user: "Mom", type: "diaper" },
+    "d2": { title: "After Breakfast", detail: "Dirty", time: "08:30 AM", user: "Mom", type: "diaper" },
+    "d3": { title: "Mid-Morning", detail: "Wet", time: "10:15 AM", user: "Dad", type: "diaper" },
+    "d4": { title: "Before Nap", detail: "Wet", time: "12:00 PM", user: "Nanny", type: "diaper" },
+    "d5": { title: "After Nap", detail: "Dirty", time: "01:45 PM", user: "Nanny", type: "diaper" },
+    "d6": { title: "Afternoon", detail: "Wet", time: "03:30 PM", user: "Mom", type: "diaper" },
+    "d7": { title: "Before Dinner", detail: "Dirty", time: "05:45 PM", user: "Dad", type: "diaper" },
+    "d8": { title: "Before Bed", detail: "Wet", time: "08:00 PM", user: "Mom", type: "diaper" },
+    // Sleep activities
+    "s1": { title: "Overnight Sleep", detail: "10 hrs", time: "07:00 PM - 05:00 AM", user: "Mom", type: "sleep" },
+    "s2": { title: "Morning Nap", detail: "1.5 hrs", time: "09:00 AM - 10:30 AM", user: "Dad", type: "sleep" },
+    "s3": { title: "Afternoon Nap", detail: "2 hrs", time: "01:00 PM - 03:00 PM", user: "Nanny", type: "sleep" },
+    "s4": { title: "Evening Nap", detail: "45 min", time: "05:30 PM - 06:15 PM", user: "Mom", type: "sleep" },
+    "s5": { title: "Overnight Sleep", detail: "9.5 hrs", time: "07:30 PM - 05:00 AM", user: "Dad", type: "sleep" },
+    "s6": { title: "Morning Nap", detail: "1 hr", time: "08:30 AM - 09:30 AM", user: "Mom", type: "sleep" },
   };
 
   const initialActivity = id ? activitiesData[id] : null;
@@ -75,6 +99,14 @@ export function ActivityDetail() {
           <p className="text-gray-500 text-base">
             {isEditing ? "Update the activity details below" : "Activity details and information"}
           </p>
+          {!isEditing && (
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors mt-3"
+            >
+              ← Back to Dashboard
+            </Link>
+          )}
         </div>
         {!isEditing && (
           <button
@@ -196,15 +228,6 @@ export function ActivityDetail() {
                   <p className="text-lg font-medium text-gray-900">{activity.user}</p>
                 </div>
               </div>
-            </div>
-
-            <div className="pt-6 border-t border-gray-100">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors"
-              >
-                ← Back to Dashboard
-              </Link>
             </div>
           </>
         )}

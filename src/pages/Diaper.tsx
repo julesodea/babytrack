@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import {
   IconCalendar,
@@ -7,7 +8,60 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 
+interface DiaperItem {
+  id: string;
+  title: string;
+  detail: string;
+  time: string;
+  user: string;
+  type: "wet" | "dirty" | "both";
+  date: string;
+}
+
+const diaperData: DiaperItem[] = [
+  { id: "d1", title: "Morning Change", detail: "Wet", time: "06:00 AM", user: "Mom", type: "wet", date: "2024-01-15" },
+  { id: "d2", title: "After Breakfast", detail: "Dirty", time: "08:30 AM", user: "Mom", type: "dirty", date: "2024-01-15" },
+  { id: "d3", title: "Mid-Morning", detail: "Wet", time: "10:15 AM", user: "Dad", type: "wet", date: "2024-01-15" },
+  { id: "d4", title: "Before Nap", detail: "Wet", time: "12:00 PM", user: "Nanny", type: "wet", date: "2024-01-15" },
+  { id: "d5", title: "After Nap", detail: "Dirty", time: "01:45 PM", user: "Nanny", type: "dirty", date: "2024-01-14" },
+  { id: "d6", title: "Afternoon", detail: "Wet", time: "03:30 PM", user: "Mom", type: "wet", date: "2024-01-14" },
+  { id: "d7", title: "Before Dinner", detail: "Dirty", time: "05:45 PM", user: "Dad", type: "dirty", date: "2024-01-14" },
+  { id: "d8", title: "Before Bed", detail: "Wet", time: "08:00 PM", user: "Mom", type: "wet", date: "2024-01-14" },
+];
+
 export function Diaper() {
+  const [data, setData] = useState<DiaperItem[]>(diaperData);
+  const [dateFilter, setDateFilter] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const uniqueDates = [...new Set(data.map((d) => d.date))];
+
+  const filteredData = data.filter((item) => {
+    const matchesDate = !dateFilter || item.date === dateFilter;
+    const matchesType = !typeFilter || item.type === typeFilter;
+    return matchesDate && matchesType;
+  });
+
+  const handleSelect = (id: string, selected: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const handleDelete = () => {
+    setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+    setSelectedIds(new Set());
+  };
+
   return (
     <div className="space-y-10">
       {/* Header */}
@@ -75,33 +129,108 @@ export function Diaper() {
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm">
-            <IconCalendar className="w-5 h-5 text-gray-400" />
-            Show by date
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm">
-            <IconFilter className="w-5 h-5 text-gray-400" />
-            Type
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowDateDropdown(!showDateDropdown);
+                setShowTypeDropdown(false);
+              }}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"}`}
+            >
+              <IconCalendar className="w-5 h-5 text-gray-400" />
+              {dateFilter || "Show by date"}
+            </button>
+            {showDateDropdown && (
+              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
+                <button
+                  onClick={() => {
+                    setDateFilter("");
+                    setShowDateDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
+                >
+                  All dates
+                </button>
+                {uniqueDates.map((date) => (
+                  <button
+                    key={date}
+                    onClick={() => {
+                      setDateFilter(date);
+                      setShowDateDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
+                  >
+                    {date}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowTypeDropdown(!showTypeDropdown);
+                setShowDateDropdown(false);
+              }}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"}`}
+            >
+              <IconFilter className="w-5 h-5 text-gray-400" />
+              {typeFilter ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) : "Type"}
+            </button>
+            {showTypeDropdown && (
+              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
+                <button
+                  onClick={() => {
+                    setTypeFilter("");
+                    setShowTypeDropdown(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
+                >
+                  All types
+                </button>
+                {["wet", "dirty", "both"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setTypeFilter(type);
+                      setShowTypeDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Create Button + Table Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Change History</h3>
-          <Link
-            to="/diaper/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
-          >
-            <span className="text-lg leading-none">+</span>
-            Add Change
-          </Link>
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                Delete ({selectedIds.size})
+              </button>
+            )}
+            <Link
+              to="/diaper/new"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <span className="text-lg leading-none">+</span>
+              Add Change
+            </Link>
+          </div>
         </div>
 
         {/* Table */}
         <div className="bg-transparent">
           <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-200/60 mb-2">
             <div className="col-span-6 flex items-center gap-2">
-              <span className="w-4 h-4 border border-gray-300 rounded mx-1"></span>
               Diaper Details
             </div>
             <div className="col-span-3 flex items-center gap-2">Time</div>
@@ -109,62 +238,24 @@ export function Diaper() {
           </div>
 
           <div className="space-y-2">
-            <ActivityRow
-              id="d1"
-              title="Morning Change"
-              detail="Wet"
-              time="06:00 AM"
-              user="Mom"
-            />
-            <ActivityRow
-              id="d2"
-              title="After Breakfast"
-              detail="Dirty"
-              time="08:30 AM"
-              user="Mom"
-            />
-            <ActivityRow
-              id="d3"
-              title="Mid-Morning"
-              detail="Wet"
-              time="10:15 AM"
-              user="Dad"
-            />
-            <ActivityRow
-              id="d4"
-              title="Before Nap"
-              detail="Wet"
-              time="12:00 PM"
-              user="Nanny"
-            />
-            <ActivityRow
-              id="d5"
-              title="After Nap"
-              detail="Dirty"
-              time="01:45 PM"
-              user="Nanny"
-            />
-            <ActivityRow
-              id="d6"
-              title="Afternoon"
-              detail="Wet"
-              time="03:30 PM"
-              user="Mom"
-            />
-            <ActivityRow
-              id="d7"
-              title="Before Dinner"
-              detail="Dirty"
-              time="05:45 PM"
-              user="Dad"
-            />
-            <ActivityRow
-              id="d8"
-              title="Before Bed"
-              detail="Wet"
-              time="08:00 PM"
-              user="Mom"
-            />
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => (
+                <ActivityRow
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  detail={item.detail}
+                  time={item.time}
+                  user={item.user}
+                  selected={selectedIds.has(item.id)}
+                  onSelect={handleSelect}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No diaper changes match the selected filters
+              </div>
+            )}
           </div>
         </div>
       </div>
