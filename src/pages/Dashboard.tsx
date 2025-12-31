@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import {
   IconBottle,
   IconCalendar,
@@ -86,6 +87,18 @@ export function Dashboard() {
           </button>
         </div>
 
+        {/* Create Button + Table Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
+          <Link
+            to="/activity/new"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            <span className="text-lg leading-none">+</span>
+            Add Activity
+          </Link>
+        </div>
+
         {/* Table */}
         <div className="bg-transparent">
           <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-200/60 mb-2">
@@ -99,24 +112,28 @@ export function Dashboard() {
 
           <div className="space-y-2">
             <ActivityRow
+              id="1"
               title="Morning Feed"
               detail="150ml Formula"
               time="08:30 AM"
               user="Mom"
             />
             <ActivityRow
+              id="2"
               title="Diaper Change"
               detail="Wet"
               time="10:15 AM"
               user="Dad"
             />
             <ActivityRow
+              id="3"
               title="Afternoon Nap"
               detail="2 hours"
               time="01:00 PM"
               user="Nanny"
             />
             <ActivityRow
+              id="4"
               title="Evening Feed"
               detail="180ml Formula"
               time="06:45 PM"

@@ -1,13 +1,19 @@
+import { Link } from "react-router";
+
 interface ActivityRowProps {
+  id: string;
   title: string;
   detail: string;
   time: string;
   user: string;
 }
 
-export function ActivityRow({ title, detail, time, user }: ActivityRowProps) {
+export function ActivityRow({ id, title, detail, time, user }: ActivityRowProps) {
   return (
-    <div className="group bg-white rounded-xl border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer">
+    <Link
+      to={`/activity/${id}`}
+      className="group block bg-white rounded-xl border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
+    >
       {/* Mobile Layout */}
       <div className="sm:hidden p-4 space-y-3">
         <div className="flex items-start justify-between">
@@ -59,6 +65,6 @@ export function ActivityRow({ title, detail, time, user }: ActivityRowProps) {
           <span className="text-sm text-gray-700">{user}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

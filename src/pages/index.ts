@@ -1,4 +1,11 @@
+export { Account } from "./Account";
+export { ActivityDetail } from "./ActivityDetail";
+export { ActivityNew } from "./ActivityNew";
 export { Dashboard } from "./Dashboard";
 export { Diaper } from "./Diaper";
+export { DiaperNew } from "./DiaperNew";
 export { Feed } from "./Feed";
+export { FeedNew } from "./FeedNew";
+export { Preferences } from "./Preferences";
 export { Sleep } from "./Sleep";
+export { SleepNew } from "./SleepNew";

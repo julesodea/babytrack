@@ -8,3 +8,4 @@ export { IconFilter } from "./IconFilter";
 export { IconMenu } from "./IconMenu";
 export { IconMoon } from "./IconMoon";
 export { IconSearch } from "./IconSearch";
+export { IconUser } from "./IconUser";
