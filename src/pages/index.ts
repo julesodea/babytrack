@@ -6,6 +6,8 @@ export { Diaper } from "./Diaper";
 export { DiaperNew } from "./DiaperNew";
 export { Feed } from "./Feed";
 export { FeedNew } from "./FeedNew";
+export { FamilySetup } from "./FamilySetup";
+export { Login } from "./Login";
 export { Preferences } from "./Preferences";
 export { Sleep } from "./Sleep";
 export { SleepNew } from "./SleepNew";

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router";
 import { NavItem } from "./NavItem";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
 import {
   IconBottle,
   IconChevronDown,
@@ -17,7 +18,17 @@ import {
 
 export function Layout() {
   const { colorScheme } = useColorScheme();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const displayName = user?.user_metadata?.full_name || user?.email || 'User';
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
@@ -142,11 +153,29 @@ export function Layout() {
 
         {/* User Profile Bottom */}
         <div className="p-4 border-t border-gray-50">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-              JP
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                  {initials}
+                </div>
+              )}
+              <div className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                {displayName}
+              </div>
             </div>
-            <div className="text-sm font-medium text-gray-700">John Parent</div>
+            <button
+              onClick={signOut}
+              className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              Sign out
+            </button>
           </div>
         </div>
       </aside>

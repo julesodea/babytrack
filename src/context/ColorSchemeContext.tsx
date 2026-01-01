@@ -17,8 +17,8 @@ export const colorSchemes: ColorScheme[] = [
   {
     id: "blue",
     name: "Blue",
-    cardBg: "bg-blue-400",
-    cardBgHover: "hover:bg-blue-500",
+    cardBg: "bg-blue-500",
+    cardBgHover: "hover:bg-blue-600",
   },
   {
     id: "purple",
