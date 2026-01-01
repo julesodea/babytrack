@@ -25,7 +25,9 @@ export function DiaperNew() {
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <IconDiaper className="w-5 h-5 text-gray-500" />
         <span>/</span>
-        <Link to="/diaper" className="hover:text-gray-600">Diaper Changes</Link>
+        <Link to="/diaper" className="hover:text-gray-600">
+          Diaper Changes
+        </Link>
         <span>/</span>
         <span className="text-gray-900">New Change</span>
       </div>
@@ -45,7 +47,10 @@ export function DiaperNew() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Title
               </label>
               <input
@@ -53,13 +58,18 @@ export function DiaperNew() {
                 type="text"
                 required
                 value={diaper.title}
-                onChange={(e) => setDiaper({ ...diaper, title: e.target.value })}
+                onChange={(e) =>
+                  setDiaper({ ...diaper, title: e.target.value })
+                }
                 placeholder="e.g., Morning Change"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Type
               </label>
               <select
@@ -74,7 +84,10 @@ export function DiaperNew() {
               </select>
             </div>
             <div>
-              <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Time
               </label>
               <input
@@ -88,7 +101,10 @@ export function DiaperNew() {
               />
             </div>
             <div>
-              <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="user"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Caregiver
               </label>
               <input
@@ -97,18 +113,23 @@ export function DiaperNew() {
                 required
                 value={diaper.user}
                 onChange={(e) => setDiaper({ ...diaper, user: e.target.value })}
-                placeholder="e.g., Mom"
+                placeholder="e.g., Mum"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Notes (optional)
               </label>
               <textarea
                 id="notes"
                 value={diaper.notes}
-                onChange={(e) => setDiaper({ ...diaper, notes: e.target.value })}
+                onChange={(e) =>
+                  setDiaper({ ...diaper, notes: e.target.value })
+                }
                 rows={3}
                 placeholder="Any additional notes..."
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"

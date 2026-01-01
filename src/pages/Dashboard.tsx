@@ -21,10 +21,42 @@ interface ActivityItem {
 }
 
 const activityData: ActivityItem[] = [
-  { id: "1", title: "Morning Feed", detail: "150ml Formula", time: "08:30 AM", user: "Mom", type: "feed", date: "2024-01-15" },
-  { id: "2", title: "Diaper Change", detail: "Wet", time: "10:15 AM", user: "Dad", type: "diaper", date: "2024-01-15" },
-  { id: "3", title: "Afternoon Nap", detail: "2 hours", time: "01:00 PM", user: "Nanny", type: "sleep", date: "2024-01-15" },
-  { id: "4", title: "Evening Feed", detail: "180ml Formula", time: "06:45 PM", user: "Mom", type: "feed", date: "2024-01-14" },
+  {
+    id: "1",
+    title: "Morning Feed",
+    detail: "150ml Formula",
+    time: "08:30 AM",
+    user: "Mum",
+    type: "feed",
+    date: "2024-01-15",
+  },
+  {
+    id: "2",
+    title: "Diaper Change",
+    detail: "Wet",
+    time: "10:15 AM",
+    user: "Dad",
+    type: "diaper",
+    date: "2024-01-15",
+  },
+  {
+    id: "3",
+    title: "Afternoon Nap",
+    detail: "2 hours",
+    time: "01:00 PM",
+    user: "Other",
+    type: "sleep",
+    date: "2024-01-15",
+  },
+  {
+    id: "4",
+    title: "Evening Feed",
+    detail: "180ml Formula",
+    time: "06:45 PM",
+    user: "Mum",
+    type: "feed",
+    date: "2024-01-14",
+  },
 ];
 
 export function Dashboard() {
@@ -133,7 +165,9 @@ export function Dashboard() {
                 setShowDateDropdown(!showDateDropdown);
                 setShowTypeDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                dateFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconCalendar className="w-5 h-5 text-gray-400" />
               {dateFilter || "Show by date"}
@@ -170,10 +204,14 @@ export function Dashboard() {
                 setShowTypeDropdown(!showTypeDropdown);
                 setShowDateDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                typeFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) : "Type"}
+              {typeFilter
+                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                : "Type"}
             </button>
             {showTypeDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
@@ -205,7 +243,9 @@ export function Dashboard() {
 
         {/* Create Button + Table Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Recent Activities
+          </h3>
           <div className="flex items-center gap-2">
             {selectedIds.size > 0 && (
               <button

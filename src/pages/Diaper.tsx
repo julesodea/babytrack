@@ -19,14 +19,78 @@ interface DiaperItem {
 }
 
 const diaperData: DiaperItem[] = [
-  { id: "d1", title: "Morning Change", detail: "Wet", time: "06:00 AM", user: "Mom", type: "wet", date: "2024-01-15" },
-  { id: "d2", title: "After Breakfast", detail: "Dirty", time: "08:30 AM", user: "Mom", type: "dirty", date: "2024-01-15" },
-  { id: "d3", title: "Mid-Morning", detail: "Wet", time: "10:15 AM", user: "Dad", type: "wet", date: "2024-01-15" },
-  { id: "d4", title: "Before Nap", detail: "Wet", time: "12:00 PM", user: "Nanny", type: "wet", date: "2024-01-15" },
-  { id: "d5", title: "After Nap", detail: "Dirty", time: "01:45 PM", user: "Nanny", type: "dirty", date: "2024-01-14" },
-  { id: "d6", title: "Afternoon", detail: "Wet", time: "03:30 PM", user: "Mom", type: "wet", date: "2024-01-14" },
-  { id: "d7", title: "Before Dinner", detail: "Dirty", time: "05:45 PM", user: "Dad", type: "dirty", date: "2024-01-14" },
-  { id: "d8", title: "Before Bed", detail: "Wet", time: "08:00 PM", user: "Mom", type: "wet", date: "2024-01-14" },
+  {
+    id: "d1",
+    title: "Morning Change",
+    detail: "Wet",
+    time: "06:00 AM",
+    user: "Mum",
+    type: "wet",
+    date: "2024-01-15",
+  },
+  {
+    id: "d2",
+    title: "After Breakfast",
+    detail: "Dirty",
+    time: "08:30 AM",
+    user: "Mum",
+    type: "dirty",
+    date: "2024-01-15",
+  },
+  {
+    id: "d3",
+    title: "Mid-Morning",
+    detail: "Wet",
+    time: "10:15 AM",
+    user: "Dad",
+    type: "wet",
+    date: "2024-01-15",
+  },
+  {
+    id: "d4",
+    title: "Before Nap",
+    detail: "Wet",
+    time: "12:00 PM",
+    user: "Other",
+    type: "wet",
+    date: "2024-01-15",
+  },
+  {
+    id: "d5",
+    title: "After Nap",
+    detail: "Dirty",
+    time: "01:45 PM",
+    user: "Other",
+    type: "dirty",
+    date: "2024-01-14",
+  },
+  {
+    id: "d6",
+    title: "Afternoon",
+    detail: "Wet",
+    time: "03:30 PM",
+    user: "Mum",
+    type: "wet",
+    date: "2024-01-14",
+  },
+  {
+    id: "d7",
+    title: "Before Dinner",
+    detail: "Dirty",
+    time: "05:45 PM",
+    user: "Dad",
+    type: "dirty",
+    date: "2024-01-14",
+  },
+  {
+    id: "d8",
+    title: "Before Bed",
+    detail: "Wet",
+    time: "08:00 PM",
+    user: "Mum",
+    type: "wet",
+    date: "2024-01-14",
+  },
 ];
 
 export function Diaper() {
@@ -104,9 +168,7 @@ export function Diaper() {
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
             <IconCalendar className="w-7 h-7 text-gray-700" />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">
-            Last Change
-          </p>
+          <p className="text-gray-500 text-sm font-medium mb-2">Last Change</p>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-gray-900 tracking-tight">
               1:45
@@ -135,7 +197,9 @@ export function Diaper() {
                 setShowDateDropdown(!showDateDropdown);
                 setShowTypeDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                dateFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconCalendar className="w-5 h-5 text-gray-400" />
               {dateFilter || "Show by date"}
@@ -172,10 +236,14 @@ export function Diaper() {
                 setShowTypeDropdown(!showTypeDropdown);
                 setShowDateDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                typeFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) : "Type"}
+              {typeFilter
+                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                : "Type"}
             </button>
             {showTypeDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
@@ -207,7 +275,9 @@ export function Diaper() {
 
         {/* Create Button + Table Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Change History</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Change History
+          </h3>
           <div className="flex items-center gap-2">
             {selectedIds.size > 0 && (
               <button

@@ -19,12 +19,60 @@ interface SleepItem {
 }
 
 const sleepData: SleepItem[] = [
-  { id: "s1", title: "Overnight Sleep", detail: "10 hrs", time: "07:00 PM - 05:00 AM", user: "Mom", type: "overnight", date: "2024-01-15" },
-  { id: "s2", title: "Morning Nap", detail: "1.5 hrs", time: "09:00 AM - 10:30 AM", user: "Dad", type: "nap", date: "2024-01-15" },
-  { id: "s3", title: "Afternoon Nap", detail: "2 hrs", time: "01:00 PM - 03:00 PM", user: "Nanny", type: "nap", date: "2024-01-15" },
-  { id: "s4", title: "Evening Nap", detail: "45 min", time: "05:30 PM - 06:15 PM", user: "Mom", type: "nap", date: "2024-01-14" },
-  { id: "s5", title: "Overnight Sleep", detail: "9.5 hrs", time: "07:30 PM - 05:00 AM", user: "Dad", type: "overnight", date: "2024-01-14" },
-  { id: "s6", title: "Morning Nap", detail: "1 hr", time: "08:30 AM - 09:30 AM", user: "Mom", type: "nap", date: "2024-01-14" },
+  {
+    id: "s1",
+    title: "Overnight Sleep",
+    detail: "10 hrs",
+    time: "07:00 PM - 05:00 AM",
+    user: "Mum",
+    type: "overnight",
+    date: "2024-01-15",
+  },
+  {
+    id: "s2",
+    title: "Morning Nap",
+    detail: "1.5 hrs",
+    time: "09:00 AM - 10:30 AM",
+    user: "Dad",
+    type: "nap",
+    date: "2024-01-15",
+  },
+  {
+    id: "s3",
+    title: "Afternoon Nap",
+    detail: "2 hrs",
+    time: "01:00 PM - 03:00 PM",
+    user: "Other",
+    type: "nap",
+    date: "2024-01-15",
+  },
+  {
+    id: "s4",
+    title: "Evening Nap",
+    detail: "45 min",
+    time: "05:30 PM - 06:15 PM",
+    user: "Mum",
+    type: "nap",
+    date: "2024-01-14",
+  },
+  {
+    id: "s5",
+    title: "Overnight Sleep",
+    detail: "9.5 hrs",
+    time: "07:30 PM - 05:00 AM",
+    user: "Dad",
+    type: "overnight",
+    date: "2024-01-14",
+  },
+  {
+    id: "s6",
+    title: "Morning Nap",
+    detail: "1 hr",
+    time: "08:30 AM - 09:30 AM",
+    user: "Mum",
+    type: "nap",
+    date: "2024-01-14",
+  },
 ];
 
 export function Sleep() {
@@ -102,9 +150,7 @@ export function Sleep() {
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
             <IconCalendar className="w-7 h-7 text-gray-700" />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">
-            Last Sleep
-          </p>
+          <p className="text-gray-500 text-sm font-medium mb-2">Last Sleep</p>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-gray-900 tracking-tight">
               2:30
@@ -133,7 +179,9 @@ export function Sleep() {
                 setShowDateDropdown(!showDateDropdown);
                 setShowTypeDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                dateFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconCalendar className="w-5 h-5 text-gray-400" />
               {dateFilter || "Show by date"}
@@ -170,10 +218,14 @@ export function Sleep() {
                 setShowTypeDropdown(!showTypeDropdown);
                 setShowDateDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                typeFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) : "Type"}
+              {typeFilter
+                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                : "Type"}
             </button>
             {showTypeDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">

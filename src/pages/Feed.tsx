@@ -19,12 +19,60 @@ interface FeedItem {
 }
 
 const feedData: FeedItem[] = [
-  { id: "f1", title: "Morning Feed", detail: "150ml Formula - Bottle", time: "06:30 AM", user: "Mom", type: "bottle", date: "2024-01-15" },
-  { id: "f2", title: "Mid-Morning Feed", detail: "120ml Breast Milk", time: "09:15 AM", user: "Mom", type: "breast", date: "2024-01-15" },
-  { id: "f3", title: "Lunch Feed", detail: "180ml Formula - Bottle", time: "12:00 PM", user: "Dad", type: "bottle", date: "2024-01-15" },
-  { id: "f4", title: "Afternoon Feed", detail: "150ml Formula - Bottle", time: "02:30 PM", user: "Nanny", type: "bottle", date: "2024-01-14" },
-  { id: "f5", title: "Evening Feed", detail: "180ml Formula - Bottle", time: "06:00 PM", user: "Mom", type: "bottle", date: "2024-01-14" },
-  { id: "f6", title: "Night Feed", detail: "120ml Breast Milk", time: "09:30 PM", user: "Mom", type: "breast", date: "2024-01-14" },
+  {
+    id: "f1",
+    title: "Morning Feed",
+    detail: "150ml Formula - Bottle",
+    time: "06:30 AM",
+    user: "Mum",
+    type: "bottle",
+    date: "2024-01-15",
+  },
+  {
+    id: "f2",
+    title: "Mid-Morning Feed",
+    detail: "120ml Breast Milk",
+    time: "09:15 AM",
+    user: "Mum",
+    type: "breast",
+    date: "2024-01-15",
+  },
+  {
+    id: "f3",
+    title: "Lunch Feed",
+    detail: "180ml Formula - Bottle",
+    time: "12:00 PM",
+    user: "Dad",
+    type: "bottle",
+    date: "2024-01-15",
+  },
+  {
+    id: "f4",
+    title: "Afternoon Feed",
+    detail: "150ml Formula - Bottle",
+    time: "02:30 PM",
+    user: "Other",
+    type: "bottle",
+    date: "2024-01-14",
+  },
+  {
+    id: "f5",
+    title: "Evening Feed",
+    detail: "180ml Formula - Bottle",
+    time: "06:00 PM",
+    user: "Mum",
+    type: "bottle",
+    date: "2024-01-14",
+  },
+  {
+    id: "f6",
+    title: "Night Feed",
+    detail: "120ml Breast Milk",
+    time: "09:30 PM",
+    user: "Mum",
+    type: "breast",
+    date: "2024-01-14",
+  },
 ];
 
 export function Feed() {
@@ -102,9 +150,7 @@ export function Feed() {
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
             <IconCalendar className="w-7 h-7 text-gray-700" />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">
-            Last Feed
-          </p>
+          <p className="text-gray-500 text-sm font-medium mb-2">Last Feed</p>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-gray-900 tracking-tight">
               2:30
@@ -133,7 +179,9 @@ export function Feed() {
                 setShowDateDropdown(!showDateDropdown);
                 setShowTypeDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                dateFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconCalendar className="w-5 h-5 text-gray-400" />
               {dateFilter || "Show by date"}
@@ -170,10 +218,14 @@ export function Feed() {
                 setShowTypeDropdown(!showTypeDropdown);
                 setShowDateDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"}`}
+              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                typeFilter ? "border-gray-900" : "border-gray-200"
+              }`}
             >
               <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) : "Type"}
+              {typeFilter
+                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                : "Type"}
             </button>
             {showTypeDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">

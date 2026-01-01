@@ -25,7 +25,9 @@ export function ActivityNew() {
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <IconDashboard className="w-5 h-5 text-gray-500" />
         <span>/</span>
-        <Link to="/" className="hover:text-gray-600">Dashboard</Link>
+        <Link to="/" className="hover:text-gray-600">
+          Dashboard
+        </Link>
         <span>/</span>
         <span className="text-gray-900">New Activity</span>
       </div>
@@ -45,7 +47,10 @@ export function ActivityNew() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Title
               </label>
               <input
@@ -53,19 +58,26 @@ export function ActivityNew() {
                 type="text"
                 required
                 value={activity.title}
-                onChange={(e) => setActivity({ ...activity, title: e.target.value })}
+                onChange={(e) =>
+                  setActivity({ ...activity, title: e.target.value })
+                }
                 placeholder="e.g., Morning Feed"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Type
               </label>
               <select
                 id="type"
                 value={activity.type}
-                onChange={(e) => setActivity({ ...activity, type: e.target.value })}
+                onChange={(e) =>
+                  setActivity({ ...activity, type: e.target.value })
+                }
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="feed">Feed</option>
@@ -74,7 +86,10 @@ export function ActivityNew() {
               </select>
             </div>
             <div>
-              <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Time
               </label>
               <input
@@ -82,13 +97,18 @@ export function ActivityNew() {
                 type="text"
                 required
                 value={activity.time}
-                onChange={(e) => setActivity({ ...activity, time: e.target.value })}
+                onChange={(e) =>
+                  setActivity({ ...activity, time: e.target.value })
+                }
                 placeholder="e.g., 08:30 AM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div>
-              <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="user"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Caregiver
               </label>
               <input
@@ -96,19 +116,26 @@ export function ActivityNew() {
                 type="text"
                 required
                 value={activity.user}
-                onChange={(e) => setActivity({ ...activity, user: e.target.value })}
-                placeholder="e.g., Mom"
+                onChange={(e) =>
+                  setActivity({ ...activity, user: e.target.value })
+                }
+                placeholder="e.g., Mum"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="detail" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="detail"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Details
               </label>
               <textarea
                 id="detail"
                 value={activity.detail}
-                onChange={(e) => setActivity({ ...activity, detail: e.target.value })}
+                onChange={(e) =>
+                  setActivity({ ...activity, detail: e.target.value })
+                }
                 rows={3}
                 placeholder="e.g., 150ml Formula"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
