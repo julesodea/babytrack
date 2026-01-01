@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router";
 import { NavItem } from "./NavItem";
+import { useColorScheme } from "../context/ColorSchemeContext";
 import {
   IconBottle,
   IconChevronDown,
@@ -15,6 +16,7 @@ import {
 } from "./icons";
 
 export function Layout() {
+  const { colorScheme } = useColorScheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -22,7 +24,9 @@ export function Layout() {
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center text-white">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white ${
+              colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg
+            }`}>
             <IconBottle className="w-4 h-4" />
           </div>
           <h1 className="text-sm font-bold text-gray-900">Baby Tracker</h1>
@@ -57,7 +61,9 @@ export function Layout() {
         <div className="p-4 lg:mt-0">
           <div className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200 group">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-white shadow-sm">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm ${
+                  colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg
+                }`}>
                 <IconBottle className="w-5 h-5" />
               </div>
               <div>

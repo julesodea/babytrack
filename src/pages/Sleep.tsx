@@ -7,6 +7,7 @@ import {
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
+import { useColorScheme } from "../context/ColorSchemeContext";
 
 interface SleepItem {
   id: string;
@@ -76,6 +77,7 @@ const sleepData: SleepItem[] = [
 ];
 
 export function Sleep() {
+  const { colorScheme } = useColorScheme();
   const [data, setData] = useState<SleepItem[]>(sleepData);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -129,35 +131,109 @@ export function Sleep() {
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1 */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-shadow duration-300">
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
-            <IconMoon className="w-7 h-7 text-gray-700" />
+        <div
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+          }`}
+        >
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+              colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+            }`}
+          >
+            <IconMoon
+              className={`w-7 h-7 ${
+                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+              }`}
+            />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">
+          <p
+            className={`text-sm font-medium mb-2 ${
+              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+            }`}
+          >
             Total Sleep Today
           </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-gray-900 tracking-tight">
+            <span
+              className={`text-4xl font-bold tracking-tight ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
               14.5
             </span>
-            <span className="text-xl text-gray-400 font-medium">hours</span>
+            <span
+              className={`text-xl font-medium ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              }`}
+            >
+              hours
+            </span>
           </div>
-          <p className="text-gray-400 text-sm mt-2">3 naps + overnight</p>
+          <p
+            className={`text-sm mt-2 ${
+              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+            }`}
+          >
+            3 naps + overnight
+          </p>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-shadow duration-300">
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
-            <IconCalendar className="w-7 h-7 text-gray-700" />
+        <div
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+          }`}
+        >
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+              colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+            }`}
+          >
+            <IconCalendar
+              className={`w-7 h-7 ${
+                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+              }`}
+            />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">Last Sleep</p>
+          <p
+            className={`text-sm font-medium mb-2 ${
+              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+            }`}
+          >
+            Last Sleep
+          </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-gray-900 tracking-tight">
+            <span
+              className={`text-4xl font-bold tracking-tight ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
               2:30
             </span>
-            <span className="text-xl text-gray-400 font-medium">PM</span>
+            <span
+              className={`text-xl font-medium ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              }`}
+            >
+              PM
+            </span>
           </div>
-          <p className="text-gray-400 text-sm mt-2">Afternoon nap - 1.5 hrs</p>
+          <p
+            className={`text-sm mt-2 ${
+              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+            }`}
+          >
+            Afternoon nap - 1.5 hrs
+          </p>
         </div>
       </div>
 
@@ -269,7 +345,11 @@ export function Sleep() {
             )}
             <Link
               to="/sleep/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+                colorScheme.id === "default"
+                  ? "bg-gray-900 hover:bg-gray-800"
+                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+              }`}
             >
               <span className="text-lg leading-none">+</span>
               Add Sleep

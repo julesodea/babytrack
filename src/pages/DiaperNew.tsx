@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconDiaper } from "../components/icons";
+import { useColorScheme } from "../context/ColorSchemeContext";
 
 export function DiaperNew() {
+  const { colorScheme } = useColorScheme();
   const navigate = useNavigate();
   const [diaper, setDiaper] = useState({
     title: "",
@@ -140,7 +142,11 @@ export function DiaperNew() {
           <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
             <button
               type="submit"
-              className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+                colorScheme.id === "default"
+                  ? "bg-gray-900 hover:bg-gray-800"
+                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+              }`}
             >
               Log Change
             </button>

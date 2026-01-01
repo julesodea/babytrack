@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { IconUser } from "../components/icons";
+import { useColorScheme } from "../context/ColorSchemeContext";
 
 export function Account() {
+  const { colorScheme } = useColorScheme();
   const [profile, setProfile] = useState({
     name: "Sarah Johnson",
     email: "sarah.johnson@email.com",
@@ -120,7 +122,11 @@ export function Account() {
         <div className="flex justify-end pt-6 mt-6 border-t border-gray-100">
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+            className={`px-6 py-2.5 text-white rounded-lg text-sm font-medium transition-colors ${
+              colorScheme.id === "default"
+                ? "bg-gray-900 hover:bg-gray-800"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            }`}
           >
             Save Changes
           </button>

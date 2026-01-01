@@ -7,6 +7,7 @@ import {
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
+import { useColorScheme } from "../context/ColorSchemeContext";
 
 interface FeedItem {
   id: string;
@@ -76,6 +77,7 @@ const feedData: FeedItem[] = [
 ];
 
 export function Feed() {
+  const { colorScheme } = useColorScheme();
   const [data, setData] = useState<FeedItem[]>(feedData);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -129,35 +131,109 @@ export function Feed() {
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1 */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-shadow duration-300">
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
-            <IconBottle className="w-7 h-7 text-gray-700" />
+        <div
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+          }`}
+        >
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+              colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+            }`}
+          >
+            <IconBottle
+              className={`w-7 h-7 ${
+                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+              }`}
+            />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">
+          <p
+            className={`text-sm font-medium mb-2 ${
+              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+            }`}
+          >
             Total Feeds Today
           </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-gray-900 tracking-tight">
+            <span
+              className={`text-4xl font-bold tracking-tight ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
               6
             </span>
-            <span className="text-xl text-gray-400 font-medium">feeds</span>
+            <span
+              className={`text-xl font-medium ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              }`}
+            >
+              feeds
+            </span>
           </div>
-          <p className="text-gray-400 text-sm mt-2">850ml total volume</p>
+          <p
+            className={`text-sm mt-2 ${
+              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+            }`}
+          >
+            850ml total volume
+          </p>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-shadow duration-300">
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
-            <IconCalendar className="w-7 h-7 text-gray-700" />
+        <div
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+          }`}
+        >
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+              colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+            }`}
+          >
+            <IconCalendar
+              className={`w-7 h-7 ${
+                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+              }`}
+            />
           </div>
-          <p className="text-gray-500 text-sm font-medium mb-2">Last Feed</p>
+          <p
+            className={`text-sm font-medium mb-2 ${
+              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+            }`}
+          >
+            Last Feed
+          </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-gray-900 tracking-tight">
+            <span
+              className={`text-4xl font-bold tracking-tight ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
               2:30
             </span>
-            <span className="text-xl text-gray-400 font-medium">PM</span>
+            <span
+              className={`text-xl font-medium ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              }`}
+            >
+              PM
+            </span>
           </div>
-          <p className="text-gray-400 text-sm mt-2">180ml Formula</p>
+          <p
+            className={`text-sm mt-2 ${
+              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+            }`}
+          >
+            180ml Formula
+          </p>
         </div>
       </div>
 
@@ -269,7 +345,11 @@ export function Feed() {
             )}
             <Link
               to="/feed/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+                colorScheme.id === "default"
+                  ? "bg-gray-900 hover:bg-gray-800"
+                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+              }`}
             >
               <span className="text-lg leading-none">+</span>
               Add Feed

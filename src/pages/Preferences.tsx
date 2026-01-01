@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { IconFilter } from "../components/icons";
+import { useColorScheme, colorSchemes } from "../context/ColorSchemeContext";
 
 export function Preferences() {
+  const { colorScheme, setColorScheme } = useColorScheme();
   const [settings, setSettings] = useState({
     feedReminders: true,
     diaperAlerts: true,
@@ -60,7 +62,11 @@ export function Preferences() {
                   })
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.feedReminders ? "bg-gray-900" : "bg-gray-200"
+                  settings.feedReminders
+                    ? colorScheme.id === "default"
+                      ? "bg-gray-900"
+                      : colorScheme.cardBg
+                    : "bg-gray-200"
                 }`}
               >
                 <span
@@ -87,7 +93,11 @@ export function Preferences() {
                   })
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.diaperAlerts ? "bg-gray-900" : "bg-gray-200"
+                  settings.diaperAlerts
+                    ? colorScheme.id === "default"
+                      ? "bg-gray-900"
+                      : colorScheme.cardBg
+                    : "bg-gray-200"
                 }`}
               >
                 <span
@@ -114,7 +124,11 @@ export function Preferences() {
                   })
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.sleepTracking ? "bg-gray-900" : "bg-gray-200"
+                  settings.sleepTracking
+                    ? colorScheme.id === "default"
+                      ? "bg-gray-900"
+                      : colorScheme.cardBg
+                    : "bg-gray-200"
                 }`}
               >
                 <span
@@ -173,6 +187,38 @@ export function Preferences() {
           </div>
         </div>
 
+        {/* Card Color Scheme */}
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Dashboard Card Color
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            Choose a color scheme for your dashboard cards
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {colorSchemes.map((scheme) => (
+              <button
+                key={scheme.id}
+                onClick={() => setColorScheme(scheme)}
+                className={`relative p-4 rounded-xl border-2 transition-all ${
+                  colorScheme.id === scheme.id
+                    ? "border-gray-900 ring-1+ ring-gray-900"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div
+                  className={`w-full h-12 rounded-lg mb-2 ${scheme.cardBg} ${
+                    scheme.id === "default" ? "border border-gray-200" : ""
+                  }`}
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {scheme.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Data */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
@@ -222,7 +268,11 @@ export function Preferences() {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+            className={`px-6 py-2.5 text-white rounded-lg text-sm font-medium transition-colors ${
+              colorScheme.id === "default"
+                ? "bg-gray-900 hover:bg-gray-800"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            }`}
           >
             Save Preferences
           </button>
