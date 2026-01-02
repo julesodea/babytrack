@@ -6,8 +6,8 @@ import { useColorScheme } from "../context/ColorSchemeContext";
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 };
 
@@ -25,7 +25,6 @@ export function ActivityNew() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would save to a database/API
-    ("Creating activity:", activity);
     navigate("/");
   };
 

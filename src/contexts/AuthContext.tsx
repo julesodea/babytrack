@@ -23,8 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const initialSessionHandled = useRef(false);
 
   const fetchProfile = async (userId: string) => {
-    "🔍 fetchProfile called with userId:", userId;
-
     // Set timeout to ensure loading doesn't hang forever
     const timeoutId = setTimeout(() => {
       console.warn(
@@ -48,13 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = result;
 
       clearTimeout(timeoutId);
-      "🔍 Profile query returned:", { data, error, fullResult: result };
 
       if (error) {
         console.error("❌ Error fetching profile:", error);
         setProfile(null);
       } else {
-        "✅ Profile fetched successfully:", data;
         setProfile(data);
       }
     } catch (err) {
@@ -71,11 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      "🔶 onAuthStateChange fired:",
-        _event,
-        session?.user?.id,
-        "handled:",
-        initialSessionHandled.current;
+      session?.user?.id, "handled:", initialSessionHandled.current;
 
       if (!initialSessionHandled.current) {
         initialSessionHandled.current = true;
@@ -83,7 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          "📞 Calling fetchProfile for user:", session.user.id;
           // Don't await - let it run in background
           fetchProfile(session.user.id)
             .then(() => {
