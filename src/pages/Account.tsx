@@ -11,8 +11,7 @@ export function Account() {
   });
 
   const handleSave = () => {
-    // In a real app, this would save to a database/API
-    "Saving profile:", profile;
+    // TODO: Save to a database/API
   };
 
   // Generate initials from name
