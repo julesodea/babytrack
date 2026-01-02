@@ -61,6 +61,7 @@ export interface Database {
           time: string;
           caregiver: string;
           type: 'bottle' | 'breast' | 'solid' | null;
+          notes: string | null;
           date: string;
           created_at: string;
           updated_at: string;
@@ -75,6 +76,7 @@ export interface Database {
           time: string;
           caregiver: string;
           type?: 'bottle' | 'breast' | 'solid' | null;
+          notes?: string | null;
           date: string;
         };
         Update: {
@@ -84,6 +86,7 @@ export interface Database {
           time?: string;
           caregiver?: string;
           type?: 'bottle' | 'breast' | 'solid' | null;
+          notes?: string | null;
           date?: string;
           updated_at?: string;
         };
@@ -138,6 +141,7 @@ export interface Database {
           end_time: string | null;
           caregiver: string;
           type: 'nap' | 'overnight' | null;
+          notes: string | null;
           date: string;
           created_at: string;
           updated_at: string;
@@ -153,6 +157,7 @@ export interface Database {
           end_time?: string | null;
           caregiver: string;
           type?: 'nap' | 'overnight' | null;
+          notes?: string | null;
           date: string;
         };
         Update: {
@@ -163,6 +168,7 @@ export interface Database {
           end_time?: string | null;
           caregiver?: string;
           type?: 'nap' | 'overnight' | null;
+          notes?: string | null;
           date?: string;
           updated_at?: string;
         };

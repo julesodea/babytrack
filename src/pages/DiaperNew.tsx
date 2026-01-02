@@ -18,7 +18,6 @@ export function DiaperNew() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [diaper, setDiaper] = useState({
-    title: "",
     type: "wet" as "wet" | "dirty" | "both",
     time: getCurrentTime(),
     user: "",
@@ -35,10 +34,11 @@ export function DiaperNew() {
     setError("");
 
     try {
+      const diaperDetail = diaper.type.charAt(0).toUpperCase() + diaper.type.slice(1);
       await createDiaper({
         user_id: user.id,
-        title: diaper.title,
-        detail: diaper.type.charAt(0).toUpperCase() + diaper.type.slice(1),
+        title: `${diaperDetail} Diaper`,
+        detail: diaperDetail,
         time: diaper.time,
         caregiver: diaper.user,
         type: diaper.type,
@@ -83,25 +83,6 @@ export function DiaperNew() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                required
-                value={diaper.title}
-                onChange={(e) =>
-                  setDiaper({ ...diaper, title: e.target.value })
-                }
-                placeholder="e.g., Morning Change"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label
                 htmlFor="type"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -141,15 +122,18 @@ export function DiaperNew() {
               >
                 Caregiver
               </label>
-              <input
+              <select
                 id="user"
-                type="text"
                 required
                 value={diaper.user}
                 onChange={(e) => setDiaper({ ...diaper, user: e.target.value })}
-                placeholder="e.g., Mum"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+              >
+                <option value="">Select caregiver</option>
+                <option value="Mum">Mum</option>
+                <option value="Dad">Dad</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
             <div className="sm:col-span-2">
               <label

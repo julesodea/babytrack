@@ -17,6 +17,7 @@ export function Feed() {
   const { user } = useAuth();
   const [data, setData] = useState<Feed[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
@@ -48,7 +49,12 @@ export function Feed() {
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
-    return matchesDate && matchesType;
+    const matchesSearch = !searchQuery ||
+      item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.amount?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDate && matchesType && matchesSearch;
   });
 
   const handleSelect = (id: string, selected: boolean) => {
@@ -76,10 +82,13 @@ export function Feed() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split('T')[0];
-  const todayFeeds = data.filter(f => f.date === today);
+  const today = new Date().toISOString().split("T")[0];
+  const todayFeeds = data.filter((f) => f.date === today);
   const totalFeeds = todayFeeds.length;
-  const totalVolume = todayFeeds.reduce((sum, f) => sum + (parseInt(f.amount || '0') || 0), 0);
+  const totalVolume = todayFeeds.reduce(
+    (sum, f) => sum + (parseInt(f.amount || "0") || 0),
+    0
+  );
   const lastFeed = data.length > 0 ? data[0] : null;
 
   if (loading) {
@@ -151,7 +160,7 @@ export function Feed() {
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              feeds
+              Feeds
             </span>
           </div>
           <p
@@ -159,7 +168,7 @@ export function Feed() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {totalVolume}ml total volume
+            {totalVolume}ml Total Volume
           </p>
         </div>
 
@@ -196,22 +205,28 @@ export function Feed() {
               <div className="flex items-baseline gap-2">
                 <span
                   className={`text-4xl font-bold tracking-tight ${
-                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                    colorScheme.id === "default"
+                      ? "text-gray-900"
+                      : "text-white"
                   }`}
                 >
-                  {lastFeed.time.split(' ')[0]}
+                  {lastFeed.time.split(" ")[0]}
                 </span>
                 <span
                   className={`text-xl font-medium ${
-                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                    colorScheme.id === "default"
+                      ? "text-gray-400"
+                      : "text-white/70"
                   }`}
                 >
-                  {lastFeed.time.split(' ')[1] || ''}
+                  {lastFeed.time.split(" ")[1] || ""}
                 </span>
               </div>
               <p
                 className={`text-sm mt-2 ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/60"
                 }`}
               >
                 {lastFeed.detail}
@@ -238,6 +253,8 @@ export function Feed() {
             <input
               type="text"
               placeholder="Search feed logs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
@@ -365,8 +382,8 @@ export function Feed() {
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  title={item.title}
-                  detail={item.detail || ''}
+                  type={item.type || "feed"}
+                  detail={item.detail || ""}
                   time={item.time}
                   user={item.caregiver}
                   selected={selectedIds.has(item.id)}
@@ -376,7 +393,9 @@ export function Feed() {
             ) : (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg font-medium mb-2">No feeds logged yet</p>
-                <p className="text-sm">Click "Add Feed" to log your first feeding session</p>
+                <p className="text-sm">
+                  Click "Add Feed" to log your first feeding session
+                </p>
               </div>
             )}
           </div>

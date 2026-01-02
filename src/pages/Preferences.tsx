@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IconFilter } from "../components/icons";
 import { useColorScheme, colorSchemes } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { getProfile, updateProfile } from "../lib/api/profiles";
 
 export function Preferences() {
   const { colorScheme, setColorScheme } = useColorScheme();
+  const { user } = useAuth();
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const [settings, setSettings] = useState({
     feedReminders: true,
     diaperAlerts: true,
@@ -14,9 +21,42 @@ export function Preferences() {
     measurementUnit: "ml",
   });
 
-  const handleSave = () => {
-    // In a real app, this would save to a database/API
-    "Saving preferences:", settings;
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      const profile = await getProfile(user.id);
+      if (profile && profile.full_name) {
+        setFullName(profile.full_name);
+      }
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      await updateProfile(user.id, { full_name: fullName });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to save preferences:", err);
+      setError("Failed to save preferences. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,8 +77,63 @@ export function Preferences() {
         </p>
       </div>
 
+      {/* Success/Error Messages */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          Preferences saved successfully!
+        </div>
+      )}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Settings Cards */}
       <div className="space-y-6">
+        {/* Account Information */}
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Account Information
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={user?.email || ''}
+                readOnly
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Email cannot be changed
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Notifications */}
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
@@ -268,13 +363,16 @@ export function Preferences() {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
+            disabled={loading}
             className={`px-6 py-2.5 text-white rounded-lg text-sm font-medium transition-colors ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            } ${
               colorScheme.id === "default"
                 ? "bg-gray-900 hover:bg-gray-800"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
             }`}
           >
-            Save Preferences
+            {loading ? 'Saving...' : 'Save Preferences'}
           </button>
         </div>
       </div>

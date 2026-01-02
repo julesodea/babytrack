@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 interface ActivityRowProps {
   id: string;
-  title: string;
+  type: string;
   detail: string;
   time: string;
   user: string;
@@ -12,7 +12,7 @@ interface ActivityRowProps {
 
 export function ActivityRow({
   id,
-  title,
+  type,
   detail,
   time,
   user,
@@ -48,11 +48,15 @@ export function ActivityRow({
       {/* Mobile Layout */}
       <div className="sm:hidden p-4 space-y-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <Checkbox />
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
-              <p className="text-xs text-gray-500 mt-0.5">{detail}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
+                  {type}
+                </span>
+              </div>
+              <p className="text-sm text-gray-900">{detail}</p>
             </div>
           </div>
         </div>
@@ -73,9 +77,13 @@ export function ActivityRow({
       <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-4 items-center">
         <div className="col-span-6 flex items-center gap-4">
           <Checkbox />
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
-            <p className="text-xs text-gray-500 mt-0.5">{detail}</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
+                {type}
+              </span>
+            </div>
+            <p className="text-sm text-gray-900">{detail}</p>
           </div>
         </div>
         <div className="col-span-3 text-sm text-gray-600 font-mono bg-gray-50 w-fit px-2 py-1 rounded-md border border-gray-100">

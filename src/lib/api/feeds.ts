@@ -1,7 +1,7 @@
 import { supabase } from '../supabase';
-import type { FeedInsert, FeedUpdate } from '../../types/database';
+import type { Feed, FeedInsert, FeedUpdate } from '../../types/database';
 
-export async function getFeeds(userId: string) {
+export async function getFeeds(userId: string): Promise<Feed[]> {
   const { data, error } = await supabase
     .from('feeds')
     .select('*')
@@ -10,7 +10,7 @@ export async function getFeeds(userId: string) {
     .order('time', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function getFeed(id: string) {

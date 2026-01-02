@@ -69,8 +69,8 @@ export function ActivityDetail() {
   const getActivityType = (): 'feed' | 'diaper' | 'sleep' | null => {
     if (!activity) return null;
     if ('amount' in activity) return 'feed';
-    if ('type' in activity && ('wet' in activity || 'dirty' in activity)) return 'diaper';
     if ('start_time' in activity) return 'sleep';
+    if ('time' in activity && !('start_time' in activity)) return 'diaper';
     return null;
   };
 
@@ -177,7 +177,7 @@ export function ActivityDetail() {
               to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : '/sleep'}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors mt-3"
             >
-              ← Back to {activityType === 'feed' ? 'Feed' : activityType === 'diaper' ? 'Diaper' : 'Sleep'} Logs
+              ← Back to {activityType === 'feed' ? 'Feed Logs' : activityType === 'diaper' ? 'Diaper Changes' : 'Sleep Logs'}
             </Link>
           )}
         </div>
@@ -206,23 +206,69 @@ export function ActivityDetail() {
             className="space-y-6"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {'title' in activity && (
+              {'type' in activity && getActivityType() === 'diaper' && (
                 <div>
                   <label
-                    htmlFor="title"
+                    htmlFor="diaperType"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Title
+                    Type
                   </label>
-                  <input
-                    id="title"
-                    type="text"
-                    value={activity.title || ''}
+                  <select
+                    id="diaperType"
+                    value={(activity as Diaper).type || 'wet'}
                     onChange={(e) =>
-                      setActivity({ ...activity, title: e.target.value })
+                      setActivity({ ...(activity as Diaper), type: e.target.value as 'wet' | 'dirty' | 'both' })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                  />
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="wet">Wet</option>
+                    <option value="dirty">Dirty</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+              )}
+              {'type' in activity && getActivityType() === 'feed' && (
+                <div>
+                  <label
+                    htmlFor="feedType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Feed Type
+                  </label>
+                  <select
+                    id="feedType"
+                    value={(activity as Feed).type || 'bottle'}
+                    onChange={(e) =>
+                      setActivity({ ...(activity as Feed), type: e.target.value as 'bottle' | 'breast' | 'solid' })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="bottle">Bottle</option>
+                    <option value="breast">Breast</option>
+                    <option value="solid">Solid Food</option>
+                  </select>
+                </div>
+              )}
+              {'type' in activity && getActivityType() === 'sleep' && (
+                <div>
+                  <label
+                    htmlFor="sleepType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Sleep Type
+                  </label>
+                  <select
+                    id="sleepType"
+                    value={(activity as Sleep).type || 'nap'}
+                    onChange={(e) =>
+                      setActivity({ ...(activity as Sleep), type: e.target.value as 'nap' | 'overnight' })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="nap">Nap</option>
+                    <option value="overnight">Overnight</option>
+                  </select>
                 </div>
               )}
               {'time' in activity && (
@@ -252,15 +298,18 @@ export function ActivityDetail() {
                   >
                     Caregiver
                   </label>
-                  <input
+                  <select
                     id="caregiver"
-                    type="text"
                     value={activity.caregiver}
                     onChange={(e) =>
                       setActivity({ ...activity, caregiver: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                  />
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               )}
               {'detail' in activity && (
@@ -278,6 +327,26 @@ export function ActivityDetail() {
                       setActivity({ ...activity, detail: e.target.value })
                     }
                     rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+                  />
+                </div>
+              )}
+              {'notes' in activity && (
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="notes"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Notes
+                  </label>
+                  <textarea
+                    id="notes"
+                    value={activity.notes || ''}
+                    onChange={(e) =>
+                      setActivity({ ...activity, notes: e.target.value })
+                    }
+                    rows={4}
+                    placeholder="Add any additional notes here..."
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
                   />
                 </div>
@@ -308,11 +377,21 @@ export function ActivityDetail() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Type</p>
+                <p className="text-sm text-gray-500 mb-1">Activity Type</p>
                 <p className="text-lg font-medium text-gray-900 capitalize">
                   {activityType}
                 </p>
               </div>
+              {'type' in activity && activity.type && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">
+                    {activityType === 'diaper' ? 'Diaper Type' : activityType === 'feed' ? 'Feed Type' : 'Sleep Type'}
+                  </p>
+                  <p className="text-lg font-medium text-gray-900 capitalize">
+                    {activity.type}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500 mb-1">Time</p>
                 <p className="text-lg font-medium text-gray-900">
@@ -336,6 +415,14 @@ export function ActivityDetail() {
                       {caregiver}
                     </p>
                   </div>
+                </div>
+              )}
+              {'notes' in activity && activity.notes && (
+                <div className="sm:col-span-2">
+                  <p className="text-sm text-gray-500 mb-1">Notes</p>
+                  <p className="text-base text-gray-900 whitespace-pre-wrap">
+                    {activity.notes}
+                  </p>
                 </div>
               )}
             </div>

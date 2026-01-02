@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import {
   IconBottle,
@@ -10,10 +10,14 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { getProfile } from "../lib/api/profiles";
+import { getFeeds } from "../lib/api/feeds";
+import { getDiapers } from "../lib/api/diapers";
+import { getSleeps } from "../lib/api/sleeps";
 
 interface ActivityItem {
   id: string;
-  title: string;
   detail: string;
   time: string;
   user: string;
@@ -21,53 +25,104 @@ interface ActivityItem {
   date: string;
 }
 
-const activityData: ActivityItem[] = [
-  {
-    id: "1",
-    title: "Morning Feed",
-    detail: "150ml Formula",
-    time: "08:30 AM",
-    user: "Mum",
-    type: "feed",
-    date: "2024-01-15",
-  },
-  {
-    id: "2",
-    title: "Diaper Change",
-    detail: "Wet",
-    time: "10:15 AM",
-    user: "Dad",
-    type: "diaper",
-    date: "2024-01-15",
-  },
-  {
-    id: "3",
-    title: "Afternoon Nap",
-    detail: "2 hours",
-    time: "01:00 PM",
-    user: "Other",
-    type: "sleep",
-    date: "2024-01-15",
-  },
-  {
-    id: "4",
-    title: "Evening Feed",
-    detail: "180ml Formula",
-    time: "06:45 PM",
-    user: "Mum",
-    type: "feed",
-    date: "2024-01-14",
-  },
-];
-
 export function Dashboard() {
   const { colorScheme } = useColorScheme();
-  const [data, setData] = useState<ActivityItem[]>(activityData);
+  const { user } = useAuth();
+  const [fullName, setFullName] = useState("");
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [data, setData] = useState<ActivityItem[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+      loadActivities();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    setLoadingProfile(true);
+    try {
+      const profile = await getProfile(user.id);
+      if (profile && profile.full_name) {
+        setFullName(profile.full_name);
+      }
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  const loadActivities = async () => {
+    if (!user) return;
+
+    setLoadingActivities(true);
+    try {
+      const [feeds, diapers, sleeps] = await Promise.all([
+        getFeeds(user.id),
+        getDiapers(user.id),
+        getSleeps(user.id),
+      ]);
+
+      // Map feeds to ActivityItem format
+      const feedActivities: ActivityItem[] = feeds.map((f) => ({
+        id: f.id,
+        detail: f.detail || "",
+        time: f.time,
+        user: f.caregiver,
+        type: "feed" as const,
+        date: f.date,
+      }));
+
+      // Map diapers to ActivityItem format
+      const diaperActivities: ActivityItem[] = diapers.map((d) => ({
+        id: d.id,
+        detail: d.detail || "",
+        time: d.time,
+        user: d.caregiver,
+        type: "diaper" as const,
+        date: d.date,
+      }));
+
+      // Map sleeps to ActivityItem format
+      const sleepActivities: ActivityItem[] = sleeps.map((s) => ({
+        id: s.id,
+        detail: s.detail || "",
+        time: s.start_time || "",
+        user: s.caregiver,
+        type: "sleep" as const,
+        date: s.date,
+      }));
+
+      // Combine all activities and sort by date and time (most recent first)
+      const allActivities = [
+        ...feedActivities,
+        ...diaperActivities,
+        ...sleepActivities,
+      ];
+      allActivities.sort((a, b) => {
+        // Sort by date first
+        const dateCompare = b.date.localeCompare(a.date);
+        if (dateCompare !== 0) return dateCompare;
+        // Then by time
+        return b.time.localeCompare(a.time);
+      });
+
+      setData(allActivities);
+    } catch (err) {
+      console.error("Failed to load activities:", err);
+    } finally {
+      setLoadingActivities(false);
+    }
+  };
 
   const uniqueDates = [...new Set(data.map((a) => a.date))];
 
@@ -94,6 +149,21 @@ export function Dashboard() {
     setSelectedIds(new Set());
   };
 
+  // Calculate stats from real data
+  const today = new Date().toISOString().split("T")[0];
+  const todayActivities = data.filter((a) => a.date === today);
+  const todayFeeds = todayActivities.filter((a) => a.type === "feed");
+  const todaySleeps = todayActivities.filter((a) => a.type === "sleep");
+
+  // Total feeds count
+  const totalFeedsCount = todayFeeds.length;
+
+  // Total feeds volume (we need to fetch actual feeds data for amounts)
+  const totalFeedsRecorded = data.filter((a) => a.type === "feed").length;
+
+  // Total sleep hours (we need to calculate from sleep durations)
+  const totalSleepLogs = todaySleeps.length;
+
   return (
     <div className="space-y-10">
       {/* Header */}
@@ -104,12 +174,23 @@ export function Dashboard() {
       </div>
 
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-          Overview
-        </h2>
-        <p className="text-gray-500 text-base">
-          Track and manage your baby's daily activities
-        </p>
+        {loadingProfile ? (
+          <>
+            <div className="h-9 w-64 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-6 w-80 bg-gray-200 rounded-lg animate-pulse"></div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+              {fullName
+                ? `Welcome back, ${fullName.split(" ")[0]}`
+                : "Overview"}
+            </h2>
+            <p className="text-gray-500 text-base">
+              Track and manage your baby's daily activities
+            </p>
+          </>
+        )}
       </div>
 
       {/* Cards Section */}
@@ -148,14 +229,14 @@ export function Dashboard() {
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
-              850
+              {totalFeedsCount}
             </span>
             <span
               className={`text-xl font-medium ${
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              ml
+              Feeds
             </span>
           </div>
           <p
@@ -163,7 +244,7 @@ export function Dashboard() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            123 feeds recorded total
+            {totalFeedsRecorded} feeds recorded total
           </p>
         </div>
 
@@ -201,14 +282,14 @@ export function Dashboard() {
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
-              14
+              {totalSleepLogs}
             </span>
             <span
               className={`text-xl font-medium ${
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              hrs
+              Naps
             </span>
           </div>
           <p
@@ -216,7 +297,7 @@ export function Dashboard() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            12 sleep logs total
+            {todaySleeps.length} sleep logs today
           </p>
         </div>
       </div>
@@ -354,12 +435,16 @@ export function Dashboard() {
           </div>
 
           <div className="space-y-2">
-            {filteredData.length > 0 ? (
+            {loadingActivities ? (
+              <div className="text-center py-12 text-gray-500">
+                <div className="animate-pulse">Loading activities...</div>
+              </div>
+            ) : filteredData.length > 0 ? (
               filteredData.map((item) => (
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  title={item.title}
+                  type={item.type}
                   detail={item.detail}
                   time={item.time}
                   user={item.user}
@@ -369,7 +454,9 @@ export function Dashboard() {
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No activities match the selected filters
+                {data.length === 0
+                  ? "No activities logged yet. Click 'Add Activity' to get started."
+                  : "No activities match the selected filters"}
               </div>
             )}
           </div>

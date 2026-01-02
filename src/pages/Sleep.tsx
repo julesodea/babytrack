@@ -17,6 +17,7 @@ export function Sleep() {
   const { user } = useAuth();
   const [data, setData] = useState<SleepType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
@@ -48,7 +49,12 @@ export function Sleep() {
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
-    return matchesDate && matchesType;
+    const matchesSearch = !searchQuery ||
+      item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.duration?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDate && matchesType && matchesSearch;
   });
 
   const handleSelect = (id: string, selected: boolean) => {
@@ -76,10 +82,12 @@ export function Sleep() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split('T')[0];
-  const todaySleeps = data.filter(s => s.date === today);
-  const napCount = todaySleeps.filter(s => s.type === 'nap').length;
-  const overnightCount = todaySleeps.filter(s => s.type === 'overnight').length;
+  const today = new Date().toISOString().split("T")[0];
+  const todaySleeps = data.filter((s) => s.date === today);
+  const napCount = todaySleeps.filter((s) => s.type === "nap").length;
+  const overnightCount = todaySleeps.filter(
+    (s) => s.type === "overnight"
+  ).length;
 
   // Calculate total sleep hours (simplified - just count the entries for now)
   const totalSleeps = napCount + overnightCount;
@@ -154,7 +162,7 @@ export function Sleep() {
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              sessions
+              Sessions
             </span>
           </div>
           <p
@@ -162,7 +170,7 @@ export function Sleep() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {napCount} naps + {overnightCount} overnight
+            {napCount} Naps + {overnightCount} Overnight
           </p>
         </div>
 
@@ -199,22 +207,28 @@ export function Sleep() {
               <div className="flex items-baseline gap-2">
                 <span
                   className={`text-4xl font-bold tracking-tight ${
-                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                    colorScheme.id === "default"
+                      ? "text-gray-900"
+                      : "text-white"
                   }`}
                 >
-                  {lastSleep.start_time?.split(' ')[0] || '-'}
+                  {lastSleep.start_time?.split(" ")[0] || "-"}
                 </span>
                 <span
                   className={`text-xl font-medium ${
-                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                    colorScheme.id === "default"
+                      ? "text-gray-400"
+                      : "text-white/70"
                   }`}
                 >
-                  {lastSleep.start_time?.split(' ')[1] || ''}
+                  {lastSleep.start_time?.split(" ")[1] || ""}
                 </span>
               </div>
               <p
                 className={`text-sm mt-2 ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/60"
                 }`}
               >
                 {lastSleep.type} - {lastSleep.duration}
@@ -241,6 +255,8 @@ export function Sleep() {
             <input
               type="text"
               placeholder="Search sleep logs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
@@ -368,9 +384,13 @@ export function Sleep() {
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  title={item.title}
-                  detail={item.detail || ''}
-                  time={item.start_time && item.end_time ? `${item.start_time} - ${item.end_time}` : item.start_time || '-'}
+                  type="sleep"
+                  detail={item.detail || ""}
+                  time={
+                    item.start_time && item.end_time
+                      ? `${item.start_time} - ${item.end_time}`
+                      : item.start_time || "-"
+                  }
                   user={item.caregiver}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
@@ -379,7 +399,9 @@ export function Sleep() {
             ) : (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg font-medium mb-2">No sleep logs yet</p>
-                <p className="text-sm">Click "Add Sleep" to log your first sleep session</p>
+                <p className="text-sm">
+                  Click "Add Sleep" to log your first sleep session
+                </p>
               </div>
             )}
           </div>

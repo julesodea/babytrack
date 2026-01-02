@@ -17,6 +17,7 @@ export function Diaper() {
   const { user } = useAuth();
   const [data, setData] = useState<DiaperType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
@@ -48,7 +49,11 @@ export function Diaper() {
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
-    return matchesDate && matchesType;
+    const matchesSearch = !searchQuery ||
+      item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDate && matchesType && matchesSearch;
   });
 
   const handleSelect = (id: string, selected: boolean) => {
@@ -76,17 +81,23 @@ export function Diaper() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split('T')[0];
-  const todayChanges = data.filter(d => d.date === today);
+  const today = new Date().toISOString().split("T")[0];
+  const todayChanges = data.filter((d) => d.date === today);
   const totalChanges = todayChanges.length;
-  const wetCount = todayChanges.filter(d => d.type === 'wet' || d.type === 'both').length;
-  const dirtyCount = todayChanges.filter(d => d.type === 'dirty' || d.type === 'both').length;
+  const wetCount = todayChanges.filter(
+    (d) => d.type === "wet" || d.type === "both"
+  ).length;
+  const dirtyCount = todayChanges.filter(
+    (d) => d.type === "dirty" || d.type === "both"
+  ).length;
   const lastChange = data.length > 0 ? data[0] : null;
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse text-gray-500">Loading diaper changes...</div>
+        <div className="animate-pulse text-gray-500">
+          Loading diaper changes...
+        </div>
       </div>
     );
   }
@@ -152,7 +163,7 @@ export function Diaper() {
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              changes
+              Changes
             </span>
           </div>
           <p
@@ -160,7 +171,7 @@ export function Diaper() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {wetCount} wet, {dirtyCount} dirty
+            {wetCount} Wet, {dirtyCount} Dirty
           </p>
         </div>
 
@@ -197,22 +208,28 @@ export function Diaper() {
               <div className="flex items-baseline gap-2">
                 <span
                   className={`text-4xl font-bold tracking-tight ${
-                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                    colorScheme.id === "default"
+                      ? "text-gray-900"
+                      : "text-white"
                   }`}
                 >
-                  {lastChange.time.split(' ')[0]}
+                  {lastChange.time.split(" ")[0]}
                 </span>
                 <span
                   className={`text-xl font-medium ${
-                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                    colorScheme.id === "default"
+                      ? "text-gray-400"
+                      : "text-white/70"
                   }`}
                 >
-                  {lastChange.time.split(' ')[1] || ''}
+                  {lastChange.time.split(" ")[1] || ""}
                 </span>
               </div>
               <p
                 className={`text-sm mt-2 ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/60"
                 }`}
               >
                 {lastChange.detail} diaper
@@ -238,7 +255,9 @@ export function Diaper() {
             <IconSearch className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search diaper logs..."
+              placeholder="Search diaper changes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
@@ -368,8 +387,8 @@ export function Diaper() {
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  title={item.title}
-                  detail={item.detail || ''}
+                  type={item.type || "diaper"}
+                  detail={item.detail || ""}
                   time={item.time}
                   user={item.caregiver}
                   selected={selectedIds.has(item.id)}
@@ -378,8 +397,12 @@ export function Diaper() {
               ))
             ) : (
               <div className="text-center py-12 text-gray-500">
-                <p className="text-lg font-medium mb-2">No diaper changes logged yet</p>
-                <p className="text-sm">Click "Add Change" to log your first diaper change</p>
+                <p className="text-lg font-medium mb-2">
+                  No diaper changes logged yet
+                </p>
+                <p className="text-sm">
+                  Click "Add Change" to log your first diaper change
+                </p>
               </div>
             )}
           </div>

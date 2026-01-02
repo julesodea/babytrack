@@ -4,7 +4,6 @@ import { ColorSchemeProvider } from "./context/ColorSchemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import {
-  Account,
   ActivityDetail,
   ActivityNew,
   Dashboard,
@@ -37,7 +36,6 @@ function App() {
             <Route path="/sleep" element={<Sleep />} />
             <Route path="/sleep/new" element={<SleepNew />} />
             <Route path="/settings" element={<Preferences />} />
-            <Route path="/account" element={<Account />} />
             <Route path="/activity/new" element={<ActivityNew />} />
             <Route path="/activity/:id" element={<ActivityDetail />} />
           </Route>

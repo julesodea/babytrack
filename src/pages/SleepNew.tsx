@@ -13,13 +13,43 @@ const getCurrentTime = (): string => {
   return `${hours}:${minutes}`;
 };
 
+// Helper function to calculate duration between two times
+const calculateDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return "";
+
+  const [startHours, startMinutes] = startTime.split(':').map(Number);
+  const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+  let startDate = new Date();
+  startDate.setHours(startHours, startMinutes, 0, 0);
+
+  let endDate = new Date();
+  endDate.setHours(endHours, endMinutes, 0, 0);
+
+  // If end time is earlier than start time, assume it's the next day
+  if (endDate < startDate) {
+    endDate.setDate(endDate.getDate() + 1);
+  }
+
+  const diffMs = endDate.getTime() - startDate.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const hours = Math.floor(diffMinutes / 60);
+  const minutes = diffMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes} min`;
+  } else if (minutes === 0) {
+    return `${hours} hr${hours > 1 ? 's' : ''}`;
+  } else {
+    return `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min`;
+  }
+};
+
 export function SleepNew() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [sleep, setSleep] = useState({
-    title: "",
-    duration: "",
     startTime: getCurrentTime(),
     endTime: getCurrentTime(),
     user: "",
@@ -27,6 +57,9 @@ export function SleepNew() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Auto-calculate duration when start or end time changes
+  const duration = calculateDuration(sleep.startTime, sleep.endTime);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,11 +69,12 @@ export function SleepNew() {
     setError("");
 
     try {
+      const sleepType = sleep.type === 'nap' ? 'Nap' : 'Overnight Sleep';
       await createSleep({
         user_id: user.id,
-        title: sleep.title,
-        detail: `${sleep.duration} sleep`,
-        duration: sleep.duration,
+        title: sleepType,
+        detail: `${duration} sleep`,
+        duration: duration,
         start_time: sleep.startTime,
         end_time: sleep.endTime,
         caregiver: sleep.user,
@@ -83,23 +117,6 @@ export function SleepNew() {
       <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                required
-                value={sleep.title}
-                onChange={(e) => setSleep({ ...sleep, title: e.target.value })}
-                placeholder="e.g., Afternoon Nap"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
             <div>
               <label
                 htmlFor="type"
@@ -160,17 +177,9 @@ export function SleepNew() {
               >
                 Duration
               </label>
-              <input
-                id="duration"
-                type="text"
-                required
-                value={sleep.duration}
-                onChange={(e) =>
-                  setSleep({ ...sleep, duration: e.target.value })
-                }
-                placeholder="e.g., 2 hrs"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
+              <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
+                {duration || 'Select start and end time'}
+              </div>
             </div>
             <div>
               <label
@@ -179,15 +188,18 @@ export function SleepNew() {
               >
                 Caregiver
               </label>
-              <input
+              <select
                 id="user"
-                type="text"
                 required
                 value={sleep.user}
                 onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
-                placeholder="e.g., Mum"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+              >
+                <option value="">Select caregiver</option>
+                <option value="Mum">Mum</option>
+                <option value="Dad">Dad</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
 

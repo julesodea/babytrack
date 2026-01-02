@@ -1,7 +1,7 @@
 import { supabase } from '../supabase';
-import type { SleepInsert, SleepUpdate } from '../../types/database';
+import type { Sleep, SleepInsert, SleepUpdate } from '../../types/database';
 
-export async function getSleeps(userId: string) {
+export async function getSleeps(userId: string): Promise<Sleep[]> {
   const { data, error } = await supabase
     .from('sleeps')
     .select('*')
@@ -10,7 +10,7 @@ export async function getSleeps(userId: string) {
     .order('start_time', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function getSleep(id: string) {

@@ -1,7 +1,7 @@
 import { supabase } from '../supabase';
-import type { DiaperInsert, DiaperUpdate } from '../../types/database';
+import type { Diaper, DiaperInsert, DiaperUpdate } from '../../types/database';
 
-export async function getDiapers(userId: string) {
+export async function getDiapers(userId: string): Promise<Diaper[]> {
   const { data, error } = await supabase
     .from('diapers')
     .select('*')
@@ -10,7 +10,7 @@ export async function getDiapers(userId: string) {
     .order('time', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function getDiaper(id: string) {

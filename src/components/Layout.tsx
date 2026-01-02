@@ -13,7 +13,6 @@ import {
   IconMenu,
   IconMoon,
   IconSearch,
-  IconUser,
 } from "./icons";
 
 export function Layout() {
@@ -147,12 +146,6 @@ export function Layout() {
             to="/settings"
             icon={<IconFilter className="w-5 h-5" />}
             label="Preferences"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <NavItem
-            to="/account"
-            icon={<IconUser className="w-5 h-5" />}
-            label="Account"
             onClick={() => setSidebarOpen(false)}
           />
         </nav>
