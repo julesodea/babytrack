@@ -81,7 +81,8 @@ export function Diaper() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todayChanges = data.filter((d) => d.date === today);
   const totalChanges = todayChanges.length;
   const wetCount = todayChanges.filter(
@@ -391,6 +392,7 @@ export function Diaper() {
                   detail={item.detail || ""}
                   time={item.time}
                   user={item.caregiver}
+                  date={item.date}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />

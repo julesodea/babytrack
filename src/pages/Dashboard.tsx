@@ -23,6 +23,7 @@ interface ActivityItem {
   user: string;
   type: "feed" | "diaper" | "sleep";
   date: string;
+  created_at: string;
 }
 
 export function Dashboard() {
@@ -80,6 +81,7 @@ export function Dashboard() {
         user: f.caregiver,
         type: "feed" as const,
         date: f.date,
+        created_at: f.created_at,
       }));
 
       // Map diapers to ActivityItem format
@@ -90,6 +92,7 @@ export function Dashboard() {
         user: d.caregiver,
         type: "diaper" as const,
         date: d.date,
+        created_at: d.created_at,
       }));
 
       // Map sleeps to ActivityItem format
@@ -100,21 +103,16 @@ export function Dashboard() {
         user: s.caregiver,
         type: "sleep" as const,
         date: s.date,
+        created_at: s.created_at,
       }));
 
-      // Combine all activities and sort by date and time (most recent first)
+      // Combine all activities and sort by created_at timestamp (most recent first)
       const allActivities = [
         ...feedActivities,
         ...diaperActivities,
         ...sleepActivities,
       ];
-      allActivities.sort((a, b) => {
-        // Sort by date first
-        const dateCompare = b.date.localeCompare(a.date);
-        if (dateCompare !== 0) return dateCompare;
-        // Then by time
-        return b.time.localeCompare(a.time);
-      });
+      allActivities.sort((a, b) => b.created_at.localeCompare(a.created_at));
 
       setData(allActivities);
     } catch (err) {
@@ -150,7 +148,8 @@ export function Dashboard() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todayActivities = data.filter((a) => a.date === today);
   const todayFeeds = todayActivities.filter((a) => a.type === "feed");
   const todaySleeps = todayActivities.filter((a) => a.type === "sleep");
@@ -448,6 +447,7 @@ export function Dashboard() {
                   detail={item.detail}
                   time={item.time}
                   user={item.user}
+                  date={item.date}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />

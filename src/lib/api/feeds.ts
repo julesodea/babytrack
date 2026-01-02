@@ -6,8 +6,7 @@ export async function getFeeds(userId: string): Promise<Feed[]> {
     .from('feeds')
     .select('*')
     .eq('user_id', userId)
-    .order('date', { ascending: false })
-    .order('time', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
   return data || [];

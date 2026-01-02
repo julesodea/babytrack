@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconDashboard } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { createFeed } from "../lib/api/feeds";
+import { createDiaper } from "../lib/api/diapers";
+import { createSleep } from "../lib/api/sleeps";
 
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
@@ -11,21 +15,132 @@ const getCurrentTime = (): string => {
   return `${hours}:${minutes}`;
 };
 
+// Helper function to get current date in YYYY-MM-DD format (local timezone)
+const getCurrentDate = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// Helper function to calculate duration between two times
+const calculateDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return "";
+
+  const [startHours, startMinutes] = startTime.split(':').map(Number);
+  const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+  let startDate = new Date();
+  startDate.setHours(startHours, startMinutes, 0, 0);
+
+  let endDate = new Date();
+  endDate.setHours(endHours, endMinutes, 0, 0);
+
+  // If end time is earlier than start time, assume it's the next day
+  if (endDate < startDate) {
+    endDate.setDate(endDate.getDate() + 1);
+  }
+
+  const diffMs = endDate.getTime() - startDate.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const hours = Math.floor(diffMinutes / 60);
+  const minutes = diffMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes} min`;
+  } else if (minutes === 0) {
+    return `${hours} hr${hours > 1 ? 's' : ''}`;
+  } else {
+    return `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min`;
+  }
+};
+
 export function ActivityNew() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [activity, setActivity] = useState({
-    title: "",
-    detail: "",
+  const [activityType, setActivityType] = useState<"feed" | "diaper" | "sleep">("feed");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Feed-specific state
+  const [feedData, setFeedData] = useState({
+    type: "bottle" as "bottle" | "breast" | "solid",
+    amount: "",
     time: getCurrentTime(),
-    user: "",
-    type: "feed",
+    caregiver: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Diaper-specific state
+  const [diaperData, setDiaperData] = useState({
+    type: "wet" as "wet" | "dirty" | "both",
+    time: getCurrentTime(),
+    caregiver: "",
+    notes: "",
+  });
+
+  // Sleep-specific state
+  const [sleepData, setSleepData] = useState({
+    type: "nap" as "nap" | "overnight",
+    startTime: getCurrentTime(),
+    endTime: getCurrentTime(),
+    caregiver: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a database/API
-    navigate("/");
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      if (activityType === "feed") {
+        const feedType = feedData.type === 'bottle' ? 'Bottle Feed' : feedData.type === 'breast' ? 'Breastfeed' : 'Solid Food';
+        await createFeed({
+          user_id: user.id,
+          title: feedType,
+          detail: `${feedData.amount}ml - ${feedData.type.charAt(0).toUpperCase() + feedData.type.slice(1)}`,
+          amount: feedData.amount,
+          time: feedData.time,
+          caregiver: feedData.caregiver,
+          type: feedData.type,
+          date: getCurrentDate(),
+        });
+      } else if (activityType === "diaper") {
+        await createDiaper({
+          user_id: user.id,
+          title: 'Diaper Change',
+          detail: `${diaperData.type.charAt(0).toUpperCase() + diaperData.type.slice(1)} diaper`,
+          time: diaperData.time,
+          caregiver: diaperData.caregiver,
+          type: diaperData.type,
+          notes: diaperData.notes,
+          date: getCurrentDate(),
+        });
+      } else if (activityType === "sleep") {
+        const duration = calculateDuration(sleepData.startTime, sleepData.endTime);
+        const sleepType = sleepData.type === 'nap' ? 'Nap' : 'Overnight Sleep';
+        await createSleep({
+          user_id: user.id,
+          title: sleepType,
+          detail: `${duration} sleep`,
+          duration: duration,
+          start_time: sleepData.startTime,
+          end_time: sleepData.endTime,
+          caregiver: sleepData.caregiver,
+          type: sleepData.type,
+          date: getCurrentDate(),
+        });
+      }
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to create activity:", err);
+      setError("Failed to save activity. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,38 +170,18 @@ export function ActivityNew() {
       <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Activity Type Selector */}
             <div>
               <label
-                htmlFor="title"
+                htmlFor="activityType"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                required
-                value={activity.title}
-                onChange={(e) =>
-                  setActivity({ ...activity, title: e.target.value })
-                }
-                placeholder="e.g., Morning Feed"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="type"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Type
+                Activity Type
               </label>
               <select
-                id="type"
-                value={activity.type}
-                onChange={(e) =>
-                  setActivity({ ...activity, type: e.target.value })
-                }
+                id="activityType"
+                value={activityType}
+                onChange={(e) => setActivityType(e.target.value as "feed" | "diaper" | "sleep")}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="feed">Feed</option>
@@ -94,73 +189,225 @@ export function ActivityNew() {
                 <option value="sleep">Sleep</option>
               </select>
             </div>
-            <div>
-              <label
-                htmlFor="time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Time
-              </label>
-              <input
-                id="time"
-                type="time"
-                required
-                value={activity.time}
-                onChange={(e) =>
-                  setActivity({ ...activity, time: e.target.value })
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="user"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Caregiver
-              </label>
-              <input
-                id="user"
-                type="text"
-                required
-                value={activity.user}
-                onChange={(e) =>
-                  setActivity({ ...activity, user: e.target.value })
-                }
-                placeholder="e.g., Mum"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="detail"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Details
-              </label>
-              <textarea
-                id="detail"
-                value={activity.detail}
-                onChange={(e) =>
-                  setActivity({ ...activity, detail: e.target.value })
-                }
-                rows={3}
-                placeholder="e.g., 150ml Formula"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
-              />
-            </div>
+
+            {/* Feed Fields */}
+            {activityType === "feed" && (
+              <>
+                <div>
+                  <label htmlFor="feedType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Feed Type
+                  </label>
+                  <select
+                    id="feedType"
+                    value={feedData.type}
+                    onChange={(e) => setFeedData({ ...feedData, type: e.target.value as "bottle" | "breast" | "solid" })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="bottle">Bottle</option>
+                    <option value="breast">Breast</option>
+                    <option value="solid">Solid Food</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount (ml)
+                  </label>
+                  <input
+                    id="amount"
+                    type="number"
+                    required
+                    value={feedData.amount}
+                    onChange={(e) => setFeedData({ ...feedData, amount: e.target.value })}
+                    placeholder="e.g., 150"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="feedTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    Time
+                  </label>
+                  <input
+                    id="feedTime"
+                    type="time"
+                    required
+                    value={feedData.time}
+                    onChange={(e) => setFeedData({ ...feedData, time: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="feedCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                    Caregiver
+                  </label>
+                  <select
+                    id="feedCaregiver"
+                    required
+                    value={feedData.caregiver}
+                    onChange={(e) => setFeedData({ ...feedData, caregiver: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="">Select caregiver</option>
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {/* Diaper Fields */}
+            {activityType === "diaper" && (
+              <>
+                <div>
+                  <label htmlFor="diaperType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Diaper Type
+                  </label>
+                  <select
+                    id="diaperType"
+                    value={diaperData.type}
+                    onChange={(e) => setDiaperData({ ...diaperData, type: e.target.value as "wet" | "dirty" | "both" })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="wet">Wet</option>
+                    <option value="dirty">Dirty</option>
+                    <option value="both">Both</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="diaperTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    Time
+                  </label>
+                  <input
+                    id="diaperTime"
+                    type="time"
+                    required
+                    value={diaperData.time}
+                    onChange={(e) => setDiaperData({ ...diaperData, time: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="diaperCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                    Caregiver
+                  </label>
+                  <select
+                    id="diaperCaregiver"
+                    required
+                    value={diaperData.caregiver}
+                    onChange={(e) => setDiaperData({ ...diaperData, caregiver: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="">Select caregiver</option>
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="diaperNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    id="diaperNotes"
+                    value={diaperData.notes}
+                    onChange={(e) => setDiaperData({ ...diaperData, notes: e.target.value })}
+                    rows={3}
+                    placeholder="Any additional notes..."
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Sleep Fields */}
+            {activityType === "sleep" && (
+              <>
+                <div>
+                  <label htmlFor="sleepType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Sleep Type
+                  </label>
+                  <select
+                    id="sleepType"
+                    value={sleepData.type}
+                    onChange={(e) => setSleepData({ ...sleepData, type: e.target.value as "nap" | "overnight" })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="nap">Nap</option>
+                    <option value="overnight">Overnight</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Time
+                  </label>
+                  <input
+                    id="startTime"
+                    type="time"
+                    required
+                    value={sleepData.startTime}
+                    onChange={(e) => setSleepData({ ...sleepData, startTime: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 mb-2">
+                    End Time
+                  </label>
+                  <input
+                    id="endTime"
+                    type="time"
+                    required
+                    value={sleepData.endTime}
+                    onChange={(e) => setSleepData({ ...sleepData, endTime: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration
+                  </label>
+                  <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
+                    {calculateDuration(sleepData.startTime, sleepData.endTime) || 'Select start and end time'}
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="sleepCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                    Caregiver
+                  </label>
+                  <select
+                    id="sleepCaregiver"
+                    required
+                    value={sleepData.caregiver}
+                    onChange={(e) => setSleepData({ ...sleepData, caregiver: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                  >
+                    <option value="">Select caregiver</option>
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
+
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
             <button
               type="submit"
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              Create Activity
+              {loading ? "Saving..." : `Log ${activityType.charAt(0).toUpperCase() + activityType.slice(1)}`}
             </button>
             <Link
               to="/"

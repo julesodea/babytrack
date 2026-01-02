@@ -82,7 +82,8 @@ export function Sleep() {
   };
 
   // Calculate stats from real data
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todaySleeps = data.filter((s) => s.date === today);
   const napCount = todaySleeps.filter((s) => s.type === "nap").length;
   const overnightCount = todaySleeps.filter(
@@ -392,6 +393,7 @@ export function Sleep() {
                       : item.start_time || "-"
                   }
                   user={item.caregiver}
+                  date={item.date}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />

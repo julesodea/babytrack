@@ -73,6 +73,41 @@ export function ActivityDetail() {
     return null;
   };
 
+  const calculateDuration = (startTime: string | null, endTime: string | null): string => {
+    if (!startTime || !endTime) return '';
+
+    try {
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+      let startDate = new Date();
+      startDate.setHours(startHours, startMinutes, 0, 0);
+
+      let endDate = new Date();
+      endDate.setHours(endHours, endMinutes, 0, 0);
+
+      // If end time is earlier than start time, assume it's the next day
+      if (endDate < startDate) {
+        endDate.setDate(endDate.getDate() + 1);
+      }
+
+      const diffMs = endDate.getTime() - startDate.getTime();
+      const diffMinutes = Math.floor(diffMs / 60000);
+      const hours = Math.floor(diffMinutes / 60);
+      const minutes = diffMinutes % 60;
+
+      if (hours === 0) {
+        return `${minutes} min`;
+      } else if (minutes === 0) {
+        return `${hours} hr${hours > 1 ? 's' : ''}`;
+      } else {
+        return `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min`;
+      }
+    } catch {
+      return '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -270,24 +305,88 @@ export function ActivityDetail() {
                   </select>
                 </div>
               )}
-              {'time' in activity && (
-                <div>
-                  <label
-                    htmlFor="time"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Time
-                  </label>
-                  <input
-                    id="time"
-                    type="time"
-                    value={activity.time}
-                    onChange={(e) =>
-                      setActivity({ ...activity, time: e.target.value })
-                    }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                  />
-                </div>
+              {getActivityType() === 'sleep' && 'start_time' in activity ? (
+                <>
+                  <div>
+                    <label
+                      htmlFor="startTime"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Start Time
+                    </label>
+                    <input
+                      id="startTime"
+                      type="time"
+                      value={(activity as Sleep).start_time || ''}
+                      onChange={(e) => {
+                        const newStartTime = e.target.value;
+                        const sleepActivity = activity as Sleep;
+                        const calculatedDuration = calculateDuration(newStartTime, sleepActivity.end_time);
+                        setActivity({
+                          ...sleepActivity,
+                          start_time: newStartTime,
+                          duration: calculatedDuration
+                        });
+                      }}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="endTime"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      End Time
+                    </label>
+                    <input
+                      id="endTime"
+                      type="time"
+                      value={(activity as Sleep).end_time || ''}
+                      onChange={(e) => {
+                        const newEndTime = e.target.value;
+                        const sleepActivity = activity as Sleep;
+                        const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
+                        setActivity({
+                          ...sleepActivity,
+                          end_time: newEndTime,
+                          duration: calculatedDuration
+                        });
+                      }}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="duration"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Duration
+                    </label>
+                    <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 flex items-center">
+                      {calculateDuration((activity as Sleep).start_time, (activity as Sleep).end_time) || 'Set start and end times'}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                'time' in activity && (
+                  <div>
+                    <label
+                      htmlFor="time"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Time
+                    </label>
+                    <input
+                      id="time"
+                      type="time"
+                      value={activity.time}
+                      onChange={(e) =>
+                        setActivity({ ...activity, time: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                )
               )}
               {'caregiver' in activity && (
                 <div>
@@ -391,12 +490,35 @@ export function ActivityDetail() {
                   </p>
                 </div>
               )}
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Time</p>
-                <p className="text-lg font-medium text-gray-900">
-                  {time}
-                </p>
-              </div>
+              {getActivityType() === 'sleep' && 'start_time' in activity ? (
+                <>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Start Time</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {(activity as Sleep).start_time || '-'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">End Time</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {(activity as Sleep).end_time || '-'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Duration</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {(activity as Sleep).duration || calculateDuration((activity as Sleep).start_time, (activity as Sleep).end_time) || '-'}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Time</p>
+                  <p className="text-lg font-medium text-gray-900">
+                    {time}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500 mb-1">Details</p>
                 <p className="text-lg font-medium text-gray-900">

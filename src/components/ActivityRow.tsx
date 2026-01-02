@@ -6,6 +6,7 @@ interface ActivityRowProps {
   detail: string;
   time: string;
   user: string;
+  date: string;
   selected?: boolean;
   onSelect?: (id: string, selected: boolean) => void;
 }
@@ -16,9 +17,20 @@ export function ActivityRow({
   detail,
   time,
   user,
+  date,
   selected = false,
   onSelect,
 }: ActivityRowProps) {
+  // Get day of week from date
+  const getDayOfWeek = (dateString: string): string => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // Parse date components directly to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return days[date.getDay()];
+  };
+
+  const dayOfWeek = getDayOfWeek(date);
   const handleCheckboxClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -55,6 +67,9 @@ export function ActivityRow({
                 <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
                   {type}
                 </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                  {dayOfWeek}
+                </span>
               </div>
               <p className="text-sm text-gray-900">{detail}</p>
             </div>
@@ -81,6 +96,9 @@ export function ActivityRow({
             <div className="flex items-center gap-2 mb-1">
               <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
                 {type}
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                {dayOfWeek}
               </span>
             </div>
             <p className="text-sm text-gray-900">{detail}</p>

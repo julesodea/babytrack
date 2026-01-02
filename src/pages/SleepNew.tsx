@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconMoon } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { createSleep } from "../lib/api/sleeps";
+import { getPreferences } from "../lib/api/preferences";
 
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
@@ -11,6 +12,15 @@ const getCurrentTime = (): string => {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
+};
+
+// Helper function to get current date in YYYY-MM-DD format (local timezone)
+const getCurrentDate = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 // Helper function to calculate duration between two times
@@ -55,11 +65,30 @@ export function SleepNew() {
     user: "",
     type: "nap" as "nap" | "overnight",
   });
+  const [isOngoing, setIsOngoing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (user) {
+      loadDefaultCaregiver();
+    }
+  }, [user]);
+
+  const loadDefaultCaregiver = async () => {
+    if (!user) return;
+    try {
+      const preferences = await getPreferences(user.id);
+      if (preferences?.default_caregiver) {
+        setSleep(prev => ({ ...prev, user: preferences.default_caregiver! }));
+      }
+    } catch (error) {
+      console.error("Failed to load preferences:", error);
+    }
+  };
+
   // Auto-calculate duration when start or end time changes
-  const duration = calculateDuration(sleep.startTime, sleep.endTime);
+  const duration = isOngoing ? "Ongoing" : calculateDuration(sleep.startTime, sleep.endTime);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,13 +102,13 @@ export function SleepNew() {
       await createSleep({
         user_id: user.id,
         title: sleepType,
-        detail: `${duration} sleep`,
-        duration: duration,
+        detail: isOngoing ? 'Ongoing sleep' : `${duration} sleep`,
+        duration: isOngoing ? 'Ongoing' : duration,
         start_time: sleep.startTime,
-        end_time: sleep.endTime,
+        end_time: isOngoing ? null : sleep.endTime,
         caregiver: sleep.user,
         type: sleep.type,
-        date: new Date().toISOString().split('T')[0],
+        date: getCurrentDate(),
       });
       navigate("/sleep");
     } catch (err) {
@@ -162,12 +191,15 @@ export function SleepNew() {
               <input
                 id="endTime"
                 type="time"
-                required
+                required={!isOngoing}
+                disabled={isOngoing}
                 value={sleep.endTime}
                 onChange={(e) =>
                   setSleep({ ...sleep, endTime: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
+                  isOngoing ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
               />
             </div>
             <div>
@@ -180,6 +212,20 @@ export function SleepNew() {
               <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
                 {duration || 'Select start and end time'}
               </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isOngoing}
+                  onChange={(e) => setIsOngoing(e.target.checked)}
+                  className="w-5 h-5 text-gray-900 border-gray-300 rounded focus:ring-2 focus:ring-gray-200"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Ongoing Sleep</span>
+                  <p className="text-xs text-gray-500">Check this if the baby is still sleeping</p>
+                </div>
+              </label>
             </div>
             <div>
               <label

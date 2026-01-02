@@ -3,6 +3,7 @@ import { IconFilter } from "../components/icons";
 import { useColorScheme, colorSchemes } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile, updateProfile } from "../lib/api/profiles";
+import { getPreferences, upsertPreferences } from "../lib/api/preferences";
 
 export function Preferences() {
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -17,13 +18,14 @@ export function Preferences() {
     sleepTracking: false,
     theme: "light",
     timeFormat: "12h",
-    defaultCaregiver: "Mum",
+    defaultCaregiver: "",
     measurementUnit: "ml",
   });
 
   useEffect(() => {
     if (user) {
       loadProfile();
+      loadPreferences();
     }
   }, [user]);
 
@@ -40,6 +42,22 @@ export function Preferences() {
     }
   };
 
+  const loadPreferences = async () => {
+    if (!user) return;
+
+    try {
+      const preferences = await getPreferences(user.id);
+      if (preferences) {
+        setSettings(prev => ({
+          ...prev,
+          defaultCaregiver: preferences.default_caregiver || "",
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to load preferences:", err);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -48,7 +66,13 @@ export function Preferences() {
     setSuccess(false);
 
     try {
-      await updateProfile(user.id, { full_name: fullName });
+      await Promise.all([
+        updateProfile(user.id, { full_name: fullName }),
+        upsertPreferences({
+          user_id: user.id,
+          default_caregiver: settings.defaultCaregiver || null
+        })
+      ]);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -327,15 +351,22 @@ export function Preferences() {
               >
                 Default Caregiver
               </label>
-              <input
+              <select
                 id="defaultCaregiver"
-                type="text"
                 value={settings.defaultCaregiver}
                 onChange={(e) =>
                   setSettings({ ...settings, defaultCaregiver: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+              >
+                <option value="">None (select manually each time)</option>
+                <option value="Mum">Mum</option>
+                <option value="Dad">Dad</option>
+                <option value="Other">Other</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                This caregiver will be pre-selected when creating new activities
+              </p>
             </div>
             <div>
               <label

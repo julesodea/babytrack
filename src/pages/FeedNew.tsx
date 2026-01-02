@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconBottle } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { createFeed } from "../lib/api/feeds";
+import { getPreferences } from "../lib/api/preferences";
 
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
@@ -11,6 +12,15 @@ const getCurrentTime = (): string => {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
+};
+
+// Helper function to get current date in YYYY-MM-DD format (local timezone)
+const getCurrentDate = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export function FeedNew() {
@@ -25,6 +35,24 @@ export function FeedNew() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      loadDefaultCaregiver();
+    }
+  }, [user]);
+
+  const loadDefaultCaregiver = async () => {
+    if (!user) return;
+    try {
+      const preferences = await getPreferences(user.id);
+      if (preferences?.default_caregiver) {
+        setFeed(prev => ({ ...prev, user: preferences.default_caregiver! }));
+      }
+    } catch (error) {
+      console.error("Failed to load preferences:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +71,7 @@ export function FeedNew() {
         time: feed.time,
         caregiver: feed.user,
         type: feed.type,
-        date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+        date: getCurrentDate(),
       });
       navigate("/feed");
     } catch (err) {
