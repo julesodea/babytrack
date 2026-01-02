@@ -3,13 +3,21 @@ import { Link, useNavigate } from "react-router";
 import { IconDashboard } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 
+// Helper function to get current time in HH:MM format
+const getCurrentTime = (): string => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
 export function ActivityNew() {
   const { colorScheme } = useColorScheme();
   const navigate = useNavigate();
   const [activity, setActivity] = useState({
     title: "",
     detail: "",
-    time: "",
+    time: getCurrentTime(),
     user: "",
     type: "feed",
   });
@@ -17,7 +25,7 @@ export function ActivityNew() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would save to a database/API
-    console.log("Creating activity:", activity);
+    ("Creating activity:", activity);
     navigate("/");
   };
 
@@ -96,13 +104,12 @@ export function ActivityNew() {
               </label>
               <input
                 id="time"
-                type="text"
+                type="time"
                 required
                 value={activity.time}
                 onChange={(e) =>
                   setActivity({ ...activity, time: e.target.value })
                 }
-                placeholder="e.g., 08:30 AM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>

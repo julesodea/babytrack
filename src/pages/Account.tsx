@@ -12,7 +12,7 @@ export function Account() {
 
   const handleSave = () => {
     // In a real app, this would save to a database/API
-    console.log("Saving profile:", profile);
+    "Saving profile:", profile;
   };
 
   // Generate initials from name

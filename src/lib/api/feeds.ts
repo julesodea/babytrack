@@ -1,11 +1,11 @@
 import { supabase } from '../supabase';
 import type { FeedInsert, FeedUpdate } from '../../types/database';
 
-export async function getFeeds(familyId: string) {
+export async function getFeeds(userId: string) {
   const { data, error } = await supabase
     .from('feeds')
     .select('*')
-    .eq('family_id', familyId)
+    .eq('user_id', userId)
     .order('date', { ascending: false })
     .order('time', { ascending: false });
 

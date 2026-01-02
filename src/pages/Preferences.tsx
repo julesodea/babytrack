@@ -16,7 +16,7 @@ export function Preferences() {
 
   const handleSave = () => {
     // In a real app, this would save to a database/API
-    console.log("Saving preferences:", settings);
+    "Saving preferences:", settings;
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import {
   IconCalendar,
@@ -8,100 +8,40 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
-
-interface DiaperItem {
-  id: string;
-  title: string;
-  detail: string;
-  time: string;
-  user: string;
-  type: "wet" | "dirty" | "both";
-  date: string;
-}
-
-const diaperData: DiaperItem[] = [
-  {
-    id: "d1",
-    title: "Morning Change",
-    detail: "Wet",
-    time: "06:00 AM",
-    user: "Mum",
-    type: "wet",
-    date: "2024-01-15",
-  },
-  {
-    id: "d2",
-    title: "After Breakfast",
-    detail: "Dirty",
-    time: "08:30 AM",
-    user: "Mum",
-    type: "dirty",
-    date: "2024-01-15",
-  },
-  {
-    id: "d3",
-    title: "Mid-Morning",
-    detail: "Wet",
-    time: "10:15 AM",
-    user: "Dad",
-    type: "wet",
-    date: "2024-01-15",
-  },
-  {
-    id: "d4",
-    title: "Before Nap",
-    detail: "Wet",
-    time: "12:00 PM",
-    user: "Other",
-    type: "wet",
-    date: "2024-01-15",
-  },
-  {
-    id: "d5",
-    title: "After Nap",
-    detail: "Dirty",
-    time: "01:45 PM",
-    user: "Other",
-    type: "dirty",
-    date: "2024-01-14",
-  },
-  {
-    id: "d6",
-    title: "Afternoon",
-    detail: "Wet",
-    time: "03:30 PM",
-    user: "Mum",
-    type: "wet",
-    date: "2024-01-14",
-  },
-  {
-    id: "d7",
-    title: "Before Dinner",
-    detail: "Dirty",
-    time: "05:45 PM",
-    user: "Dad",
-    type: "dirty",
-    date: "2024-01-14",
-  },
-  {
-    id: "d8",
-    title: "Before Bed",
-    detail: "Wet",
-    time: "08:00 PM",
-    user: "Mum",
-    type: "wet",
-    date: "2024-01-14",
-  },
-];
+import { useAuth } from "../contexts/AuthContext";
+import { getDiapers, deleteDiapers } from "../lib/api/diapers";
+import type { Diaper as DiaperType } from "../types/database";
 
 export function Diaper() {
   const { colorScheme } = useColorScheme();
-  const [data, setData] = useState<DiaperItem[]>(diaperData);
+  const { user } = useAuth();
+  const [data, setData] = useState<DiaperType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (user) {
+      loadDiapers();
+    }
+  }, [user]);
+
+  const loadDiapers = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const diapers = await getDiapers(user.id);
+      setData(diapers);
+    } catch (error) {
+      console.error("Failed to load diapers:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const uniqueDates = [...new Set(data.map((d) => d.date))];
 
@@ -123,10 +63,33 @@ export function Diaper() {
     });
   };
 
-  const handleDelete = () => {
-    setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-    setSelectedIds(new Set());
+  const handleDelete = async () => {
+    if (!user) return;
+
+    try {
+      await deleteDiapers(Array.from(selectedIds));
+      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+      setSelectedIds(new Set());
+    } catch (error) {
+      console.error("Failed to delete diapers:", error);
+    }
   };
+
+  // Calculate stats from real data
+  const today = new Date().toISOString().split('T')[0];
+  const todayChanges = data.filter(d => d.date === today);
+  const totalChanges = todayChanges.length;
+  const wetCount = todayChanges.filter(d => d.type === 'wet' || d.type === 'both').length;
+  const dirtyCount = todayChanges.filter(d => d.type === 'dirty' || d.type === 'both').length;
+  const lastChange = data.length > 0 ? data[0] : null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-gray-500">Loading diaper changes...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -182,7 +145,7 @@ export function Diaper() {
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
-              8
+              {totalChanges}
             </span>
             <span
               className={`text-xl font-medium ${
@@ -197,7 +160,7 @@ export function Diaper() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            5 wet, 3 dirty
+            {wetCount} wet, {dirtyCount} dirty
           </p>
         </div>
 
@@ -229,29 +192,41 @@ export function Diaper() {
           >
             Last Change
           </p>
-          <div className="flex items-baseline gap-2">
-            <span
-              className={`text-4xl font-bold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+          {lastChange ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={`text-4xl font-bold tracking-tight ${
+                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
+                >
+                  {lastChange.time.split(' ')[0]}
+                </span>
+                <span
+                  className={`text-xl font-medium ${
+                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                  }`}
+                >
+                  {lastChange.time.split(' ')[1] || ''}
+                </span>
+              </div>
+              <p
+                className={`text-sm mt-2 ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
+              >
+                {lastChange.detail} diaper
+              </p>
+            </>
+          ) : (
+            <p
+              className={`text-lg ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
               }`}
             >
-              1:45
-            </span>
-            <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
-            >
-              PM
-            </span>
-          </div>
-          <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
-          >
-            Wet diaper
-          </p>
+              No changes logged yet
+            </p>
+          )}
         </div>
       </div>
 
@@ -394,16 +369,17 @@ export function Diaper() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  detail={item.detail}
+                  detail={item.detail || ''}
                   time={item.time}
-                  user={item.user}
+                  user={item.caregiver}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                No diaper changes match the selected filters
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-medium mb-2">No diaper changes logged yet</p>
+                <p className="text-sm">Click "Add Change" to log your first diaper change</p>
               </div>
             )}
           </div>

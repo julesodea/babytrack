@@ -1,11 +1,11 @@
 import { supabase } from '../supabase';
 import type { DiaperInsert, DiaperUpdate } from '../../types/database';
 
-export async function getDiapers(familyId: string) {
+export async function getDiapers(userId: string) {
   const { data, error } = await supabase
     .from('diapers')
     .select('*')
-    .eq('family_id', familyId)
+    .eq('user_id', userId)
     .order('date', { ascending: false })
     .order('time', { ascending: false });
 

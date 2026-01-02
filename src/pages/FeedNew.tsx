@@ -2,23 +2,56 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconBottle } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { createFeed } from "../lib/api/feeds";
+
+// Helper function to get current time in HH:MM format
+const getCurrentTime = (): string => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
 
 export function FeedNew() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [feed, setFeed] = useState({
     title: "",
     amount: "",
-    time: "",
+    time: getCurrentTime(),
     user: "",
-    type: "bottle",
+    type: "bottle" as "bottle" | "breast" | "solid",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a database/API
-    console.log("Creating feed:", feed);
-    navigate("/feed");
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await createFeed({
+        user_id: user.id,
+        title: feed.title,
+        amount: feed.amount,
+        detail: `${feed.amount}ml - ${feed.type.charAt(0).toUpperCase() + feed.type.slice(1)}`,
+        time: feed.time,
+        caregiver: feed.user,
+        type: feed.type,
+        date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+      });
+      navigate("/feed");
+    } catch (err) {
+      console.error("Failed to create feed:", err);
+      setError("Failed to save feed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,7 +108,7 @@ export function FeedNew() {
               <select
                 id="type"
                 value={feed.type}
-                onChange={(e) => setFeed({ ...feed, type: e.target.value })}
+                onChange={(e) => setFeed({ ...feed, type: e.target.value as "bottle" | "breast" | "solid" })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="bottle">Bottle</option>
@@ -109,11 +142,10 @@ export function FeedNew() {
               </label>
               <input
                 id="time"
-                type="text"
+                type="time"
                 required
                 value={feed.time}
                 onChange={(e) => setFeed({ ...feed, time: e.target.value })}
-                placeholder="e.g., 08:30 AM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
@@ -136,16 +168,23 @@ export function FeedNew() {
             </div>
           </div>
 
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
             <button
               type="submit"
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              Log Feed
+              {loading ? "Saving..." : "Log Feed"}
             </button>
             <Link
               to="/feed"

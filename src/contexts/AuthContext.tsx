@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
-import type { Profile } from '../types/database';
+import { createContext, useContext, useEffect, useState, useRef } from "react";
+import type { User, Session } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
+import type { Profile } from "../types/database";
 
 interface AuthContextType {
   user: User | null;
@@ -15,52 +15,101 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  ("🔵 AuthProvider initialized");
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const initialSessionHandled = useRef(false);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    "🔍 fetchProfile called with userId:", userId;
 
-    setProfile(data);
+    // Set timeout to ensure loading doesn't hang forever
+    const timeoutId = setTimeout(() => {
+      console.warn(
+        "⏱️ Profile fetch taking longer than 10s, setting loading to false anyway"
+      );
+      setLoading(false);
+    }, 10000);
+
+    try {
+      ("🔍 About to call supabase.from(profiles)...");
+
+      const query = supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      ("🔍 Query constructed, awaiting result...");
+
+      const result = await query;
+      const { data, error } = result;
+
+      clearTimeout(timeoutId);
+      "🔍 Profile query returned:", { data, error, fullResult: result };
+
+      if (error) {
+        console.error("❌ Error fetching profile:", error);
+        setProfile(null);
+      } else {
+        "✅ Profile fetched successfully:", data;
+        setProfile(data);
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.error("💥 Exception in fetchProfile:", err);
+      setProfile(null);
+    }
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-      setLoading(false);
-    });
+    ("🟢 useEffect running");
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+    // Listen for auth changes (this also fires initially with the current session)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      "🔶 onAuthStateChange fired:",
+        _event,
+        session?.user?.id,
+        "handled:",
+        initialSessionHandled.current;
+
+      if (!initialSessionHandled.current) {
+        initialSessionHandled.current = true;
         setSession(session);
         setUser(session?.user ?? null);
+
         if (session?.user) {
-          await fetchProfile(session.user.id);
+          "📞 Calling fetchProfile for user:", session.user.id;
+          // Don't await - let it run in background
+          fetchProfile(session.user.id)
+            .then(() => {
+              ("✅ fetchProfile completed, setting loading to false");
+              setLoading(false);
+            })
+            .catch((err) => {
+              console.error("❌ fetchProfile failed:", err);
+              setLoading(false);
+            });
         } else {
           setProfile(null);
+          ("✅ No user, setting loading to false");
+          setLoading(false);
         }
-        setLoading(false);
       }
-    );
+    });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: window.location.origin,
       },
@@ -72,7 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, profile, loading, signInWithGoogle, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -81,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

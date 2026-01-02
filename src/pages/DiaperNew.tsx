@@ -2,23 +2,56 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconDiaper } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { createDiaper } from "../lib/api/diapers";
+
+// Helper function to get current time in HH:MM format
+const getCurrentTime = (): string => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
 
 export function DiaperNew() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [diaper, setDiaper] = useState({
     title: "",
-    type: "wet",
-    time: "",
+    type: "wet" as "wet" | "dirty" | "both",
+    time: getCurrentTime(),
     user: "",
     notes: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a database/API
-    console.log("Creating diaper change:", diaper);
-    navigate("/diaper");
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await createDiaper({
+        user_id: user.id,
+        title: diaper.title,
+        detail: diaper.type.charAt(0).toUpperCase() + diaper.type.slice(1),
+        time: diaper.time,
+        caregiver: diaper.user,
+        type: diaper.type,
+        notes: diaper.notes || null,
+        date: new Date().toISOString().split('T')[0],
+      });
+      navigate("/diaper");
+    } catch (err) {
+      console.error("Failed to create diaper change:", err);
+      setError("Failed to save diaper change. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,7 +110,7 @@ export function DiaperNew() {
               <select
                 id="type"
                 value={diaper.type}
-                onChange={(e) => setDiaper({ ...diaper, type: e.target.value })}
+                onChange={(e) => setDiaper({ ...diaper, type: e.target.value as "wet" | "dirty" | "both" })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="wet">Wet</option>
@@ -94,11 +127,10 @@ export function DiaperNew() {
               </label>
               <input
                 id="time"
-                type="text"
+                type="time"
                 required
                 value={diaper.time}
                 onChange={(e) => setDiaper({ ...diaper, time: e.target.value })}
-                placeholder="e.g., 08:30 AM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
@@ -139,16 +171,23 @@ export function DiaperNew() {
             </div>
           </div>
 
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
             <button
               type="submit"
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              Log Change
+              {loading ? "Saving..." : "Log Change"}
             </button>
             <Link
               to="/diaper"

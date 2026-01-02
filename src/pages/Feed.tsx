@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import {
   IconBottle,
@@ -8,82 +8,40 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
-
-interface FeedItem {
-  id: string;
-  title: string;
-  detail: string;
-  time: string;
-  user: string;
-  type: "bottle" | "breast" | "solid";
-  date: string;
-}
-
-const feedData: FeedItem[] = [
-  {
-    id: "f1",
-    title: "Morning Feed",
-    detail: "150ml Formula - Bottle",
-    time: "06:30 AM",
-    user: "Mum",
-    type: "bottle",
-    date: "2024-01-15",
-  },
-  {
-    id: "f2",
-    title: "Mid-Morning Feed",
-    detail: "120ml Breast Milk",
-    time: "09:15 AM",
-    user: "Mum",
-    type: "breast",
-    date: "2024-01-15",
-  },
-  {
-    id: "f3",
-    title: "Lunch Feed",
-    detail: "180ml Formula - Bottle",
-    time: "12:00 PM",
-    user: "Dad",
-    type: "bottle",
-    date: "2024-01-15",
-  },
-  {
-    id: "f4",
-    title: "Afternoon Feed",
-    detail: "150ml Formula - Bottle",
-    time: "02:30 PM",
-    user: "Other",
-    type: "bottle",
-    date: "2024-01-14",
-  },
-  {
-    id: "f5",
-    title: "Evening Feed",
-    detail: "180ml Formula - Bottle",
-    time: "06:00 PM",
-    user: "Mum",
-    type: "bottle",
-    date: "2024-01-14",
-  },
-  {
-    id: "f6",
-    title: "Night Feed",
-    detail: "120ml Breast Milk",
-    time: "09:30 PM",
-    user: "Mum",
-    type: "breast",
-    date: "2024-01-14",
-  },
-];
+import { useAuth } from "../contexts/AuthContext";
+import { getFeeds, deleteFeeds } from "../lib/api/feeds";
+import type { Feed } from "../types/database";
 
 export function Feed() {
   const { colorScheme } = useColorScheme();
-  const [data, setData] = useState<FeedItem[]>(feedData);
+  const { user } = useAuth();
+  const [data, setData] = useState<Feed[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (user) {
+      loadFeeds();
+    }
+  }, [user]);
+
+  const loadFeeds = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const feeds = await getFeeds(user.id);
+      setData(feeds);
+    } catch (error) {
+      console.error("Failed to load feeds:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const uniqueDates = [...new Set(data.map((f) => f.date))];
 
@@ -105,10 +63,32 @@ export function Feed() {
     });
   };
 
-  const handleDelete = () => {
-    setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-    setSelectedIds(new Set());
+  const handleDelete = async () => {
+    if (!user) return;
+
+    try {
+      await deleteFeeds(Array.from(selectedIds));
+      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+      setSelectedIds(new Set());
+    } catch (error) {
+      console.error("Failed to delete feeds:", error);
+    }
   };
+
+  // Calculate stats from real data
+  const today = new Date().toISOString().split('T')[0];
+  const todayFeeds = data.filter(f => f.date === today);
+  const totalFeeds = todayFeeds.length;
+  const totalVolume = todayFeeds.reduce((sum, f) => sum + (parseInt(f.amount || '0') || 0), 0);
+  const lastFeed = data.length > 0 ? data[0] : null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-gray-500">Loading feeds...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -164,7 +144,7 @@ export function Feed() {
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
-              6
+              {totalFeeds}
             </span>
             <span
               className={`text-xl font-medium ${
@@ -179,7 +159,7 @@ export function Feed() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            850ml total volume
+            {totalVolume}ml total volume
           </p>
         </div>
 
@@ -211,29 +191,41 @@ export function Feed() {
           >
             Last Feed
           </p>
-          <div className="flex items-baseline gap-2">
-            <span
-              className={`text-4xl font-bold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+          {lastFeed ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={`text-4xl font-bold tracking-tight ${
+                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
+                >
+                  {lastFeed.time.split(' ')[0]}
+                </span>
+                <span
+                  className={`text-xl font-medium ${
+                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                  }`}
+                >
+                  {lastFeed.time.split(' ')[1] || ''}
+                </span>
+              </div>
+              <p
+                className={`text-sm mt-2 ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
+              >
+                {lastFeed.detail}
+              </p>
+            </>
+          ) : (
+            <p
+              className={`text-lg ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
               }`}
             >
-              2:30
-            </span>
-            <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
-            >
-              PM
-            </span>
-          </div>
-          <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
-          >
-            180ml Formula
-          </p>
+              No feeds logged yet
+            </p>
+          )}
         </div>
       </div>
 
@@ -374,16 +366,17 @@ export function Feed() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  detail={item.detail}
+                  detail={item.detail || ''}
                   time={item.time}
-                  user={item.user}
+                  user={item.caregiver}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                No feeds match the selected filters
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-medium mb-2">No feeds logged yet</p>
+                <p className="text-sm">Click "Add Feed" to log your first feeding session</p>
               </div>
             )}
           </div>

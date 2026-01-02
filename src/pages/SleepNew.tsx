@@ -2,24 +2,58 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { IconMoon } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { createSleep } from "../lib/api/sleeps";
+
+// Helper function to get current time in HH:MM format
+const getCurrentTime = (): string => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
 
 export function SleepNew() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [sleep, setSleep] = useState({
     title: "",
     duration: "",
-    startTime: "",
-    endTime: "",
+    startTime: getCurrentTime(),
+    endTime: getCurrentTime(),
     user: "",
-    type: "nap",
+    type: "nap" as "nap" | "overnight",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a database/API
-    console.log("Creating sleep entry:", sleep);
-    navigate("/sleep");
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await createSleep({
+        user_id: user.id,
+        title: sleep.title,
+        detail: `${sleep.duration} sleep`,
+        duration: sleep.duration,
+        start_time: sleep.startTime,
+        end_time: sleep.endTime,
+        caregiver: sleep.user,
+        type: sleep.type,
+        date: new Date().toISOString().split('T')[0],
+      });
+      navigate("/sleep");
+    } catch (err) {
+      console.error("Failed to create sleep entry:", err);
+      setError("Failed to save sleep entry. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,7 +110,7 @@ export function SleepNew() {
               <select
                 id="type"
                 value={sleep.type}
-                onChange={(e) => setSleep({ ...sleep, type: e.target.value })}
+                onChange={(e) => setSleep({ ...sleep, type: e.target.value as "nap" | "overnight" })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="nap">Nap</option>
@@ -92,13 +126,12 @@ export function SleepNew() {
               </label>
               <input
                 id="startTime"
-                type="text"
+                type="time"
                 required
                 value={sleep.startTime}
                 onChange={(e) =>
                   setSleep({ ...sleep, startTime: e.target.value })
                 }
-                placeholder="e.g., 01:00 PM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
@@ -111,13 +144,12 @@ export function SleepNew() {
               </label>
               <input
                 id="endTime"
-                type="text"
+                type="time"
                 required
                 value={sleep.endTime}
                 onChange={(e) =>
                   setSleep({ ...sleep, endTime: e.target.value })
                 }
-                placeholder="e.g., 03:00 PM"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
@@ -159,16 +191,23 @@ export function SleepNew() {
             </div>
           </div>
 
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
             <button
               type="submit"
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                 colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              Log Sleep
+              {loading ? "Saving..." : "Log Sleep"}
             </button>
             <Link
               to="/sleep"

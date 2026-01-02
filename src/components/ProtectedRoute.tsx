@@ -1,12 +1,12 @@
-import { Navigate } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from "react-router";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -18,11 +18,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-
-  // If user has no family, redirect to family setup
-  if (profile && !profile.family_id) {
-    return <Navigate to="/family-setup" replace />;
   }
 
   return <>{children}</>;

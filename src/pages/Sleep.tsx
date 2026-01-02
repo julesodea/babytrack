@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import {
   IconCalendar,
@@ -8,82 +8,40 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
-
-interface SleepItem {
-  id: string;
-  title: string;
-  detail: string;
-  time: string;
-  user: string;
-  type: "nap" | "overnight";
-  date: string;
-}
-
-const sleepData: SleepItem[] = [
-  {
-    id: "s1",
-    title: "Overnight Sleep",
-    detail: "10 hrs",
-    time: "07:00 PM - 05:00 AM",
-    user: "Mum",
-    type: "overnight",
-    date: "2024-01-15",
-  },
-  {
-    id: "s2",
-    title: "Morning Nap",
-    detail: "1.5 hrs",
-    time: "09:00 AM - 10:30 AM",
-    user: "Dad",
-    type: "nap",
-    date: "2024-01-15",
-  },
-  {
-    id: "s3",
-    title: "Afternoon Nap",
-    detail: "2 hrs",
-    time: "01:00 PM - 03:00 PM",
-    user: "Other",
-    type: "nap",
-    date: "2024-01-15",
-  },
-  {
-    id: "s4",
-    title: "Evening Nap",
-    detail: "45 min",
-    time: "05:30 PM - 06:15 PM",
-    user: "Mum",
-    type: "nap",
-    date: "2024-01-14",
-  },
-  {
-    id: "s5",
-    title: "Overnight Sleep",
-    detail: "9.5 hrs",
-    time: "07:30 PM - 05:00 AM",
-    user: "Dad",
-    type: "overnight",
-    date: "2024-01-14",
-  },
-  {
-    id: "s6",
-    title: "Morning Nap",
-    detail: "1 hr",
-    time: "08:30 AM - 09:30 AM",
-    user: "Mum",
-    type: "nap",
-    date: "2024-01-14",
-  },
-];
+import { useAuth } from "../contexts/AuthContext";
+import { getSleeps, deleteSleeps } from "../lib/api/sleeps";
+import type { Sleep as SleepType } from "../types/database";
 
 export function Sleep() {
   const { colorScheme } = useColorScheme();
-  const [data, setData] = useState<SleepItem[]>(sleepData);
+  const { user } = useAuth();
+  const [data, setData] = useState<SleepType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (user) {
+      loadSleeps();
+    }
+  }, [user]);
+
+  const loadSleeps = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const sleeps = await getSleeps(user.id);
+      setData(sleeps);
+    } catch (error) {
+      console.error("Failed to load sleeps:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const uniqueDates = [...new Set(data.map((s) => s.date))];
 
@@ -105,10 +63,35 @@ export function Sleep() {
     });
   };
 
-  const handleDelete = () => {
-    setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-    setSelectedIds(new Set());
+  const handleDelete = async () => {
+    if (!user) return;
+
+    try {
+      await deleteSleeps(Array.from(selectedIds));
+      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+      setSelectedIds(new Set());
+    } catch (error) {
+      console.error("Failed to delete sleeps:", error);
+    }
   };
+
+  // Calculate stats from real data
+  const today = new Date().toISOString().split('T')[0];
+  const todaySleeps = data.filter(s => s.date === today);
+  const napCount = todaySleeps.filter(s => s.type === 'nap').length;
+  const overnightCount = todaySleeps.filter(s => s.type === 'overnight').length;
+
+  // Calculate total sleep hours (simplified - just count the entries for now)
+  const totalSleeps = napCount + overnightCount;
+  const lastSleep = data.length > 0 ? data[0] : null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-gray-500">Loading sleep logs...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -156,7 +139,7 @@ export function Sleep() {
               colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
             }`}
           >
-            Total Sleep Today
+            Sleep Sessions Today
           </p>
           <div className="flex items-baseline gap-2">
             <span
@@ -164,14 +147,14 @@ export function Sleep() {
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
-              14.5
+              {totalSleeps}
             </span>
             <span
               className={`text-xl font-medium ${
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
               }`}
             >
-              hours
+              sessions
             </span>
           </div>
           <p
@@ -179,7 +162,7 @@ export function Sleep() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            3 naps + overnight
+            {napCount} naps + {overnightCount} overnight
           </p>
         </div>
 
@@ -211,29 +194,41 @@ export function Sleep() {
           >
             Last Sleep
           </p>
-          <div className="flex items-baseline gap-2">
-            <span
-              className={`text-4xl font-bold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+          {lastSleep ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span
+                  className={`text-4xl font-bold tracking-tight ${
+                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
+                >
+                  {lastSleep.start_time?.split(' ')[0] || '-'}
+                </span>
+                <span
+                  className={`text-xl font-medium ${
+                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                  }`}
+                >
+                  {lastSleep.start_time?.split(' ')[1] || ''}
+                </span>
+              </div>
+              <p
+                className={`text-sm mt-2 ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
+              >
+                {lastSleep.type} - {lastSleep.duration}
+              </p>
+            </>
+          ) : (
+            <p
+              className={`text-lg ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
               }`}
             >
-              2:30
-            </span>
-            <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
-            >
-              PM
-            </span>
-          </div>
-          <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
-          >
-            Afternoon nap - 1.5 hrs
-          </p>
+              No sleeps logged yet
+            </p>
+          )}
         </div>
       </div>
 
@@ -374,16 +369,17 @@ export function Sleep() {
                   key={item.id}
                   id={item.id}
                   title={item.title}
-                  detail={item.detail}
-                  time={item.time}
-                  user={item.user}
+                  detail={item.detail || ''}
+                  time={item.start_time && item.end_time ? `${item.start_time} - ${item.end_time}` : item.start_time || '-'}
+                  user={item.caregiver}
                   selected={selectedIds.has(item.id)}
                   onSelect={handleSelect}
                 />
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                No sleep logs match the selected filters
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-medium mb-2">No sleep logs yet</p>
+                <p className="text-sm">Click "Add Sleep" to log your first sleep session</p>
               </div>
             )}
           </div>

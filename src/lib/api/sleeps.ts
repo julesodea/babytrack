@@ -1,11 +1,11 @@
 import { supabase } from '../supabase';
 import type { SleepInsert, SleepUpdate } from '../../types/database';
 
-export async function getSleeps(familyId: string) {
+export async function getSleeps(userId: string) {
   const { data, error } = await supabase
     .from('sleeps')
     .select('*')
-    .eq('family_id', familyId)
+    .eq('user_id', userId)
     .order('date', { ascending: false })
     .order('start_time', { ascending: false });
 

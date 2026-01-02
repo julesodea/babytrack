@@ -4,56 +4,32 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          family_id: string | null;
           email: string | null;
           full_name: string | null;
           avatar_url: string | null;
-          role: string;
+          color_scheme: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id: string;
-          family_id?: string | null;
           email?: string | null;
           full_name?: string | null;
           avatar_url?: string | null;
-          role?: string;
+          color_scheme?: string;
         };
         Update: {
-          family_id?: string | null;
           email?: string | null;
           full_name?: string | null;
           avatar_url?: string | null;
-          role?: string;
-          updated_at?: string;
-        };
-      };
-      families: {
-        Row: {
-          id: string;
-          name: string;
-          invite_code: string | null;
-          created_by: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          invite_code?: string | null;
-          created_by?: string | null;
-        };
-        Update: {
-          name?: string;
-          invite_code?: string | null;
+          color_scheme?: string;
           updated_at?: string;
         };
       };
       babies: {
         Row: {
           id: string;
-          family_id: string;
+          user_id: string;
           name: string;
           birth_date: string | null;
           avatar_url: string | null;
@@ -62,7 +38,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          family_id: string;
+          user_id: string;
           name: string;
           birth_date?: string | null;
           avatar_url?: string | null;
@@ -78,7 +54,6 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          family_id: string | null;
           baby_id: string | null;
           title: string;
           amount: string | null;
@@ -93,7 +68,6 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          family_id?: string | null;
           baby_id?: string | null;
           title: string;
           amount?: string | null;
@@ -118,7 +92,6 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          family_id: string | null;
           baby_id: string | null;
           title: string;
           detail: string | null;
@@ -133,7 +106,6 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          family_id?: string | null;
           baby_id?: string | null;
           title: string;
           detail?: string | null;
@@ -158,7 +130,6 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          family_id: string | null;
           baby_id: string | null;
           title: string;
           detail: string | null;
@@ -174,7 +145,6 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          family_id?: string | null;
           baby_id?: string | null;
           title: string;
           detail?: string | null;
@@ -239,7 +209,6 @@ export interface Database {
 
 // Helper types for easier access
 export type Profile = Database['public']['Tables']['profiles']['Row'];
-export type Family = Database['public']['Tables']['families']['Row'];
 export type Baby = Database['public']['Tables']['babies']['Row'];
 export type Feed = Database['public']['Tables']['feeds']['Row'];
 export type Diaper = Database['public']['Tables']['diapers']['Row'];
@@ -254,4 +223,3 @@ export type SleepInsert = Database['public']['Tables']['sleeps']['Insert'];
 export type SleepUpdate = Database['public']['Tables']['sleeps']['Update'];
 export type PreferencesInsert = Database['public']['Tables']['preferences']['Insert'];
 export type PreferencesUpdate = Database['public']['Tables']['preferences']['Update'];
-export type FamilyInsert = Database['public']['Tables']['families']['Insert'];

@@ -1,197 +1,86 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router";
 import { IconDashboard } from "../components/icons";
+import { useAuth } from "../contexts/AuthContext";
+import { useColorScheme } from "../context/ColorSchemeContext";
+import { getFeed, updateFeed } from "../lib/api/feeds";
+import { getDiaper, updateDiaper } from "../lib/api/diapers";
+import { getSleep, updateSleep } from "../lib/api/sleeps";
+import type { Feed, Diaper, Sleep } from "../types/database";
 
-interface Activity {
-  title: string;
-  detail: string;
-  time: string;
-  user: string;
-  type: string;
-}
+type Activity = Feed | Diaper | Sleep;
 
 export function ActivityDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { colorScheme } = useColorScheme();
+  const [activity, setActivity] = useState<Activity | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  // Mock data - in a real app this would come from a database/API
-  const activitiesData: Record<string, Activity> = {
-    // Dashboard activities
-    "1": {
-      title: "Morning Feed",
-      detail: "150ml Formula",
-      time: "08:30 AM",
-      user: "Mum",
-      type: "feed",
-    },
-    "2": {
-      title: "Diaper Change",
-      detail: "Wet",
-      time: "10:15 AM",
-      user: "Dad",
-      type: "diaper",
-    },
-    "3": {
-      title: "Afternoon Nap",
-      detail: "2 hours",
-      time: "01:00 PM",
-      user: "Other",
-      type: "sleep",
-    },
-    "4": {
-      title: "Evening Feed",
-      detail: "180ml Formula",
-      time: "06:45 PM",
-      user: "Mum",
-      type: "feed",
-    },
-    // Feed activities
-    f1: {
-      title: "Morning Feed",
-      detail: "150ml Formula - Bottle",
-      time: "06:30 AM",
-      user: "Mum",
-      type: "feed",
-    },
-    f2: {
-      title: "Mid-Morning Feed",
-      detail: "120ml Breast Milk",
-      time: "09:15 AM",
-      user: "Mum",
-      type: "feed",
-    },
-    f3: {
-      title: "Lunch Feed",
-      detail: "180ml Formula - Bottle",
-      time: "12:00 PM",
-      user: "Dad",
-      type: "feed",
-    },
-    f4: {
-      title: "Afternoon Feed",
-      detail: "150ml Formula - Bottle",
-      time: "02:30 PM",
-      user: "Other",
-      type: "feed",
-    },
-    f5: {
-      title: "Evening Feed",
-      detail: "180ml Formula - Bottle",
-      time: "06:00 PM",
-      user: "Mum",
-      type: "feed",
-    },
-    f6: {
-      title: "Night Feed",
-      detail: "120ml Breast Milk",
-      time: "09:30 PM",
-      user: "Mum",
-      type: "feed",
-    },
-    // Diaper activities
-    d1: {
-      title: "Morning Change",
-      detail: "Wet",
-      time: "06:00 AM",
-      user: "Mum",
-      type: "diaper",
-    },
-    d2: {
-      title: "After Breakfast",
-      detail: "Dirty",
-      time: "08:30 AM",
-      user: "Mum",
-      type: "diaper",
-    },
-    d3: {
-      title: "Mid-Morning",
-      detail: "Wet",
-      time: "10:15 AM",
-      user: "Dad",
-      type: "diaper",
-    },
-    d4: {
-      title: "Before Nap",
-      detail: "Wet",
-      time: "12:00 PM",
-      user: "Other",
-      type: "diaper",
-    },
-    d5: {
-      title: "After Nap",
-      detail: "Dirty",
-      time: "01:45 PM",
-      user: "Other",
-      type: "diaper",
-    },
-    d6: {
-      title: "Afternoon",
-      detail: "Wet",
-      time: "03:30 PM",
-      user: "Mum",
-      type: "diaper",
-    },
-    d7: {
-      title: "Before Dinner",
-      detail: "Dirty",
-      time: "05:45 PM",
-      user: "Dad",
-      type: "diaper",
-    },
-    d8: {
-      title: "Before Bed",
-      detail: "Wet",
-      time: "08:00 PM",
-      user: "Mum",
-      type: "diaper",
-    },
-    // Sleep activities
-    s1: {
-      title: "Overnight Sleep",
-      detail: "10 hrs",
-      time: "07:00 PM - 05:00 AM",
-      user: "Mum",
-      type: "sleep",
-    },
-    s2: {
-      title: "Morning Nap",
-      detail: "1.5 hrs",
-      time: "09:00 AM - 10:30 AM",
-      user: "Dad",
-      type: "sleep",
-    },
-    s3: {
-      title: "Afternoon Nap",
-      detail: "2 hrs",
-      time: "01:00 PM - 03:00 PM",
-      user: "Other",
-      type: "sleep",
-    },
-    s4: {
-      title: "Evening Nap",
-      detail: "45 min",
-      time: "05:30 PM - 06:15 PM",
-      user: "Mum",
-      type: "sleep",
-    },
-    s5: {
-      title: "Overnight Sleep",
-      detail: "9.5 hrs",
-      time: "07:30 PM - 05:00 AM",
-      user: "Dad",
-      type: "sleep",
-    },
-    s6: {
-      title: "Morning Nap",
-      detail: "1 hr",
-      time: "08:30 AM - 09:30 AM",
-      user: "Mum",
-      type: "sleep",
-    },
+  useEffect(() => {
+    if (id && user) {
+      loadActivity();
+    }
+  }, [id, user]);
+
+  const loadActivity = async () => {
+    if (!id) return;
+
+    setLoading(true);
+    setError("");
+    try {
+      // Try to fetch from feeds first
+      let data = await getFeed(id).catch(() => null);
+      if (data) {
+        setActivity(data);
+        setLoading(false);
+        return;
+      }
+
+      // Try diapers
+      data = await getDiaper(id).catch(() => null);
+      if (data) {
+        setActivity(data);
+        setLoading(false);
+        return;
+      }
+
+      // Try sleeps
+      data = await getSleep(id).catch(() => null);
+      if (data) {
+        setActivity(data);
+        setLoading(false);
+        return;
+      }
+
+      // Not found in any table
+      setActivity(null);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to load activity:", err);
+      setError("Failed to load activity");
+      setLoading(false);
+    }
   };
 
-  const initialActivity = id ? activitiesData[id] : null;
-  const [activity, setActivity] = useState<Activity | null>(initialActivity);
+  const getActivityType = (): 'feed' | 'diaper' | 'sleep' | null => {
+    if (!activity) return null;
+    if ('amount' in activity) return 'feed';
+    if ('type' in activity && ('wet' in activity || 'dirty' in activity)) return 'diaper';
+    if ('start_time' in activity) return 'sleep';
+    return null;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-gray-500">Loading activity...</div>
+      </div>
+    );
+  }
 
   if (!activity) {
     return (
@@ -218,18 +107,49 @@ export function ActivityDetail() {
     );
   }
 
-  const handleSave = () => {
-    // In a real app, this would save to a database/API
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (!activity || !id) return;
+
+    setError("");
+    try {
+      const activityType = getActivityType();
+
+      if (activityType === 'feed') {
+        await updateFeed(id, activity as Feed);
+      } else if (activityType === 'diaper') {
+        await updateDiaper(id, activity as Diaper);
+      } else if (activityType === 'sleep') {
+        await updateSleep(id, activity as Sleep);
+      }
+
+      setIsEditing(false);
+      await loadActivity(); // Reload to get updated data
+    } catch (err) {
+      console.error("Failed to save activity:", err);
+      setError("Failed to save changes. Please try again.");
+    }
   };
 
   const handleCancel = () => {
-    setActivity(initialActivity);
     setIsEditing(false);
+    loadActivity(); // Reload original data
   };
+
+  const activityType = getActivityType();
+  const title = 'title' in activity ? activity.title : 'Activity';
+  const detail = 'detail' in activity ? activity.detail : '';
+  const time = 'time' in activity ? activity.time : ('start_time' in activity ? activity.start_time : '');
+  const caregiver = 'caregiver' in activity ? activity.caregiver : '';
 
   return (
     <div className="space-y-6">
+      {/* Error message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <IconDashboard className="w-5 h-5 text-gray-500" />
@@ -238,14 +158,14 @@ export function ActivityDetail() {
           Dashboard
         </Link>
         <span>/</span>
-        <span className="text-gray-900">{activity.title}</span>
+        <span className="text-gray-900">{title}</span>
       </div>
 
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Edit Activity" : activity.title}
+            {isEditing ? "Edit Activity" : title}
           </h2>
           <p className="text-gray-500 text-base">
             {isEditing
@@ -254,17 +174,21 @@ export function ActivityDetail() {
           </p>
           {!isEditing && (
             <Link
-              to="/"
+              to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : '/sleep'}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors mt-3"
             >
-              ← Back to Dashboard
+              ← Back to {activityType === 'feed' ? 'Feed' : activityType === 'diaper' ? 'Diaper' : 'Sleep'} Logs
             </Link>
           )}
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+            className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              colorScheme.id === "default"
+                ? "bg-gray-900 hover:bg-gray-800"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            }`}
           >
             Edit
           </button>
@@ -282,100 +206,92 @@ export function ActivityDetail() {
             className="space-y-6"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Title
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  value={activity.title}
-                  onChange={(e) =>
-                    setActivity({ ...activity, title: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Type
-                </label>
-                <select
-                  id="type"
-                  value={activity.type}
-                  onChange={(e) =>
-                    setActivity({ ...activity, type: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                >
-                  <option value="feed">Feed</option>
-                  <option value="diaper">Diaper</option>
-                  <option value="sleep">Sleep</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="time"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Time
-                </label>
-                <input
-                  id="time"
-                  type="text"
-                  value={activity.time}
-                  onChange={(e) =>
-                    setActivity({ ...activity, time: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="user"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Caregiver
-                </label>
-                <input
-                  id="user"
-                  type="text"
-                  value={activity.user}
-                  onChange={(e) =>
-                    setActivity({ ...activity, user: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="detail"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Details
-                </label>
-                <textarea
-                  id="detail"
-                  value={activity.detail}
-                  onChange={(e) =>
-                    setActivity({ ...activity, detail: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
-                />
-              </div>
+              {'title' in activity && (
+                <div>
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Title
+                  </label>
+                  <input
+                    id="title"
+                    type="text"
+                    value={activity.title || ''}
+                    onChange={(e) =>
+                      setActivity({ ...activity, title: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+              )}
+              {'time' in activity && (
+                <div>
+                  <label
+                    htmlFor="time"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Time
+                  </label>
+                  <input
+                    id="time"
+                    type="time"
+                    value={activity.time}
+                    onChange={(e) =>
+                      setActivity({ ...activity, time: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+              )}
+              {'caregiver' in activity && (
+                <div>
+                  <label
+                    htmlFor="caregiver"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Caregiver
+                  </label>
+                  <input
+                    id="caregiver"
+                    type="text"
+                    value={activity.caregiver}
+                    onChange={(e) =>
+                      setActivity({ ...activity, caregiver: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+              )}
+              {'detail' in activity && (
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="detail"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Details
+                  </label>
+                  <textarea
+                    id="detail"
+                    value={activity.detail || ''}
+                    onChange={(e) =>
+                      setActivity({ ...activity, detail: e.target.value })
+                    }
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
               <button
                 type="submit"
-                className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors"
+                className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+                  colorScheme.id === "default"
+                    ? "bg-gray-900 hover:bg-gray-800"
+                    : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+                }`}
               >
                 Save Changes
               </button>
@@ -394,32 +310,34 @@ export function ActivityDetail() {
               <div>
                 <p className="text-sm text-gray-500 mb-1">Type</p>
                 <p className="text-lg font-medium text-gray-900 capitalize">
-                  {activity.type}
+                  {activityType}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Time</p>
                 <p className="text-lg font-medium text-gray-900">
-                  {activity.time}
+                  {time}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Details</p>
                 <p className="text-lg font-medium text-gray-900">
-                  {activity.detail}
+                  {detail || 'No details provided'}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Caregiver</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
-                    {activity.user.charAt(0)}
+              {caregiver && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Caregiver</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
+                      {caregiver.charAt(0)}
+                    </div>
+                    <p className="text-lg font-medium text-gray-900">
+                      {caregiver}
+                    </p>
                   </div>
-                  <p className="text-lg font-medium text-gray-900">
-                    {activity.user}
-                  </p>
                 </div>
-              </div>
+              )}
             </div>
           </>
         )}
