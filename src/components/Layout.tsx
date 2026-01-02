@@ -10,6 +10,7 @@ import {
   IconDashboard,
   IconDiaper,
   IconFilter,
+  IconLogo,
   IconMenu,
   IconMoon,
   IconSearch,
@@ -80,7 +81,7 @@ export function Layout() {
                     : colorScheme.cardBg
                 }`}
               >
-                <IconBottle className="w-5 h-5" />
+                <IconLogo className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-900 leading-tight">
