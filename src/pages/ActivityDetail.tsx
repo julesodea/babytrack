@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router";
+import { Link, useParams } from "react-router";
 import { IconDashboard } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { useColorScheme } from "../context/ColorSchemeContext";
@@ -12,7 +12,6 @@ type Activity = Feed | Diaper | Sleep;
 
 export function ActivityDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
   const [activity, setActivity] = useState<Activity | null>(null);
