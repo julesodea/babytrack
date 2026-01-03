@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IconCalendar,
   IconFilter,
@@ -15,8 +16,7 @@ import type { Sleep as SleepType } from "../types/database";
 export function Sleep() {
   const { colorScheme } = useColorScheme();
   const { selectedBaby } = useBaby();
-  const [data, setData] = useState<SleepType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -24,25 +24,22 @@ export function Sleep() {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (selectedBaby) {
-      loadSleeps();
-    }
-  }, [selectedBaby]);
+  // Query for sleeps
+  const { data = [], isLoading: loading } = useQuery({
+    queryKey: ["sleeps", selectedBaby?.id],
+    queryFn: () => getSleeps(selectedBaby!.id),
+    enabled: !!selectedBaby,
+  });
 
-  const loadSleeps = async () => {
-    if (!selectedBaby) return;
-
-    setLoading(true);
-    try {
-      const sleeps = await getSleeps(selectedBaby.id);
-      setData(sleeps);
-    } catch (error) {
-      console.error("Failed to load sleeps:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Mutation for deleting sleeps
+  const deleteMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteSleeps(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sleeps", selectedBaby?.id] });
+      queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
+      setSelectedIds(new Set());
+    },
+  });
 
   const uniqueDates = [...new Set(data.map((s) => s.date))];
 
@@ -71,14 +68,7 @@ export function Sleep() {
 
   const handleDelete = async () => {
     if (!selectedBaby) return;
-
-    try {
-      await deleteSleeps(Array.from(selectedIds));
-      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-      setSelectedIds(new Set());
-    } catch (error) {
-      console.error("Failed to delete sleeps:", error);
-    }
+    deleteMutation.mutate(Array.from(selectedIds));
   };
 
   // Calculate stats from real data

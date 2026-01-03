@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IconBottle,
   IconCalendar,
@@ -10,13 +11,11 @@ import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getFeeds, deleteFeeds } from "../lib/api/feeds";
-import type { Feed } from "../types/database";
 
 export function Feed() {
   const { colorScheme } = useColorScheme();
   const { selectedBaby } = useBaby();
-  const [data, setData] = useState<Feed[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -24,25 +23,22 @@ export function Feed() {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (selectedBaby) {
-      loadFeeds();
-    }
-  }, [selectedBaby]);
+  // Query for feeds
+  const { data = [], isLoading: loading } = useQuery({
+    queryKey: ["feeds", selectedBaby?.id],
+    queryFn: () => getFeeds(selectedBaby!.id),
+    enabled: !!selectedBaby,
+  });
 
-  const loadFeeds = async () => {
-    if (!selectedBaby) return;
-
-    setLoading(true);
-    try {
-      const feeds = await getFeeds(selectedBaby.id);
-      setData(feeds);
-    } catch (error) {
-      console.error("Failed to load feeds:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Mutation for deleting feeds
+  const deleteMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteFeeds(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feeds", selectedBaby?.id] });
+      queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
+      setSelectedIds(new Set());
+    },
+  });
 
   const uniqueDates = [...new Set(data.map((f) => f.date))];
 
@@ -71,14 +67,7 @@ export function Feed() {
 
   const handleDelete = async () => {
     if (!selectedBaby) return;
-
-    try {
-      await deleteFeeds(Array.from(selectedIds));
-      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-      setSelectedIds(new Set());
-    } catch (error) {
-      console.error("Failed to delete feeds:", error);
-    }
+    deleteMutation.mutate(Array.from(selectedIds));
   };
 
   // Calculate stats from real data

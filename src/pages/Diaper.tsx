@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IconCalendar,
   IconDiaper,
@@ -10,13 +11,11 @@ import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getDiapers, deleteDiapers } from "../lib/api/diapers";
-import type { Diaper as DiaperType } from "../types/database";
 
 export function Diaper() {
   const { colorScheme } = useColorScheme();
   const { selectedBaby } = useBaby();
-  const [data, setData] = useState<DiaperType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -24,25 +23,22 @@ export function Diaper() {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (selectedBaby) {
-      loadDiapers();
-    }
-  }, [selectedBaby]);
+  // Query for diapers
+  const { data = [], isLoading: loading } = useQuery({
+    queryKey: ["diapers", selectedBaby?.id],
+    queryFn: () => getDiapers(selectedBaby!.id),
+    enabled: !!selectedBaby,
+  });
 
-  const loadDiapers = async () => {
-    if (!selectedBaby) return;
-
-    setLoading(true);
-    try {
-      const diapers = await getDiapers(selectedBaby.id);
-      setData(diapers);
-    } catch (error) {
-      console.error("Failed to load diapers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Mutation for deleting diapers
+  const deleteMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteDiapers(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["diapers", selectedBaby?.id] });
+      queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
+      setSelectedIds(new Set());
+    },
+  });
 
   const uniqueDates = [...new Set(data.map((d) => d.date))];
 
@@ -70,14 +66,7 @@ export function Diaper() {
 
   const handleDelete = async () => {
     if (!selectedBaby) return;
-
-    try {
-      await deleteDiapers(Array.from(selectedIds));
-      setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
-      setSelectedIds(new Set());
-    } catch (error) {
-      console.error("Failed to delete diapers:", error);
-    }
+    deleteMutation.mutate(Array.from(selectedIds));
   };
 
   // Calculate stats from real data

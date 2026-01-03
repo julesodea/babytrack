@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   IconBottle,
   IconCalendar,
@@ -32,49 +33,25 @@ export function Dashboard() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
-  const [fullName, setFullName] = useState("");
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const [data, setData] = useState<ActivityItem[]>([]);
-  const [loadingActivities, setLoadingActivities] = useState(true);
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
-  }, [user]);
+  // Query for user profile
+  const { data: profile, isLoading: loadingProfile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: () => getProfile(user!.id),
+    enabled: !!user,
+  });
 
-  useEffect(() => {
-    if (selectedBaby) {
-      loadActivities();
-    }
-  }, [selectedBaby]);
+  // Query for activities
+  const { data: activities = [], isLoading: loadingActivities } = useQuery({
+    queryKey: ["activities", selectedBaby?.id],
+    queryFn: async () => {
+      if (!selectedBaby) return [];
 
-  const loadProfile = async () => {
-    if (!user) return;
-
-    setLoadingProfile(true);
-    try {
-      const profile = await getProfile(user.id);
-      if (profile && profile.full_name) {
-        setFullName(profile.full_name);
-      }
-    } catch (err) {
-      console.error("Failed to load profile:", err);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
-
-  const loadActivities = async () => {
-    if (!selectedBaby) return;
-
-    setLoadingActivities(true);
-    try {
       const [feeds, diapers, sleeps] = await Promise.all([
         getFeeds(selectedBaby.id),
         getDiapers(selectedBaby.id),
@@ -122,13 +99,13 @@ export function Dashboard() {
       ];
       allActivities.sort((a, b) => b.created_at.localeCompare(a.created_at));
 
-      setData(allActivities);
-    } catch (err) {
-      console.error("Failed to load activities:", err);
-    } finally {
-      setLoadingActivities(false);
-    }
-  };
+      return allActivities;
+    },
+    enabled: !!selectedBaby,
+  });
+
+  const fullName = profile?.full_name || "";
+  const data = activities;
 
   const uniqueDates = [...new Set(data.map((a) => a.date))];
 

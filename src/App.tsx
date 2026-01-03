@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
 import { BabyProvider } from "./contexts/BabyContext";
 import { ColorSchemeProvider } from "./context/ColorSchemeContext";
@@ -22,12 +23,24 @@ import { BabyManage } from "./pages/BabyManage";
 import { InviteAccept } from "./pages/InviteAccept";
 import { Profile } from "./pages/Profile";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <AuthProvider>
-      <BabyProvider>
-        <ColorSchemeProvider>
-          <Routes>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BabyProvider>
+          <ColorSchemeProvider>
+            <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/invites/accept" element={<InviteAccept />} />
             <Route element={
@@ -53,6 +66,7 @@ function App() {
         </ColorSchemeProvider>
       </BabyProvider>
     </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
