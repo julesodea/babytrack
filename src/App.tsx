@@ -20,6 +20,7 @@ import {
 import { BabyNew } from "./pages/BabyNew";
 import { BabyManage } from "./pages/BabyManage";
 import { InviteAccept } from "./pages/InviteAccept";
+import { Profile } from "./pages/Profile";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="/activity/:id" element={<ActivityDetail />} />
               <Route path="/babies/new" element={<BabyNew />} />
               <Route path="/babies/manage" element={<BabyManage />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Routes>
         </ColorSchemeProvider>

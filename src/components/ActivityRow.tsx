@@ -90,24 +90,26 @@ export function ActivityRow({
 
       {/* Desktop Layout */}
       <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-4 items-center">
-        <div className="col-span-6 flex items-center gap-4">
+        <div className="col-span-1 flex items-center">
           <Checkbox />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
-                {type}
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                {dayOfWeek}
-              </span>
-            </div>
-            <p className="text-sm text-gray-900">{detail}</p>
-          </div>
         </div>
-        <div className="col-span-3 text-sm text-gray-600 font-mono bg-gray-50 w-fit px-2 py-1 rounded-md border border-gray-100">
-          {time}
+        <div className="col-span-2 flex items-center gap-2">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
+            {type}
+          </span>
+        </div>
+        <div className="col-span-4">
+          <p className="text-sm text-gray-900">{detail}</p>
         </div>
         <div className="col-span-3 flex items-center gap-2">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+            {dayOfWeek}
+          </span>
+          <div className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+            {time}
+          </div>
+        </div>
+        <div className="col-span-2 flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
             {user.charAt(0)}
           </div>

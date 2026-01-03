@@ -17,6 +17,7 @@ interface BabyUser {
   id: string;
   role: 'owner' | 'caregiver';
   user_id: string | null;
+  invited_email: string | null;
   profiles?: {
     full_name: string | null;
     email: string | null;
@@ -39,9 +40,11 @@ export function BabyManage() {
 
   useEffect(() => {
     loadSharedUsers();
-  }, [babies]);
+  }, [babies, user]);
 
   const loadSharedUsers = async () => {
+    if (!user) return;
+
     const usersMap: Record<string, BabyUser[]> = {};
     for (const baby of babies) {
       try {
@@ -332,7 +335,11 @@ export function BabyManage() {
                             >
                               <div>
                                 <p className="text-sm font-medium text-gray-900">
-                                  {sharedUser.profiles?.full_name || sharedUser.profiles?.email || 'Unknown User'}
+                                  {sharedUser.profiles?.full_name ||
+                                   sharedUser.profiles?.email ||
+                                   sharedUser.invited_email ||
+                                   (sharedUser.user_id === user?.id ? user?.email : null) ||
+                                   'Unknown User'}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                   {sharedUser.role === 'owner' ? 'Owner' : 'Caregiver'}

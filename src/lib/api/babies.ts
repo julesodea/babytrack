@@ -51,12 +51,17 @@ export async function createBaby(
 
   if (error) throw error;
 
+  // Get user's email from auth
+  const { data: { user } } = await supabase.auth.getUser();
+  const userEmail = user?.email || null;
+
   // Automatically create a baby_share for the owner
   const { error: shareError } = await supabase.from('baby_shares').insert({
     baby_id: data.id,
     user_id: userId,
     role: 'owner',
     status: 'active',
+    invited_email: userEmail,
   });
 
   if (shareError) {

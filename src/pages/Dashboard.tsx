@@ -437,11 +437,11 @@ export function Dashboard() {
         {/* Table */}
         <div className="bg-transparent">
           <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-200/60 mb-2">
-            <div className="col-span-6 flex items-center gap-2">
-              Activity Name
-            </div>
+            <div className="col-span-1"></div>
+            <div className="col-span-2 flex items-center gap-2">Type</div>
+            <div className="col-span-4 flex items-center gap-2">Details</div>
             <div className="col-span-3 flex items-center gap-2">Time</div>
-            <div className="col-span-3 flex items-center gap-2">Caregiver</div>
+            <div className="col-span-2 flex items-center gap-2">Caregiver</div>
           </div>
 
           <div className="space-y-2">

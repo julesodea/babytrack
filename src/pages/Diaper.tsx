@@ -8,13 +8,13 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { getDiapers, deleteDiapers } from "../lib/api/diapers";
 import type { Diaper as DiaperType } from "../types/database";
 
 export function Diaper() {
   const { colorScheme } = useColorScheme();
-  const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const [data, setData] = useState<DiaperType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -25,17 +25,17 @@ export function Diaper() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (user) {
+    if (selectedBaby) {
       loadDiapers();
     }
-  }, [user]);
+  }, [selectedBaby]);
 
   const loadDiapers = async () => {
-    if (!user) return;
+    if (!selectedBaby) return;
 
     setLoading(true);
     try {
-      const diapers = await getDiapers(user.id);
+      const diapers = await getDiapers(selectedBaby.id);
       setData(diapers);
     } catch (error) {
       console.error("Failed to load diapers:", error);
@@ -69,7 +69,7 @@ export function Diaper() {
   };
 
   const handleDelete = async () => {
-    if (!user) return;
+    if (!selectedBaby) return;
 
     try {
       await deleteDiapers(Array.from(selectedIds));
@@ -375,11 +375,11 @@ export function Diaper() {
         {/* Table */}
         <div className="bg-transparent">
           <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-200/60 mb-2">
-            <div className="col-span-6 flex items-center gap-2">
-              Diaper Details
-            </div>
+            <div className="col-span-1"></div>
+            <div className="col-span-2 flex items-center gap-2">Type</div>
+            <div className="col-span-4 flex items-center gap-2">Details</div>
             <div className="col-span-3 flex items-center gap-2">Time</div>
-            <div className="col-span-3 flex items-center gap-2">Caregiver</div>
+            <div className="col-span-2 flex items-center gap-2">Caregiver</div>
           </div>
 
           <div className="space-y-2">
