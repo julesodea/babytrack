@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { IconMoon } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { createSleep } from "../lib/api/sleeps";
 import { getPreferences } from "../lib/api/preferences";
 
@@ -58,6 +59,7 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 export function SleepNew() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const navigate = useNavigate();
   const [sleep, setSleep] = useState({
     startTime: getCurrentTime(),
@@ -94,6 +96,11 @@ export function SleepNew() {
     e.preventDefault();
     if (!user) return;
 
+    if (!selectedBaby) {
+      setError("Please select a baby first");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -101,6 +108,8 @@ export function SleepNew() {
       const sleepType = sleep.type === 'nap' ? 'Nap' : 'Overnight Sleep';
       await createSleep({
         user_id: user.id,
+        baby_id: selectedBaby.id,
+        created_by_user_id: user.id,
         title: sleepType,
         detail: isOngoing ? 'Ongoing sleep' : `${duration} sleep`,
         duration: isOngoing ? 'Ongoing' : duration,

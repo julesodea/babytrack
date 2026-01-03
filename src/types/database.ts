@@ -50,11 +50,40 @@ export interface Database {
           updated_at?: string;
         };
       };
+      baby_shares: {
+        Row: {
+          id: string;
+          baby_id: string;
+          user_id: string | null;
+          role: 'owner' | 'caregiver';
+          invited_by: string | null;
+          status: 'pending' | 'active' | 'declined';
+          invited_email: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          user_id?: string | null;
+          role?: 'owner' | 'caregiver';
+          invited_by?: string | null;
+          status?: 'pending' | 'active' | 'declined';
+          invited_email?: string | null;
+        };
+        Update: {
+          user_id?: string | null;
+          role?: 'owner' | 'caregiver';
+          status?: 'pending' | 'active' | 'declined';
+          updated_at?: string;
+        };
+      };
       feeds: {
         Row: {
           id: string;
           user_id: string;
-          baby_id: string | null;
+          baby_id: string;
+          created_by_user_id: string | null;
           title: string;
           amount: string | null;
           detail: string | null;
@@ -69,7 +98,8 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          baby_id?: string | null;
+          baby_id: string;
+          created_by_user_id?: string | null;
           title: string;
           amount?: string | null;
           detail?: string | null;
@@ -95,7 +125,8 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          baby_id: string | null;
+          baby_id: string;
+          created_by_user_id: string | null;
           title: string;
           detail: string | null;
           time: string;
@@ -109,7 +140,8 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          baby_id?: string | null;
+          baby_id: string;
+          created_by_user_id?: string | null;
           title: string;
           detail?: string | null;
           time: string;
@@ -133,7 +165,8 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          baby_id: string | null;
+          baby_id: string;
+          created_by_user_id: string | null;
           title: string;
           detail: string | null;
           duration: string | null;
@@ -149,7 +182,8 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          baby_id?: string | null;
+          baby_id: string;
+          created_by_user_id?: string | null;
           title: string;
           detail?: string | null;
           duration?: string | null;
@@ -216,11 +250,14 @@ export interface Database {
 // Helper types for easier access
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Baby = Database['public']['Tables']['babies']['Row'];
+export type BabyShare = Database['public']['Tables']['baby_shares']['Row'];
 export type Feed = Database['public']['Tables']['feeds']['Row'];
 export type Diaper = Database['public']['Tables']['diapers']['Row'];
 export type Sleep = Database['public']['Tables']['sleeps']['Row'];
 export type Preferences = Database['public']['Tables']['preferences']['Row'];
 
+export type BabyShareInsert = Database['public']['Tables']['baby_shares']['Insert'];
+export type BabyShareUpdate = Database['public']['Tables']['baby_shares']['Update'];
 export type FeedInsert = Database['public']['Tables']['feeds']['Insert'];
 export type FeedUpdate = Database['public']['Tables']['feeds']['Update'];
 export type DiaperInsert = Database['public']['Tables']['diapers']['Insert'];

@@ -1,11 +1,29 @@
 import { supabase } from '../supabase';
 import type { Sleep, SleepInsert, SleepUpdate } from '../../types/database';
 
-export async function getSleeps(userId: string): Promise<Sleep[]> {
+/**
+ * Get all sleeps for a specific baby
+ * RLS policies automatically enforce access control
+ */
+export async function getSleeps(babyId: string): Promise<Sleep[]> {
   const { data, error } = await supabase
     .from('sleeps')
     .select('*')
-    .eq('user_id', userId)
+    .eq('baby_id', babyId)
+    .order('date', { ascending: false })
+    .order('start_time', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
+ * Get all sleeps across all accessible babies
+ */
+export async function getAllSleeps(): Promise<Sleep[]> {
+  const { data, error } = await supabase
+    .from('sleeps')
+    .select('*')
     .order('date', { ascending: false })
     .order('start_time', { ascending: false });
 

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { IconDiaper } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { createDiaper } from "../lib/api/diapers";
 import { getPreferences } from "../lib/api/preferences";
 
@@ -26,6 +27,7 @@ const getCurrentDate = (): string => {
 export function DiaperNew() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const navigate = useNavigate();
   const [diaper, setDiaper] = useState({
     type: "wet" as "wet" | "dirty" | "both",
@@ -58,6 +60,11 @@ export function DiaperNew() {
     e.preventDefault();
     if (!user) return;
 
+    if (!selectedBaby) {
+      setError("Please select a baby first");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -65,6 +72,8 @@ export function DiaperNew() {
       const diaperDetail = diaper.type.charAt(0).toUpperCase() + diaper.type.slice(1);
       await createDiaper({
         user_id: user.id,
+        baby_id: selectedBaby.id,
+        created_by_user_id: user.id,
         title: `${diaperDetail} Diaper`,
         detail: diaperDetail,
         time: diaper.time,

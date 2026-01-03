@@ -9,8 +9,10 @@ import {
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
+import { PendingInvites } from "../components/PendingInvites";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { getProfile } from "../lib/api/profiles";
 import { getFeeds } from "../lib/api/feeds";
 import { getDiapers } from "../lib/api/diapers";
@@ -29,6 +31,7 @@ interface ActivityItem {
 export function Dashboard() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const [fullName, setFullName] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [data, setData] = useState<ActivityItem[]>([]);
@@ -42,9 +45,14 @@ export function Dashboard() {
   useEffect(() => {
     if (user) {
       loadProfile();
-      loadActivities();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (selectedBaby) {
+      loadActivities();
+    }
+  }, [selectedBaby]);
 
   const loadProfile = async () => {
     if (!user) return;
@@ -63,14 +71,14 @@ export function Dashboard() {
   };
 
   const loadActivities = async () => {
-    if (!user) return;
+    if (!selectedBaby) return;
 
     setLoadingActivities(true);
     try {
       const [feeds, diapers, sleeps] = await Promise.all([
-        getFeeds(user.id),
-        getDiapers(user.id),
-        getSleeps(user.id),
+        getFeeds(selectedBaby.id),
+        getDiapers(selectedBaby.id),
+        getSleeps(selectedBaby.id),
       ]);
 
       // Map feeds to ActivityItem format
@@ -172,6 +180,9 @@ export function Dashboard() {
         <span className="text-gray-900">Dashboard</span>
       </div>
 
+      {/* Pending Invites */}
+      <PendingInvites />
+
       <div className="space-y-1">
         {loadingProfile ? (
           <>
@@ -186,7 +197,7 @@ export function Dashboard() {
                 : "Overview"}
             </h2>
             <p className="text-gray-500 text-base">
-              Track and manage your baby's daily activities
+              Track and manage {selectedBaby ? `${selectedBaby.name}'s` : "your baby's"} daily activities
             </p>
           </>
         )}

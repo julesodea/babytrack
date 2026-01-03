@@ -1,11 +1,29 @@
 import { supabase } from '../supabase';
 import type { Diaper, DiaperInsert, DiaperUpdate } from '../../types/database';
 
-export async function getDiapers(userId: string): Promise<Diaper[]> {
+/**
+ * Get all diapers for a specific baby
+ * RLS policies automatically enforce access control
+ */
+export async function getDiapers(babyId: string): Promise<Diaper[]> {
   const { data, error } = await supabase
     .from('diapers')
     .select('*')
-    .eq('user_id', userId)
+    .eq('baby_id', babyId)
+    .order('date', { ascending: false })
+    .order('time', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
+ * Get all diapers across all accessible babies
+ */
+export async function getAllDiapers(): Promise<Diaper[]> {
+  const { data, error } = await supabase
+    .from('diapers')
+    .select('*')
     .order('date', { ascending: false })
     .order('time', { ascending: false });
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router";
 import { NavItem } from "./NavItem";
+import { BabySelector } from "./BabySelector";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -70,31 +71,8 @@ export function Layout() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Profile / Account Switcher */}
-        <div className="p-4 lg:mt-0">
-          <div className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200 group">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm ${
-                  colorScheme.id === "default"
-                    ? "bg-gray-900"
-                    : colorScheme.cardBg
-                }`}
-              >
-                <IconLogo className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-gray-900 leading-tight">
-                  Baby Tracker
-                </h3>
-                <p className="text-xs text-gray-500 group-hover:text-gray-700">
-                  Free Account
-                </p>
-              </div>
-            </div>
-            <IconChevronDown className="w-4 h-4 text-gray-400" />
-          </div>
-        </div>
+        {/* Baby Selector */}
+        <BabySelector />
 
         {/* Sidebar Search */}
         <div className="px-4 mb-2">

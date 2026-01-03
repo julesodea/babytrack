@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { IconBottle } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { createFeed } from "../lib/api/feeds";
 import { getPreferences } from "../lib/api/preferences";
 
@@ -26,6 +27,7 @@ const getCurrentDate = (): string => {
 export function FeedNew() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const navigate = useNavigate();
   const [feed, setFeed] = useState({
     amount: "",
@@ -58,6 +60,11 @@ export function FeedNew() {
     e.preventDefault();
     if (!user) return;
 
+    if (!selectedBaby) {
+      setError("Please select a baby first");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -65,6 +72,8 @@ export function FeedNew() {
       const feedType = feed.type.charAt(0).toUpperCase() + feed.type.slice(1);
       await createFeed({
         user_id: user.id,
+        baby_id: selectedBaby.id,
+        created_by_user_id: user.id,
         title: `${feedType} Feed`,
         amount: feed.amount,
         detail: `${feed.amount}ml - ${feedType}`,

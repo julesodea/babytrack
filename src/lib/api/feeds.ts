@@ -1,11 +1,29 @@
 import { supabase } from '../supabase';
 import type { Feed, FeedInsert, FeedUpdate } from '../../types/database';
 
-export async function getFeeds(userId: string): Promise<Feed[]> {
+/**
+ * Get all feeds for a specific baby
+ * RLS policies automatically enforce access control
+ */
+export async function getFeeds(babyId: string): Promise<Feed[]> {
   const { data, error } = await supabase
     .from('feeds')
     .select('*')
-    .eq('user_id', userId)
+    .eq('baby_id', babyId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
+ * Get all feeds across all accessible babies
+ * Useful for dashboard view showing all activities
+ */
+export async function getAllFeeds(): Promise<Feed[]> {
+  const { data, error } = await supabase
+    .from('feeds')
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
