@@ -249,7 +249,9 @@ export function ActivityNew() {
                   </label>
                   <input
                     id="amount"
-                    type="number"
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     required
                     value={feedData.amount}
                     onChange={(e) =>

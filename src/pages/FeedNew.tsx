@@ -10,8 +10,8 @@ import { getPreferences } from "../lib/api/preferences";
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 };
 
@@ -19,8 +19,8 @@ const getCurrentTime = (): string => {
 const getCurrentDate = (): string => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -49,7 +49,7 @@ export function FeedNew() {
     try {
       const preferences = await getPreferences(user.id);
       if (preferences?.default_caregiver) {
-        setFeed(prev => ({ ...prev, user: preferences.default_caregiver! }));
+        setFeed((prev) => ({ ...prev, user: preferences.default_caregiver! }));
       }
     } catch (error) {
       console.error("Failed to load preferences:", error);
@@ -128,7 +128,12 @@ export function FeedNew() {
               <select
                 id="type"
                 value={feed.type}
-                onChange={(e) => setFeed({ ...feed, type: e.target.value as "bottle" | "breast" | "solid" })}
+                onChange={(e) =>
+                  setFeed({
+                    ...feed,
+                    type: e.target.value as "bottle" | "breast" | "solid",
+                  })
+                }
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="bottle">Bottle</option>
@@ -145,7 +150,9 @@ export function FeedNew() {
               </label>
               <input
                 id="amount"
-                type="number"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 value={feed.amount}
                 onChange={(e) => setFeed({ ...feed, amount: e.target.value })}
