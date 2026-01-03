@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { IconDashboard } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useBaby } from "../contexts/BabyContext";
 import { createFeed } from "../lib/api/feeds";
 import { createDiaper } from "../lib/api/diapers";
 import { createSleep } from "../lib/api/sleeps";
@@ -28,8 +29,8 @@ const getCurrentDate = (): string => {
 const calculateDuration = (startTime: string, endTime: string): string => {
   if (!startTime || !endTime) return "";
 
-  const [startHours, startMinutes] = startTime.split(':').map(Number);
-  const [endHours, endMinutes] = endTime.split(':').map(Number);
+  const [startHours, startMinutes] = startTime.split(":").map(Number);
+  const [endHours, endMinutes] = endTime.split(":").map(Number);
 
   let startDate = new Date();
   startDate.setHours(startHours, startMinutes, 0, 0);
@@ -50,17 +51,20 @@ const calculateDuration = (startTime: string, endTime: string): string => {
   if (hours === 0) {
     return `${minutes} min`;
   } else if (minutes === 0) {
-    return `${hours} hr${hours > 1 ? 's' : ''}`;
+    return `${hours} hr${hours > 1 ? "s" : ""}`;
   } else {
-    return `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min`;
+    return `${hours} hr${hours > 1 ? "s" : ""} ${minutes} min`;
   }
 };
 
 export function ActivityNew() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const navigate = useNavigate();
-  const [activityType, setActivityType] = useState<"feed" | "diaper" | "sleep">("feed");
+  const [activityType, setActivityType] = useState<"feed" | "diaper" | "sleep">(
+    "feed"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -90,18 +94,29 @@ export function ActivityNew() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !selectedBaby) {
+      setError("Please select a baby first.");
+      return;
+    }
 
     setLoading(true);
     setError("");
 
     try {
       if (activityType === "feed") {
-        const feedType = feedData.type === 'bottle' ? 'Bottle Feed' : feedData.type === 'breast' ? 'Breastfeed' : 'Solid Food';
+        const feedType =
+          feedData.type === "bottle"
+            ? "Bottle Feed"
+            : feedData.type === "breast"
+            ? "Breastfeed"
+            : "Solid Food";
         await createFeed({
           user_id: user.id,
+          baby_id: selectedBaby.id,
           title: feedType,
-          detail: `${feedData.amount}ml - ${feedData.type.charAt(0).toUpperCase() + feedData.type.slice(1)}`,
+          detail: `${feedData.amount}ml - ${
+            feedData.type.charAt(0).toUpperCase() + feedData.type.slice(1)
+          }`,
           amount: feedData.amount,
           time: feedData.time,
           caregiver: feedData.caregiver,
@@ -111,8 +126,11 @@ export function ActivityNew() {
       } else if (activityType === "diaper") {
         await createDiaper({
           user_id: user.id,
-          title: 'Diaper Change',
-          detail: `${diaperData.type.charAt(0).toUpperCase() + diaperData.type.slice(1)} diaper`,
+          baby_id: selectedBaby.id,
+          title: "Diaper Change",
+          detail: `${
+            diaperData.type.charAt(0).toUpperCase() + diaperData.type.slice(1)
+          } diaper`,
           time: diaperData.time,
           caregiver: diaperData.caregiver,
           type: diaperData.type,
@@ -120,10 +138,14 @@ export function ActivityNew() {
           date: getCurrentDate(),
         });
       } else if (activityType === "sleep") {
-        const duration = calculateDuration(sleepData.startTime, sleepData.endTime);
-        const sleepType = sleepData.type === 'nap' ? 'Nap' : 'Overnight Sleep';
+        const duration = calculateDuration(
+          sleepData.startTime,
+          sleepData.endTime
+        );
+        const sleepType = sleepData.type === "nap" ? "Nap" : "Overnight Sleep";
         await createSleep({
           user_id: user.id,
+          baby_id: selectedBaby.id,
           title: sleepType,
           detail: `${duration} sleep`,
           duration: duration,
@@ -181,7 +203,9 @@ export function ActivityNew() {
               <select
                 id="activityType"
                 value={activityType}
-                onChange={(e) => setActivityType(e.target.value as "feed" | "diaper" | "sleep")}
+                onChange={(e) =>
+                  setActivityType(e.target.value as "feed" | "diaper" | "sleep")
+                }
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="feed">Feed</option>
@@ -194,13 +218,21 @@ export function ActivityNew() {
             {activityType === "feed" && (
               <>
                 <div>
-                  <label htmlFor="feedType" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="feedType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Feed Type
                   </label>
                   <select
                     id="feedType"
                     value={feedData.type}
-                    onChange={(e) => setFeedData({ ...feedData, type: e.target.value as "bottle" | "breast" | "solid" })}
+                    onChange={(e) =>
+                      setFeedData({
+                        ...feedData,
+                        type: e.target.value as "bottle" | "breast" | "solid",
+                      })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="bottle">Bottle</option>
@@ -209,7 +241,10 @@ export function ActivityNew() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="amount"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Amount (ml)
                   </label>
                   <input
@@ -217,13 +252,18 @@ export function ActivityNew() {
                     type="number"
                     required
                     value={feedData.amount}
-                    onChange={(e) => setFeedData({ ...feedData, amount: e.target.value })}
+                    onChange={(e) =>
+                      setFeedData({ ...feedData, amount: e.target.value })
+                    }
                     placeholder="e.g., 150"
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="feedTime" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="feedTime"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Time
                   </label>
                   <input
@@ -231,19 +271,26 @@ export function ActivityNew() {
                     type="time"
                     required
                     value={feedData.time}
-                    onChange={(e) => setFeedData({ ...feedData, time: e.target.value })}
+                    onChange={(e) =>
+                      setFeedData({ ...feedData, time: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="feedCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="feedCaregiver"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Caregiver
                   </label>
                   <select
                     id="feedCaregiver"
                     required
                     value={feedData.caregiver}
-                    onChange={(e) => setFeedData({ ...feedData, caregiver: e.target.value })}
+                    onChange={(e) =>
+                      setFeedData({ ...feedData, caregiver: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="">Select caregiver</option>
@@ -259,13 +306,21 @@ export function ActivityNew() {
             {activityType === "diaper" && (
               <>
                 <div>
-                  <label htmlFor="diaperType" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="diaperType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Diaper Type
                   </label>
                   <select
                     id="diaperType"
                     value={diaperData.type}
-                    onChange={(e) => setDiaperData({ ...diaperData, type: e.target.value as "wet" | "dirty" | "both" })}
+                    onChange={(e) =>
+                      setDiaperData({
+                        ...diaperData,
+                        type: e.target.value as "wet" | "dirty" | "both",
+                      })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="wet">Wet</option>
@@ -274,7 +329,10 @@ export function ActivityNew() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="diaperTime" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="diaperTime"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Time
                   </label>
                   <input
@@ -282,19 +340,29 @@ export function ActivityNew() {
                     type="time"
                     required
                     value={diaperData.time}
-                    onChange={(e) => setDiaperData({ ...diaperData, time: e.target.value })}
+                    onChange={(e) =>
+                      setDiaperData({ ...diaperData, time: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="diaperCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="diaperCaregiver"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Caregiver
                   </label>
                   <select
                     id="diaperCaregiver"
                     required
                     value={diaperData.caregiver}
-                    onChange={(e) => setDiaperData({ ...diaperData, caregiver: e.target.value })}
+                    onChange={(e) =>
+                      setDiaperData({
+                        ...diaperData,
+                        caregiver: e.target.value,
+                      })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="">Select caregiver</option>
@@ -304,13 +372,18 @@ export function ActivityNew() {
                   </select>
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="diaperNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="diaperNotes"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Notes (optional)
                   </label>
                   <textarea
                     id="diaperNotes"
                     value={diaperData.notes}
-                    onChange={(e) => setDiaperData({ ...diaperData, notes: e.target.value })}
+                    onChange={(e) =>
+                      setDiaperData({ ...diaperData, notes: e.target.value })
+                    }
                     rows={3}
                     placeholder="Any additional notes..."
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
@@ -323,13 +396,21 @@ export function ActivityNew() {
             {activityType === "sleep" && (
               <>
                 <div>
-                  <label htmlFor="sleepType" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="sleepType"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Sleep Type
                   </label>
                   <select
                     id="sleepType"
                     value={sleepData.type}
-                    onChange={(e) => setSleepData({ ...sleepData, type: e.target.value as "nap" | "overnight" })}
+                    onChange={(e) =>
+                      setSleepData({
+                        ...sleepData,
+                        type: e.target.value as "nap" | "overnight",
+                      })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="nap">Nap</option>
@@ -337,7 +418,10 @@ export function ActivityNew() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="startTime"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Start Time
                   </label>
                   <input
@@ -345,12 +429,17 @@ export function ActivityNew() {
                     type="time"
                     required
                     value={sleepData.startTime}
-                    onChange={(e) => setSleepData({ ...sleepData, startTime: e.target.value })}
+                    onChange={(e) =>
+                      setSleepData({ ...sleepData, startTime: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="endTime"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     End Time
                   </label>
                   <input
@@ -358,27 +447,40 @@ export function ActivityNew() {
                     type="time"
                     required
                     value={sleepData.endTime}
-                    onChange={(e) => setSleepData({ ...sleepData, endTime: e.target.value })}
+                    onChange={(e) =>
+                      setSleepData({ ...sleepData, endTime: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="duration"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Duration
                   </label>
                   <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
-                    {calculateDuration(sleepData.startTime, sleepData.endTime) || 'Select start and end time'}
+                    {calculateDuration(
+                      sleepData.startTime,
+                      sleepData.endTime
+                    ) || "Select start and end time"}
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="sleepCaregiver" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="sleepCaregiver"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Caregiver
                   </label>
                   <select
                     id="sleepCaregiver"
                     required
                     value={sleepData.caregiver}
-                    onChange={(e) => setSleepData({ ...sleepData, caregiver: e.target.value })}
+                    onChange={(e) =>
+                      setSleepData({ ...sleepData, caregiver: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="">Select caregiver</option>
@@ -407,7 +509,11 @@ export function ActivityNew() {
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              {loading ? "Saving..." : `Log ${activityType.charAt(0).toUpperCase() + activityType.slice(1)}`}
+              {loading
+                ? "Saving..."
+                : `Log ${
+                    activityType.charAt(0).toUpperCase() + activityType.slice(1)
+                  }`}
             </button>
             <Link
               to="/"

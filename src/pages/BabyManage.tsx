@@ -341,7 +341,7 @@ export function BabyManage() {
                               </div>
                               {owner && sharedUser.role !== 'owner' && (
                                 <button
-                                  onClick={() => handleRemoveUser(sharedUser.id, sharedUser.profiles?.full_name)}
+                                  onClick={() => handleRemoveUser(sharedUser.id, sharedUser.profiles?.full_name || null)}
                                   disabled={loading}
                                   className="text-sm text-red-600 hover:text-red-700"
                                 >

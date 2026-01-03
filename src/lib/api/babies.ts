@@ -4,7 +4,7 @@ import type { Baby } from '../../types/database';
 /**
  * Get all babies the current user has access to (owned or shared)
  */
-export async function getAccessibleBabies(userId: string): Promise<Baby[]> {
+export async function getAccessibleBabies(_userId: string): Promise<Baby[]> {
   const { data, error } = await supabase
     .from('babies')
     .select('*')

@@ -6,12 +6,10 @@ import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import {
   IconBottle,
-  IconChevronDown,
   IconClose,
   IconDashboard,
   IconDiaper,
   IconFilter,
-  IconLogo,
   IconMenu,
   IconMoon,
   IconSearch,
