@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
-import { getProfile, updateProfile } from '../lib/api/profiles';
-import { useColorScheme } from '../context/ColorSchemeContext';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../contexts/AuthContext";
+import { getProfile, updateProfile } from "../lib/api/profiles";
+import { useColorScheme } from "../context/ColorSchemeContext";
 
 export function Profile() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
 
-  const [fullName, setFullName] = useState('');
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -28,11 +28,11 @@ export function Profile() {
     try {
       const profile = await getProfile(user.id);
       if (profile) {
-        setFullName(profile.full_name || '');
+        setFullName(profile.full_name || "");
       }
     } catch (err) {
-      console.error('Failed to load profile:', err);
-      setError('Failed to load profile');
+      console.error("Failed to load profile:", err);
+      setError("Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -43,18 +43,18 @@ export function Profile() {
     if (!user) return;
 
     setSaving(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       await updateProfile(user.id, {
-        full_name: fullName.trim() || null,
+        full_name: fullName.trim() || undefined,
       });
-      setSuccess('Profile updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Profile updated successfully!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      console.error('Failed to update profile:', err);
-      setError('Failed to update profile. Please try again.');
+      console.error("Failed to update profile:", err);
+      setError("Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -73,7 +73,7 @@ export function Profile() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="text-sm text-gray-600 hover:text-gray-900"
           >
             ← Back to Dashboard
@@ -104,7 +104,7 @@ export function Profile() {
               </label>
               <input
                 type="email"
-                value={user?.email || ''}
+                value={user?.email || ""}
                 disabled
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
               />
@@ -125,7 +125,8 @@ export function Profile() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <p className="mt-1 text-xs text-gray-500">
-                This name will be displayed when you share babies with other caregivers
+                This name will be displayed when you share babies with other
+                caregivers
               </p>
             </div>
 
@@ -134,16 +135,16 @@ export function Profile() {
                 type="submit"
                 disabled={saving}
                 className={`px-6 py-2 rounded-lg text-white font-medium transition-colors ${
-                  colorScheme.id === 'default'
-                    ? 'bg-gray-900 hover:bg-gray-800'
-                    : colorScheme.cardBg + ' hover:opacity-90'
+                  colorScheme.id === "default"
+                    ? "bg-gray-900 hover:bg-gray-800"
+                    : colorScheme.cardBg + " hover:opacity-90"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
               >
                 Cancel
