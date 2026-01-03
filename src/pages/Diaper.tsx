@@ -8,12 +8,16 @@ import {
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
+import { NotificationBanner } from "../components/NotificationBanner";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getDiapers, deleteDiapers } from "../lib/api/diapers";
+import { getPreferences } from "../lib/api/preferences";
 
 export function Diaper() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -22,6 +26,13 @@ export function Diaper() {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Query for user preferences
+  const { data: preferences } = useQuery({
+    queryKey: ["preferences", user?.id],
+    queryFn: () => getPreferences(user!.id),
+    enabled: !!user,
+  });
 
   // Query for diapers
   const { data = [], isLoading: loading } = useQuery({
@@ -39,6 +50,28 @@ export function Diaper() {
       setSelectedIds(new Set());
     },
   });
+
+  // Check for overdue diaper changes
+  const diaperAlertEnabled = preferences?.diaper_alerts ?? true;
+  const diaperAlertInterval = preferences?.diaper_alert_interval || 3;
+
+  const mostRecentDiaper = data.length > 0 ? data[0] : undefined;
+
+  const getHoursSince = (diaper: typeof mostRecentDiaper) => {
+    if (!diaper) return Infinity;
+    const now = new Date();
+    const diaperDate = new Date(`${diaper.date}T${diaper.time}`);
+    return (now.getTime() - diaperDate.getTime()) / (1000 * 60 * 60);
+  };
+
+  const hoursSinceLastDiaper = getHoursSince(mostRecentDiaper);
+  const showDiaperAlert = diaperAlertEnabled && hoursSinceLastDiaper >= diaperAlertInterval;
+
+  const getDiaperAlertMessage = () => {
+    const hours = Math.floor(hoursSinceLastDiaper);
+    if (hours === Infinity) return `${selectedBaby?.name || "Baby"}'s diaper hasn't been checked yet. Please check!`;
+    return `${selectedBaby?.name || "Baby"}'s diaper hasn't been changed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+  };
 
   const uniqueDates = [...new Set(data.map((d) => d.date))];
 
@@ -100,6 +133,14 @@ export function Diaper() {
         <span>/</span>
         <span className="text-gray-900">Diaper Changes</span>
       </div>
+
+      {/* Notification Banner */}
+      {showDiaperAlert && (
+        <NotificationBanner
+          message={getDiaperAlertMessage()}
+          type="diaper"
+        />
+      )}
 
       <div className="space-y-1">
         <h2 className="text-3xl font-bold text-gray-900 tracking-tight">

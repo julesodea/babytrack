@@ -11,7 +11,6 @@ import { ActivityRow } from "../components/ActivityRow";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getSleeps, deleteSleeps } from "../lib/api/sleeps";
-import type { Sleep as SleepType } from "../types/database";
 
 export function Sleep() {
   const { colorScheme } = useColorScheme();

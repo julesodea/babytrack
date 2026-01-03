@@ -212,7 +212,9 @@ export interface Database {
           id: string;
           user_id: string;
           feed_reminders: boolean;
+          feed_reminder_interval: number;
           diaper_alerts: boolean;
+          diaper_alert_interval: number;
           sleep_tracking: boolean;
           theme: string;
           time_format: string;
@@ -225,7 +227,9 @@ export interface Database {
           id?: string;
           user_id: string;
           feed_reminders?: boolean;
+          feed_reminder_interval?: number;
           diaper_alerts?: boolean;
+          diaper_alert_interval?: number;
           sleep_tracking?: boolean;
           theme?: string;
           time_format?: string;
@@ -234,7 +238,9 @@ export interface Database {
         };
         Update: {
           feed_reminders?: boolean;
+          feed_reminder_interval?: number;
           diaper_alerts?: boolean;
+          diaper_alert_interval?: number;
           sleep_tracking?: boolean;
           theme?: string;
           time_format?: string;

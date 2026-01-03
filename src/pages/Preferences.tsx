@@ -14,7 +14,9 @@ export function Preferences() {
   const [error, setError] = useState("");
   const [settings, setSettings] = useState({
     feedReminders: true,
+    feedReminderInterval: 3,
     diaperAlerts: true,
+    diaperAlertInterval: 3,
     sleepTracking: false,
     theme: "light",
     timeFormat: "12h",
@@ -51,6 +53,10 @@ export function Preferences() {
         setSettings(prev => ({
           ...prev,
           defaultCaregiver: preferences.default_caregiver || "",
+          feedReminders: preferences.feed_reminders ?? true,
+          feedReminderInterval: preferences.feed_reminder_interval || 3,
+          diaperAlerts: preferences.diaper_alerts ?? true,
+          diaperAlertInterval: preferences.diaper_alert_interval || 3,
         }));
       }
     } catch (err) {
@@ -70,7 +76,11 @@ export function Preferences() {
         updateProfile(user.id, { full_name: fullName }),
         upsertPreferences({
           user_id: user.id,
-          default_caregiver: settings.defaultCaregiver || null
+          default_caregiver: settings.defaultCaregiver || null,
+          feed_reminders: settings.feedReminders,
+          feed_reminder_interval: settings.feedReminderInterval,
+          diaper_alerts: settings.diaperAlerts,
+          diaper_alert_interval: settings.diaperAlertInterval,
         })
       ]);
       setSuccess(true);
@@ -163,68 +173,116 @@ export function Preferences() {
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             Notifications
           </h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  Feed Reminders
-                </p>
-                <p className="text-xs text-gray-500">
-                  Get notified when it's time for a feed
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  setSettings({
-                    ...settings,
-                    feedReminders: !settings.feedReminders,
-                  })
-                }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.feedReminders
-                    ? colorScheme.id === "default"
-                      ? "bg-gray-900"
-                      : colorScheme.cardBg
-                    : "bg-gray-200"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.feedReminders ? "translate-x-6" : "translate-x-1"
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Feed Reminders
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Get notified when it's time for a feed
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setSettings({
+                      ...settings,
+                      feedReminders: !settings.feedReminders,
+                    })
+                  }
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    settings.feedReminders
+                      ? colorScheme.id === "default"
+                        ? "bg-gray-900"
+                        : colorScheme.cardBg
+                      : "bg-gray-200"
                   }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      settings.feedReminders ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              {settings.feedReminders && (
+                <div className="ml-0 flex items-center gap-2">
+                  <label htmlFor="feedInterval" className="text-xs text-gray-600">
+                    Remind me every
+                  </label>
+                  <input
+                    id="feedInterval"
+                    type="number"
+                    min="1"
+                    max="24"
+                    value={settings.feedReminderInterval}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        feedReminderInterval: parseInt(e.target.value) || 3,
+                      })
+                    }
+                    className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
+                  />
+                  <span className="text-xs text-gray-600">hours</span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  Diaper Alerts
-                </p>
-                <p className="text-xs text-gray-500">
-                  Receive alerts for diaper check times
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  setSettings({
-                    ...settings,
-                    diaperAlerts: !settings.diaperAlerts,
-                  })
-                }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.diaperAlerts
-                    ? colorScheme.id === "default"
-                      ? "bg-gray-900"
-                      : colorScheme.cardBg
-                    : "bg-gray-200"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.diaperAlerts ? "translate-x-6" : "translate-x-1"
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Diaper Alerts
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Receive alerts for diaper check times
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setSettings({
+                      ...settings,
+                      diaperAlerts: !settings.diaperAlerts,
+                    })
+                  }
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    settings.diaperAlerts
+                      ? colorScheme.id === "default"
+                        ? "bg-gray-900"
+                        : colorScheme.cardBg
+                      : "bg-gray-200"
                   }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      settings.diaperAlerts ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              {settings.diaperAlerts && (
+                <div className="ml-0 flex items-center gap-2">
+                  <label htmlFor="diaperInterval" className="text-xs text-gray-600">
+                    Remind me every
+                  </label>
+                  <input
+                    id="diaperInterval"
+                    type="number"
+                    min="1"
+                    max="24"
+                    value={settings.diaperAlertInterval}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        diaperAlertInterval: parseInt(e.target.value) || 3,
+                      })
+                    }
+                    className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
+                  />
+                  <span className="text-xs text-gray-600">hours</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center justify-between">
               <div>

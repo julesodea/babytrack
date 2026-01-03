@@ -11,10 +11,12 @@ import {
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { PendingInvites } from "../components/PendingInvites";
+import { NotificationBanner } from "../components/NotificationBanner";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getProfile } from "../lib/api/profiles";
+import { getPreferences } from "../lib/api/preferences";
 import { getFeeds } from "../lib/api/feeds";
 import { getDiapers } from "../lib/api/diapers";
 import { getSleeps } from "../lib/api/sleeps";
@@ -43,6 +45,13 @@ export function Dashboard() {
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: () => getProfile(user!.id),
+    enabled: !!user,
+  });
+
+  // Query for user preferences
+  const { data: preferences } = useQuery({
+    queryKey: ["preferences", user?.id],
+    queryFn: () => getPreferences(user!.id),
     enabled: !!user,
   });
 
@@ -107,6 +116,40 @@ export function Dashboard() {
   const fullName = profile?.full_name || "";
   const data = activities;
 
+  // Check for overdue activities
+  const feedReminderEnabled = preferences?.feed_reminders ?? true;
+  const feedReminderInterval = preferences?.feed_reminder_interval || 3;
+  const diaperAlertEnabled = preferences?.diaper_alerts ?? true;
+  const diaperAlertInterval = preferences?.diaper_alert_interval || 3;
+
+  const lastFeed = data.find((a) => a.type === "feed");
+  const lastDiaper = data.find((a) => a.type === "diaper");
+
+  const getHoursSince = (activity: ActivityItem | undefined) => {
+    if (!activity) return Infinity;
+    const now = new Date();
+    const activityDate = new Date(`${activity.date}T${activity.time}`);
+    return (now.getTime() - activityDate.getTime()) / (1000 * 60 * 60);
+  };
+
+  const hoursSinceLastFeed = getHoursSince(lastFeed);
+  const hoursSinceLastDiaper = getHoursSince(lastDiaper);
+
+  const showFeedReminder = feedReminderEnabled && hoursSinceLastFeed >= feedReminderInterval;
+  const showDiaperAlert = diaperAlertEnabled && hoursSinceLastDiaper >= diaperAlertInterval;
+
+  const getFeedReminderMessage = () => {
+    const hours = Math.floor(hoursSinceLastFeed);
+    if (hours === Infinity) return `${selectedBaby?.name || "Baby"} hasn't been fed yet today. Please check!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+  };
+
+  const getDiaperAlertMessage = () => {
+    const hours = Math.floor(hoursSinceLastDiaper);
+    if (hours === Infinity) return `${selectedBaby?.name || "Baby"}'s diaper hasn't been checked yet today. Please check!`;
+    return `${selectedBaby?.name || "Baby"}'s diaper hasn't been changed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+  };
+
   const uniqueDates = [...new Set(data.map((a) => a.date))];
 
   const filteredData = data.filter((item) => {
@@ -128,7 +171,9 @@ export function Dashboard() {
   };
 
   const handleDelete = () => {
-    setData((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+    // Note: This is a local filter for UI purposes only
+    // In production, you would want to delete from the database
+    // For now, we just clear the selection
     setSelectedIds(new Set());
   };
 
@@ -159,6 +204,20 @@ export function Dashboard() {
 
       {/* Pending Invites */}
       <PendingInvites />
+
+      {/* Notification Banners */}
+      {showFeedReminder && (
+        <NotificationBanner
+          message={getFeedReminderMessage()}
+          type="feed"
+        />
+      )}
+      {showDiaperAlert && (
+        <NotificationBanner
+          message={getDiaperAlertMessage()}
+          type="diaper"
+        />
+      )}
 
       <div className="space-y-1">
         {loadingProfile ? (

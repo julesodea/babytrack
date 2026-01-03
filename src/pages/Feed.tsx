@@ -8,12 +8,16 @@ import {
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
+import { NotificationBanner } from "../components/NotificationBanner";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getFeeds, deleteFeeds } from "../lib/api/feeds";
+import { getPreferences } from "../lib/api/preferences";
 
 export function Feed() {
   const { colorScheme } = useColorScheme();
+  const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -22,6 +26,13 @@ export function Feed() {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Query for user preferences
+  const { data: preferences } = useQuery({
+    queryKey: ["preferences", user?.id],
+    queryFn: () => getPreferences(user!.id),
+    enabled: !!user,
+  });
 
   // Query for feeds
   const { data = [], isLoading: loading } = useQuery({
@@ -39,6 +50,28 @@ export function Feed() {
       setSelectedIds(new Set());
     },
   });
+
+  // Check for overdue feeds
+  const feedReminderEnabled = preferences?.feed_reminders ?? true;
+  const feedReminderInterval = preferences?.feed_reminder_interval || 3;
+
+  const mostRecentFeed = data.length > 0 ? data[0] : undefined;
+
+  const getHoursSince = (feed: typeof mostRecentFeed) => {
+    if (!feed) return Infinity;
+    const now = new Date();
+    const feedDate = new Date(`${feed.date}T${feed.time}`);
+    return (now.getTime() - feedDate.getTime()) / (1000 * 60 * 60);
+  };
+
+  const hoursSinceLastFeed = getHoursSince(mostRecentFeed);
+  const showFeedReminder = feedReminderEnabled && hoursSinceLastFeed >= feedReminderInterval;
+
+  const getFeedReminderMessage = () => {
+    const hours = Math.floor(hoursSinceLastFeed);
+    if (hours === Infinity) return `${selectedBaby?.name || "Baby"} hasn't been fed yet. Please check!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+  };
 
   const uniqueDates = [...new Set(data.map((f) => f.date))];
 
@@ -97,6 +130,14 @@ export function Feed() {
         <span>/</span>
         <span className="text-gray-900">Feed Logs</span>
       </div>
+
+      {/* Notification Banner */}
+      {showFeedReminder && (
+        <NotificationBanner
+          message={getFeedReminderMessage()}
+          type="feed"
+        />
+      )}
 
       <div className="space-y-1">
         <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
