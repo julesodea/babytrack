@@ -26,6 +26,7 @@ export function Feed() {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Query for user preferences
   const { data: preferences } = useQuery({
@@ -48,6 +49,7 @@ export function Feed() {
       queryClient.invalidateQueries({ queryKey: ["feeds", selectedBaby?.id] });
       queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
       setSelectedIds(new Set());
+      setShowDeleteModal(false);
     },
   });
 
@@ -377,7 +379,7 @@ export function Feed() {
           <div className="flex items-center gap-2">
             {selectedIds.size > 0 && (
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDeleteModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Delete ({selectedIds.size})
@@ -433,6 +435,36 @@ export function Feed() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-[2px]">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Feeds
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete {selectedIds.size} {selectedIds.size === 1 ? 'feed' : 'feeds'}? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

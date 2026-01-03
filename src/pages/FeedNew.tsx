@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconBottle } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -29,6 +30,7 @@ export function FeedNew() {
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [feed, setFeed] = useState({
     amount: "",
     time: getCurrentTime(),
@@ -82,6 +84,9 @@ export function FeedNew() {
         type: feed.type,
         date: getCurrentDate(),
       });
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] });
       navigate("/feed");
     } catch (err) {
       console.error("Failed to create feed:", err);

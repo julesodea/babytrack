@@ -10,6 +10,7 @@ export function Preferences() {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [settings, setSettings] = useState({
@@ -47,6 +48,7 @@ export function Preferences() {
   const loadPreferences = async () => {
     if (!user) return;
 
+    setIsLoadingPreferences(true);
     try {
       const preferences = await getPreferences(user.id);
       if (preferences) {
@@ -61,6 +63,8 @@ export function Preferences() {
       }
     } catch (err) {
       console.error("Failed to load preferences:", err);
+    } finally {
+      setIsLoadingPreferences(false);
     }
   };
 
@@ -173,149 +177,175 @@ export function Preferences() {
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             Notifications
           </h3>
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Feed Reminders
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Get notified when it's time for a feed
-                  </p>
+          {isLoadingPreferences ? (
+            <div className="space-y-6 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-3 bg-gray-100 rounded w-48"></div>
                 </div>
-                <button
-                  onClick={() =>
-                    setSettings({
-                      ...settings,
-                      feedReminders: !settings.feedReminders,
-                    })
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    settings.feedReminders
-                      ? colorScheme.id === "default"
-                        ? "bg-gray-900"
-                        : colorScheme.cardBg
-                      : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      settings.feedReminders ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
+                <div className="h-6 w-11 bg-gray-200 rounded-full"></div>
               </div>
-              {settings.feedReminders && (
-                <div className="ml-0 flex items-center gap-2">
-                  <label htmlFor="feedInterval" className="text-xs text-gray-600">
-                    Remind me every
-                  </label>
-                  <input
-                    id="feedInterval"
-                    type="number"
-                    min="1"
-                    max="24"
-                    value={settings.feedReminderInterval}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        feedReminderInterval: parseInt(e.target.value) || 3,
-                      })
-                    }
-                    className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
-                  />
-                  <span className="text-xs text-gray-600">hours</span>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-3 bg-gray-100 rounded w-48"></div>
                 </div>
-              )}
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Diaper Alerts
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Receive alerts for diaper check times
-                  </p>
-                </div>
-                <button
-                  onClick={() =>
-                    setSettings({
-                      ...settings,
-                      diaperAlerts: !settings.diaperAlerts,
-                    })
-                  }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    settings.diaperAlerts
-                      ? colorScheme.id === "default"
-                        ? "bg-gray-900"
-                        : colorScheme.cardBg
-                      : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      settings.diaperAlerts ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
+                <div className="h-6 w-11 bg-gray-200 rounded-full"></div>
               </div>
-              {settings.diaperAlerts && (
-                <div className="ml-0 flex items-center gap-2">
-                  <label htmlFor="diaperInterval" className="text-xs text-gray-600">
-                    Remind me every
-                  </label>
-                  <input
-                    id="diaperInterval"
-                    type="number"
-                    min="1"
-                    max="24"
-                    value={settings.diaperAlertInterval}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        diaperAlertInterval: parseInt(e.target.value) || 3,
-                      })
-                    }
-                    className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
-                  />
-                  <span className="text-xs text-gray-600">hours</span>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                  <div className="h-3 bg-gray-100 rounded w-48"></div>
                 </div>
-              )}
+                <div className="h-6 w-11 bg-gray-200 rounded-full"></div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
+          ) : (
+            <div className="space-y-6">
               <div>
-                <p className="text-sm font-medium text-gray-900">
-                  Sleep Tracking
-                </p>
-                <p className="text-xs text-gray-500">
-                  Enable automatic sleep pattern analysis
-                </p>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Feed Reminders
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Get notified when it's time for a feed
+                    </p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      setSettings({
+                        ...settings,
+                        feedReminders: !settings.feedReminders,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      settings.feedReminders
+                        ? colorScheme.id === "default"
+                          ? "bg-gray-900"
+                          : colorScheme.cardBg
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        settings.feedReminders ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {settings.feedReminders && (
+                  <div className="ml-0 flex items-center gap-2">
+                    <label htmlFor="feedInterval" className="text-xs text-gray-600">
+                      Remind me every
+                    </label>
+                    <input
+                      id="feedInterval"
+                      type="number"
+                      min="1"
+                      max="24"
+                      value={settings.feedReminderInterval}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          feedReminderInterval: parseInt(e.target.value) || 3,
+                        })
+                      }
+                      className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
+                    />
+                    <span className="text-xs text-gray-600">hours</span>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() =>
-                  setSettings({
-                    ...settings,
-                    sleepTracking: !settings.sleepTracking,
-                  })
-                }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.sleepTracking
-                    ? colorScheme.id === "default"
-                      ? "bg-gray-900"
-                      : colorScheme.cardBg
-                    : "bg-gray-200"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.sleepTracking ? "translate-x-6" : "translate-x-1"
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Diaper Alerts
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Receive alerts for diaper check times
+                    </p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      setSettings({
+                        ...settings,
+                        diaperAlerts: !settings.diaperAlerts,
+                      })
+                    }
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      settings.diaperAlerts
+                        ? colorScheme.id === "default"
+                          ? "bg-gray-900"
+                          : colorScheme.cardBg
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        settings.diaperAlerts ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {settings.diaperAlerts && (
+                  <div className="ml-0 flex items-center gap-2">
+                    <label htmlFor="diaperInterval" className="text-xs text-gray-600">
+                      Remind me every
+                    </label>
+                    <input
+                      id="diaperInterval"
+                      type="number"
+                      min="1"
+                      max="24"
+                      value={settings.diaperAlertInterval}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          diaperAlertInterval: parseInt(e.target.value) || 3,
+                        })
+                      }
+                      className="w-16 px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none"
+                    />
+                    <span className="text-xs text-gray-600">hours</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Sleep Tracking
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Enable automatic sleep pattern analysis
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setSettings({
+                      ...settings,
+                      sleepTracking: !settings.sleepTracking,
+                    })
+                  }
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    settings.sleepTracking
+                      ? colorScheme.id === "default"
+                        ? "bg-gray-900"
+                        : colorScheme.cardBg
+                      : "bg-gray-200"
                   }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      settings.sleepTracking ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Display */}
@@ -401,51 +431,65 @@ export function Preferences() {
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             Data Defaults
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="defaultCaregiver"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Default Caregiver
-              </label>
-              <select
-                id="defaultCaregiver"
-                value={settings.defaultCaregiver}
-                onChange={(e) =>
-                  setSettings({ ...settings, defaultCaregiver: e.target.value })
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="">None (select manually each time)</option>
-                <option value="Mum">Mum</option>
-                <option value="Dad">Dad</option>
-                <option value="Other">Other</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-2">
-                This caregiver will be pre-selected when creating new activities
-              </p>
+          {isLoadingPreferences ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-pulse">
+              <div>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                <div className="h-10 bg-gray-100 rounded"></div>
+                <div className="h-3 bg-gray-100 rounded w-full mt-2"></div>
+              </div>
+              <div>
+                <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                <div className="h-10 bg-gray-100 rounded"></div>
+              </div>
             </div>
-            <div>
-              <label
-                htmlFor="measurementUnit"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Measurement Unit
-              </label>
-              <select
-                id="measurementUnit"
-                value={settings.measurementUnit}
-                onChange={(e) =>
-                  setSettings({ ...settings, measurementUnit: e.target.value })
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="ml">Milliliters (ml)</option>
-                <option value="oz">Ounces (oz)</option>
-              </select>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label
+                  htmlFor="defaultCaregiver"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Default Caregiver
+                </label>
+                <select
+                  id="defaultCaregiver"
+                  value={settings.defaultCaregiver}
+                  onChange={(e) =>
+                    setSettings({ ...settings, defaultCaregiver: e.target.value })
+                  }
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                >
+                  <option value="">None (select manually each time)</option>
+                  <option value="Mum">Mum</option>
+                  <option value="Dad">Dad</option>
+                  <option value="Other">Other</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-2">
+                  This caregiver will be pre-selected when creating new activities
+                </p>
+              </div>
+              <div>
+                <label
+                  htmlFor="measurementUnit"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Measurement Unit
+                </label>
+                <select
+                  id="measurementUnit"
+                  value={settings.measurementUnit}
+                  onChange={(e) =>
+                    setSettings({ ...settings, measurementUnit: e.target.value })
+                  }
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                >
+                  <option value="ml">Milliliters (ml)</option>
+                  <option value="oz">Ounces (oz)</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Save Button */}

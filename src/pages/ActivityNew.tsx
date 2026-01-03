@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconDashboard } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -62,6 +63,7 @@ export function ActivityNew() {
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activityType, setActivityType] = useState<"feed" | "diaper" | "sleep">(
     "feed"
   );
@@ -156,6 +158,11 @@ export function ActivityNew() {
           date: getCurrentDate(),
         });
       }
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      await queryClient.invalidateQueries({ queryKey: ["diapers"] });
+      await queryClient.invalidateQueries({ queryKey: ["sleeps"] });
       navigate("/");
     } catch (err) {
       console.error("Failed to create activity:", err);

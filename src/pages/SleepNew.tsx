@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconMoon } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -61,6 +62,7 @@ export function SleepNew() {
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [sleep, setSleep] = useState({
     startTime: getCurrentTime(),
     endTime: getCurrentTime(),
@@ -119,6 +121,9 @@ export function SleepNew() {
         type: sleep.type,
         date: getCurrentDate(),
       });
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+      await queryClient.invalidateQueries({ queryKey: ["sleeps"] });
       navigate("/sleep");
     } catch (err) {
       console.error("Failed to create sleep entry:", err);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconDiaper } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -29,6 +30,7 @@ export function DiaperNew() {
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [diaper, setDiaper] = useState({
     type: "wet" as "wet" | "dirty" | "both",
     time: getCurrentTime(),
@@ -82,6 +84,9 @@ export function DiaperNew() {
         notes: diaper.notes || null,
         date: getCurrentDate(),
       });
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+      await queryClient.invalidateQueries({ queryKey: ["diapers"] });
       navigate("/diaper");
     } catch (err) {
       console.error("Failed to create diaper change:", err);

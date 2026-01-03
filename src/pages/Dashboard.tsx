@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IconBottle,
   IconCalendar,
@@ -17,9 +17,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getProfile } from "../lib/api/profiles";
 import { getPreferences } from "../lib/api/preferences";
-import { getFeeds } from "../lib/api/feeds";
-import { getDiapers } from "../lib/api/diapers";
-import { getSleeps } from "../lib/api/sleeps";
+import { getFeeds, deleteFeeds } from "../lib/api/feeds";
+import { getDiapers, deleteDiapers } from "../lib/api/diapers";
+import { getSleeps, deleteSleeps } from "../lib/api/sleeps";
 
 interface ActivityItem {
   id: string;
@@ -35,11 +35,16 @@ export function Dashboard() {
   const { colorScheme } = useColorScheme();
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
+  const queryClient = useQueryClient();
   const [dateFilter, setDateFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 24;
 
   // Query for user profile
   const { data: profile, isLoading: loadingProfile } = useQuery({
@@ -49,7 +54,7 @@ export function Dashboard() {
   });
 
   // Query for user preferences
-  const { data: preferences } = useQuery({
+  const { data: preferences, isLoading: loadingPreferences } = useQuery({
     queryKey: ["preferences", user?.id],
     queryFn: () => getPreferences(user!.id),
     enabled: !!user,
@@ -100,13 +105,18 @@ export function Dashboard() {
         created_at: s.created_at,
       }));
 
-      // Combine all activities and sort by created_at timestamp (most recent first)
+      // Combine all activities and sort by date + time (most recent first)
       const allActivities = [
         ...feedActivities,
         ...diaperActivities,
         ...sleepActivities,
       ];
-      allActivities.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      allActivities.sort((a, b) => {
+        // Create datetime strings for comparison
+        const dateTimeA = `${a.date}T${a.time}`;
+        const dateTimeB = `${b.date}T${b.time}`;
+        return dateTimeB.localeCompare(dateTimeA);
+      });
 
       return allActivities;
     },
@@ -135,19 +145,19 @@ export function Dashboard() {
   const hoursSinceLastFeed = getHoursSince(lastFeed);
   const hoursSinceLastDiaper = getHoursSince(lastDiaper);
 
-  const showFeedReminder = feedReminderEnabled && hoursSinceLastFeed >= feedReminderInterval;
-  const showDiaperAlert = diaperAlertEnabled && hoursSinceLastDiaper >= diaperAlertInterval;
+  const showFeedReminder = !loadingPreferences && feedReminderEnabled && hoursSinceLastFeed >= feedReminderInterval;
+  const showDiaperAlert = !loadingPreferences && diaperAlertEnabled && hoursSinceLastDiaper >= diaperAlertInterval;
 
   const getFeedReminderMessage = () => {
     const hours = Math.floor(hoursSinceLastFeed);
-    if (hours === Infinity) return `${selectedBaby?.name || "Baby"} hasn't been fed yet today. Please check!`;
-    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+    if (hours === Infinity) return `No feed recorded yet for ${selectedBaby?.name || "Baby"}. Time for a feed!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Time for a feed!`;
   };
 
   const getDiaperAlertMessage = () => {
     const hours = Math.floor(hoursSinceLastDiaper);
-    if (hours === Infinity) return `${selectedBaby?.name || "Baby"}'s diaper hasn't been checked yet today. Please check!`;
-    return `${selectedBaby?.name || "Baby"}'s diaper hasn't been changed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
+    if (hours === Infinity) return `No diaper change recorded yet for ${selectedBaby?.name || "Baby"}. Time for a check!`;
+    return `${selectedBaby?.name || "Baby"}'s diaper hasn't been changed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Time for a check!`;
   };
 
   const uniqueDates = [...new Set(data.map((a) => a.date))];
@@ -157,6 +167,25 @@ export function Dashboard() {
     const matchesType = !typeFilter || item.type === typeFilter;
     return matchesDate && matchesType;
   });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  const handleDateFilterChange = (date: string) => {
+    setDateFilter(date);
+    setCurrentPage(1);
+    setShowDateDropdown(false);
+  };
+
+  const handleTypeFilterChange = (type: string) => {
+    setTypeFilter(type);
+    setCurrentPage(1);
+    setShowTypeDropdown(false);
+  };
 
   const handleSelect = (id: string, selected: boolean) => {
     setSelectedIds((prev) => {
@@ -170,11 +199,44 @@ export function Dashboard() {
     });
   };
 
-  const handleDelete = () => {
-    // Note: This is a local filter for UI purposes only
-    // In production, you would want to delete from the database
-    // For now, we just clear the selection
-    setSelectedIds(new Set());
+  const handleDelete = async () => {
+    if (!selectedBaby || selectedIds.size === 0) return;
+
+    setIsDeleting(true);
+    try {
+      // Group selected activities by type
+      const feedIds: string[] = [];
+      const diaperIds: string[] = [];
+      const sleepIds: string[] = [];
+
+      selectedIds.forEach((id) => {
+        const activity = data.find((a) => a.id === id);
+        if (activity) {
+          if (activity.type === "feed") feedIds.push(id);
+          else if (activity.type === "diaper") diaperIds.push(id);
+          else if (activity.type === "sleep") sleepIds.push(id);
+        }
+      });
+
+      // Delete each type separately
+      await Promise.all([
+        feedIds.length > 0 ? deleteFeeds(feedIds) : Promise.resolve(),
+        diaperIds.length > 0 ? deleteDiapers(diaperIds) : Promise.resolve(),
+        sleepIds.length > 0 ? deleteSleeps(sleepIds) : Promise.resolve(),
+      ]);
+
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+
+      // Clear selection and close modal
+      setSelectedIds(new Set());
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error("Failed to delete activities:", error);
+      alert("Failed to delete activities. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Calculate stats from real data
@@ -376,10 +438,7 @@ export function Dashboard() {
             {showDateDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
                 <button
-                  onClick={() => {
-                    setDateFilter("");
-                    setShowDateDropdown(false);
-                  }}
+                  onClick={() => handleDateFilterChange("")}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                 >
                   All dates
@@ -387,10 +446,7 @@ export function Dashboard() {
                 {uniqueDates.map((date) => (
                   <button
                     key={date}
-                    onClick={() => {
-                      setDateFilter(date);
-                      setShowDateDropdown(false);
-                    }}
+                    onClick={() => handleDateFilterChange(date)}
                     className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
                   >
                     {date}
@@ -417,10 +473,7 @@ export function Dashboard() {
             {showTypeDropdown && (
               <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
                 <button
-                  onClick={() => {
-                    setTypeFilter("");
-                    setShowTypeDropdown(false);
-                  }}
+                  onClick={() => handleTypeFilterChange("")}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                 >
                   All types
@@ -428,10 +481,7 @@ export function Dashboard() {
                 {["feed", "diaper", "sleep"].map((type) => (
                   <button
                     key={type}
-                    onClick={() => {
-                      setTypeFilter(type);
-                      setShowTypeDropdown(false);
-                    }}
+                    onClick={() => handleTypeFilterChange(type)}
                     className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
                   >
                     {type}
@@ -450,7 +500,7 @@ export function Dashboard() {
           <div className="flex items-center gap-2">
             {selectedIds.size > 0 && (
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDeleteModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Delete ({selectedIds.size})
@@ -486,7 +536,7 @@ export function Dashboard() {
                 <div className="animate-pulse">Loading activities...</div>
               </div>
             ) : filteredData.length > 0 ? (
-              filteredData.map((item) => (
+              paginatedData.map((item) => (
                 <ActivityRow
                   key={item.id}
                   id={item.id}
@@ -507,8 +557,80 @@ export function Dashboard() {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-6 border-t border-gray-200/60">
+              <div className="text-sm text-gray-500">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)} of {filteredData.length} activities
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? colorScheme.id === "default"
+                            ? "bg-gray-900 text-white"
+                            : `${colorScheme.cardBg} text-white`
+                          : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-[2px]">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Activities
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete {selectedIds.size} {selectedIds.size === 1 ? 'activity' : 'activities'}? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
