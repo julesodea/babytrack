@@ -148,10 +148,12 @@ export function Dashboard() {
 
   const showFeedReminder =
     !loadingPreferences &&
+    !loadingActivities &&
     feedReminderEnabled &&
     hoursSinceLastFeed >= feedReminderInterval;
   const showDiaperAlert =
     !loadingPreferences &&
+    !loadingActivities &&
     diaperAlertEnabled &&
     hoursSinceLastDiaper >= diaperAlertInterval;
 

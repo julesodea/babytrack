@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { IconDashboard } from "../components/icons";
@@ -8,6 +8,7 @@ import { useBaby } from "../contexts/BabyContext";
 import { createFeed } from "../lib/api/feeds";
 import { createDiaper } from "../lib/api/diapers";
 import { createSleep } from "../lib/api/sleeps";
+import { getPreferences } from "../lib/api/preferences";
 
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
@@ -93,6 +94,37 @@ export function ActivityNew() {
     endTime: getCurrentTime(),
     caregiver: "",
   });
+  const [isOngoing, setIsOngoing] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      loadDefaultCaregiver();
+    }
+  }, [user]);
+
+  const loadDefaultCaregiver = async () => {
+    if (!user) return;
+    try {
+      const preferences = await getPreferences(user.id);
+      if (preferences?.default_caregiver) {
+        // Set default caregiver for all activity types
+        setFeedData((prev) => ({
+          ...prev,
+          caregiver: preferences.default_caregiver!,
+        }));
+        setDiaperData((prev) => ({
+          ...prev,
+          caregiver: preferences.default_caregiver!,
+        }));
+        setSleepData((prev) => ({
+          ...prev,
+          caregiver: preferences.default_caregiver!,
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to load preferences:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,19 +172,18 @@ export function ActivityNew() {
           date: getCurrentDate(),
         });
       } else if (activityType === "sleep") {
-        const duration = calculateDuration(
-          sleepData.startTime,
-          sleepData.endTime
-        );
+        const duration = isOngoing
+          ? "Ongoing"
+          : calculateDuration(sleepData.startTime, sleepData.endTime);
         const sleepType = sleepData.type === "nap" ? "Nap" : "Overnight Sleep";
         await createSleep({
           user_id: user.id,
           baby_id: selectedBaby.id,
           title: sleepType,
-          detail: `${duration} sleep`,
+          detail: isOngoing ? "Ongoing sleep" : `${duration} sleep`,
           duration: duration,
           start_time: sleepData.startTime,
-          end_time: sleepData.endTime,
+          end_time: isOngoing ? null : sleepData.endTime,
           caregiver: sleepData.caregiver,
           type: sleepData.type,
           date: getCurrentDate(),
@@ -273,7 +304,7 @@ export function ActivityNew() {
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
-                <div>
+                <div className="w-full">
                   <label
                     htmlFor="feedTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -288,7 +319,7 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setFeedData({ ...feedData, time: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -342,7 +373,7 @@ export function ActivityNew() {
                     <option value="both">Both</option>
                   </select>
                 </div>
-                <div>
+                <div className="w-full">
                   <label
                     htmlFor="diaperTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -357,7 +388,7 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setDiaperData({ ...diaperData, time: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -431,7 +462,7 @@ export function ActivityNew() {
                     <option value="overnight">Overnight</option>
                   </select>
                 </div>
-                <div>
+                <div className="w-full">
                   <label
                     htmlFor="startTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -446,10 +477,10 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setSleepData({ ...sleepData, startTime: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
-                <div>
+                <div className="w-full">
                   <label
                     htmlFor="endTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -459,12 +490,15 @@ export function ActivityNew() {
                   <input
                     id="endTime"
                     type="time"
-                    required
+                    required={!isOngoing}
+                    disabled={isOngoing}
                     value={sleepData.endTime}
                     onChange={(e) =>
                       setSleepData({ ...sleepData, endTime: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className={`w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
+                      isOngoing ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
                   />
                 </div>
                 <div>
@@ -475,11 +509,31 @@ export function ActivityNew() {
                     Duration
                   </label>
                   <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
-                    {calculateDuration(
-                      sleepData.startTime,
-                      sleepData.endTime
-                    ) || "Select start and end time"}
+                    {isOngoing
+                      ? "Ongoing"
+                      : calculateDuration(
+                          sleepData.startTime,
+                          sleepData.endTime
+                        ) || "Select start and end time"}
                   </div>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isOngoing}
+                      onChange={(e) => setIsOngoing(e.target.checked)}
+                      className="w-5 h-5 text-gray-900 border-gray-300 rounded focus:ring-2 focus:ring-gray-200"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Ongoing Sleep
+                      </span>
+                      <p className="text-xs text-gray-500">
+                        Check this if the baby is still sleeping
+                      </p>
+                    </div>
+                  </label>
                 </div>
                 <div>
                   <label
