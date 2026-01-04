@@ -304,7 +304,7 @@ export function ActivityNew() {
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                   />
                 </div>
-                <div className="w-full">
+                <div>
                   <label
                     htmlFor="feedTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -319,7 +319,7 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setFeedData({ ...feedData, time: e.target.value })
                     }
-                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
                   />
                 </div>
                 <div>
@@ -373,7 +373,7 @@ export function ActivityNew() {
                     <option value="both">Both</option>
                   </select>
                 </div>
-                <div className="w-full">
+                <div>
                   <label
                     htmlFor="diaperTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -388,7 +388,7 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setDiaperData({ ...diaperData, time: e.target.value })
                     }
-                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
                   />
                 </div>
                 <div>
@@ -462,7 +462,7 @@ export function ActivityNew() {
                     <option value="overnight">Overnight</option>
                   </select>
                 </div>
-                <div className="w-full">
+                <div>
                   <label
                     htmlFor="startTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -477,10 +477,10 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setSleepData({ ...sleepData, startTime: e.target.value })
                     }
-                    className="w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
                   />
                 </div>
-                <div className="w-full">
+                <div>
                   <label
                     htmlFor="endTime"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -496,7 +496,7 @@ export function ActivityNew() {
                     onChange={(e) =>
                       setSleepData({ ...sleepData, endTime: e.target.value })
                     }
-                    className={`w-full max-w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
+                    className={`px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left ${
                       isOngoing ? "bg-gray-100 cursor-not-allowed" : ""
                     }`}
                   />
