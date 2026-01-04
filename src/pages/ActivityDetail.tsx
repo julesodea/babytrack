@@ -338,7 +338,7 @@ export function ActivityDetail() {
                           duration: calculatedDuration
                         });
                       }}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -362,7 +362,7 @@ export function ActivityDetail() {
                           duration: calculatedDuration
                         });
                       }}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -393,7 +393,7 @@ export function ActivityDetail() {
                       onChange={(e) =>
                         setActivity({ ...activity, time: e.target.value })
                       }
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                     />
                   </div>
                 )

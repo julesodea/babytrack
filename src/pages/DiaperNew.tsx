@@ -150,22 +150,6 @@ export function DiaperNew() {
             </div>
             <div>
               <label
-                htmlFor="time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Time
-              </label>
-              <input
-                id="time"
-                type="time"
-                required
-                value={diaper.time}
-                onChange={(e) => setDiaper({ ...diaper, time: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label
                 htmlFor="user"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -200,6 +184,22 @@ export function DiaperNew() {
                 rows={3}
                 placeholder="Any additional notes..."
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Time
+              </label>
+              <input
+                id="time"
+                type="time"
+                required
+                value={diaper.time}
+                onChange={(e) => setDiaper({ ...diaper, time: e.target.value })}
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
           </div>

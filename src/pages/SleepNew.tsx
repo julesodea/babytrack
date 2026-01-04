@@ -186,6 +186,40 @@ export function SleepNew() {
             </div>
             <div>
               <label
+                htmlFor="user"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Caregiver
+              </label>
+              <select
+                id="user"
+                required
+                value={sleep.user}
+                onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+              >
+                <option value="">Select caregiver</option>
+                <option value="Mum">Mum</option>
+                <option value="Dad">Dad</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isOngoing}
+                  onChange={(e) => setIsOngoing(e.target.checked)}
+                  className="w-5 h-5 text-gray-900 border-gray-300 rounded focus:ring-2 focus:ring-gray-200"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Ongoing Sleep</span>
+                  <p className="text-xs text-gray-500">Check this if the baby is still sleeping</p>
+                </div>
+              </label>
+            </div>
+            <div>
+              <label
                 htmlFor="startTime"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -199,7 +233,7 @@ export function SleepNew() {
                 onChange={(e) =>
                   setSleep({ ...sleep, startTime: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div>
@@ -218,7 +252,7 @@ export function SleepNew() {
                 onChange={(e) =>
                   setSleep({ ...sleep, endTime: e.target.value })
                 }
-                className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
+                className={`px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
                   isOngoing ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
@@ -233,40 +267,6 @@ export function SleepNew() {
               <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
                 {duration || 'Select start and end time'}
               </div>
-            </div>
-            <div className="sm:col-span-2">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isOngoing}
-                  onChange={(e) => setIsOngoing(e.target.checked)}
-                  className="w-5 h-5 text-gray-900 border-gray-300 rounded focus:ring-2 focus:ring-gray-200"
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Ongoing Sleep</span>
-                  <p className="text-xs text-gray-500">Check this if the baby is still sleeping</p>
-                </div>
-              </label>
-            </div>
-            <div>
-              <label
-                htmlFor="user"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Caregiver
-              </label>
-              <select
-                id="user"
-                required
-                value={sleep.user}
-                onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="">Select caregiver</option>
-                <option value="Mum">Mum</option>
-                <option value="Dad">Dad</option>
-                <option value="Other">Other</option>
-              </select>
             </div>
           </div>
 
