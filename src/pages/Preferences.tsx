@@ -4,6 +4,7 @@ import { useColorScheme, colorSchemes } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile, updateProfile } from "../lib/api/profiles";
 import { getPreferences, upsertPreferences } from "../lib/api/preferences";
+import { Link } from "react-router";
 
 export function Preferences() {
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -52,7 +53,7 @@ export function Preferences() {
     try {
       const preferences = await getPreferences(user.id);
       if (preferences) {
-        setSettings(prev => ({
+        setSettings((prev) => ({
           ...prev,
           defaultCaregiver: preferences.default_caregiver || "",
           feedReminders: preferences.feed_reminders ?? true,
@@ -85,7 +86,7 @@ export function Preferences() {
           feed_reminder_interval: settings.feedReminderInterval,
           diaper_alerts: settings.diaperAlerts,
           diaper_alert_interval: settings.diaperAlertInterval,
-        })
+        }),
       ]);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -152,7 +153,7 @@ export function Preferences() {
               <input
                 id="email"
                 type="email"
-                value={user?.email || ''}
+                value={user?.email || ""}
                 readOnly
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
               />
@@ -237,14 +238,19 @@ export function Preferences() {
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        settings.feedReminders ? "translate-x-6" : "translate-x-1"
+                        settings.feedReminders
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       }`}
                     />
                   </button>
                 </div>
                 {settings.feedReminders && (
                   <div className="ml-0 flex items-center gap-2">
-                    <label htmlFor="feedInterval" className="text-xs text-gray-600">
+                    <label
+                      htmlFor="feedInterval"
+                      className="text-xs text-gray-600"
+                    >
                       Remind me every
                     </label>
                     <input
@@ -292,14 +298,19 @@ export function Preferences() {
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        settings.diaperAlerts ? "translate-x-6" : "translate-x-1"
+                        settings.diaperAlerts
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       }`}
                     />
                   </button>
                 </div>
                 {settings.diaperAlerts && (
                   <div className="ml-0 flex items-center gap-2">
-                    <label htmlFor="diaperInterval" className="text-xs text-gray-600">
+                    <label
+                      htmlFor="diaperInterval"
+                      className="text-xs text-gray-600"
+                    >
                       Remind me every
                     </label>
                     <input
@@ -463,7 +474,10 @@ export function Preferences() {
                   id="defaultCaregiver"
                   value={settings.defaultCaregiver}
                   onChange={(e) =>
-                    setSettings({ ...settings, defaultCaregiver: e.target.value })
+                    setSettings({
+                      ...settings,
+                      defaultCaregiver: e.target.value,
+                    })
                   }
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                 >
@@ -473,7 +487,8 @@ export function Preferences() {
                   <option value="Other">Other</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-2">
-                  This caregiver will be pre-selected when creating new activities
+                  This caregiver will be pre-selected when creating new
+                  activities
                 </p>
               </div>
               <div>
@@ -487,7 +502,10 @@ export function Preferences() {
                   id="measurementUnit"
                   value={settings.measurementUnit}
                   onChange={(e) =>
-                    setSettings({ ...settings, measurementUnit: e.target.value })
+                    setSettings({
+                      ...settings,
+                      measurementUnit: e.target.value,
+                    })
                   }
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                 >
@@ -505,14 +523,14 @@ export function Preferences() {
             onClick={handleSave}
             disabled={loading}
             className={`px-6 py-2.5 text-white rounded-lg text-sm font-medium transition-colors ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
+              loading ? "opacity-50 cursor-not-allowed" : ""
             } ${
               colorScheme.id === "default"
                 ? "bg-gray-900 hover:bg-gray-800"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
             }`}
           >
-            {loading ? 'Saving...' : 'Save Preferences'}
+            {loading ? "Saving..." : "Save Preferences"}
           </button>
         </div>
       </div>
