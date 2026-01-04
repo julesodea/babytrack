@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -5,23 +6,25 @@ import { BabyProvider } from "./contexts/BabyContext";
 import { ColorSchemeProvider } from "./context/ColorSchemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
-import {
-  ActivityDetail,
-  ActivityNew,
-  Dashboard,
-  Diaper,
-  DiaperNew,
-  Feed,
-  FeedNew,
-  Login,
-  Preferences,
-  Sleep,
-  SleepNew,
-} from "./pages";
-import { BabyNew } from "./pages/BabyNew";
-import { BabyManage } from "./pages/BabyManage";
+
+// Eager load critical pages (public routes)
+import { Login } from "./pages";
 import { InviteAccept } from "./pages/InviteAccept";
-import { Profile } from "./pages/Profile";
+import { Dashboard } from "./pages";
+
+// Lazy load all other pages for code splitting
+const ActivityDetail = lazy(() => import("./pages").then(m => ({ default: m.ActivityDetail })));
+const ActivityNew = lazy(() => import("./pages").then(m => ({ default: m.ActivityNew })));
+const Diaper = lazy(() => import("./pages").then(m => ({ default: m.Diaper })));
+const DiaperNew = lazy(() => import("./pages").then(m => ({ default: m.DiaperNew })));
+const Feed = lazy(() => import("./pages").then(m => ({ default: m.Feed })));
+const FeedNew = lazy(() => import("./pages").then(m => ({ default: m.FeedNew })));
+const Preferences = lazy(() => import("./pages").then(m => ({ default: m.Preferences })));
+const Sleep = lazy(() => import("./pages").then(m => ({ default: m.Sleep })));
+const SleepNew = lazy(() => import("./pages").then(m => ({ default: m.SleepNew })));
+const BabyNew = lazy(() => import("./pages/BabyNew").then(m => ({ default: m.BabyNew })));
+const BabyManage = lazy(() => import("./pages/BabyManage").then(m => ({ default: m.BabyManage })));
+const Profile = lazy(() => import("./pages/Profile").then(m => ({ default: m.Profile })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,32 +43,34 @@ function App() {
       <AuthProvider>
         <BabyProvider>
           <ColorSchemeProvider>
-            <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/invites/accept" element={<InviteAccept />} />
-            <Route element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/feed" element={<Feed />} />
-              <Route path="/feed/new" element={<FeedNew />} />
-              <Route path="/diaper" element={<Diaper />} />
-              <Route path="/diaper/new" element={<DiaperNew />} />
-              <Route path="/sleep" element={<Sleep />} />
-              <Route path="/sleep/new" element={<SleepNew />} />
-              <Route path="/settings" element={<Preferences />} />
-              <Route path="/activity/new" element={<ActivityNew />} />
-              <Route path="/activity/:id" element={<ActivityDetail />} />
-              <Route path="/babies/new" element={<BabyNew />} />
-              <Route path="/babies/manage" element={<BabyManage />} />
-              <Route path="/profile" element={<Profile />} />
-            </Route>
-          </Routes>
-        </ColorSchemeProvider>
-      </BabyProvider>
-    </AuthProvider>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/invites/accept" element={<InviteAccept />} />
+                <Route element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/feed" element={<Feed />} />
+                  <Route path="/feed/new" element={<FeedNew />} />
+                  <Route path="/diaper" element={<Diaper />} />
+                  <Route path="/diaper/new" element={<DiaperNew />} />
+                  <Route path="/sleep" element={<Sleep />} />
+                  <Route path="/sleep/new" element={<SleepNew />} />
+                  <Route path="/settings" element={<Preferences />} />
+                  <Route path="/activity/new" element={<ActivityNew />} />
+                  <Route path="/activity/:id" element={<ActivityDetail />} />
+                  <Route path="/babies/new" element={<BabyNew />} />
+                  <Route path="/babies/manage" element={<BabyManage />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </ColorSchemeProvider>
+        </BabyProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
