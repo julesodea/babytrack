@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDiaper } from "../components/icons";
+import { IconDashboard, IconDiaper } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
@@ -100,6 +100,13 @@ export function DiaperNew() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
+        <span>/</span>
         <IconDiaper className="w-5 h-5 text-gray-500" />
         <span>/</span>
         <Link to="/diaper" className="hover:text-gray-600">

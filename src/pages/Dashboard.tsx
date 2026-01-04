@@ -5,6 +5,7 @@ import {
   IconBottle,
   IconCalendar,
   IconDashboard,
+  IconDiaper,
   IconFilter,
   IconMoon,
   IconSearch,
@@ -145,19 +146,37 @@ export function Dashboard() {
   const hoursSinceLastFeed = getHoursSince(lastFeed);
   const hoursSinceLastDiaper = getHoursSince(lastDiaper);
 
-  const showFeedReminder = !loadingPreferences && feedReminderEnabled && hoursSinceLastFeed >= feedReminderInterval;
-  const showDiaperAlert = !loadingPreferences && diaperAlertEnabled && hoursSinceLastDiaper >= diaperAlertInterval;
+  const showFeedReminder =
+    !loadingPreferences &&
+    feedReminderEnabled &&
+    hoursSinceLastFeed >= feedReminderInterval;
+  const showDiaperAlert =
+    !loadingPreferences &&
+    diaperAlertEnabled &&
+    hoursSinceLastDiaper >= diaperAlertInterval;
 
   const getFeedReminderMessage = () => {
     const hours = Math.floor(hoursSinceLastFeed);
-    if (hours === Infinity) return `No feed recorded yet for ${selectedBaby?.name || "Baby"}. Time for a feed!`;
-    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Time for a feed!`;
+    if (hours === Infinity)
+      return `No feed recorded yet for ${
+        selectedBaby?.name || "Baby"
+      }. Time for a feed!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${
+      hours === 1 ? "hour" : "hours"
+    }. Time for a feed!`;
   };
 
   const getDiaperAlertMessage = () => {
     const hours = Math.floor(hoursSinceLastDiaper);
-    if (hours === Infinity) return `No diaper change recorded yet for ${selectedBaby?.name || "Baby"}. Time for a check!`;
-    return `${selectedBaby?.name || "Baby"}'s diaper hasn't been changed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Time for a check!`;
+    if (hours === Infinity)
+      return `No diaper change recorded yet for ${
+        selectedBaby?.name || "Baby"
+      }. Time for a check!`;
+    return `${
+      selectedBaby?.name || "Baby"
+    }'s diaper hasn't been changed in ${hours} ${
+      hours === 1 ? "hour" : "hours"
+    }. Time for a check!`;
   };
 
   const uniqueDates = [...new Set(data.map((a) => a.date))];
@@ -241,9 +260,13 @@ export function Dashboard() {
 
   // Calculate stats from real data
   const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(now.getDate()).padStart(2, "0")}`;
   const todayActivities = data.filter((a) => a.date === today);
   const todayFeeds = todayActivities.filter((a) => a.type === "feed");
+  const todayDiapers = todayActivities.filter((a) => a.type === "diaper");
   const todaySleeps = todayActivities.filter((a) => a.type === "sleep");
 
   // Total feeds count
@@ -252,6 +275,12 @@ export function Dashboard() {
   // Total feeds volume (we need to fetch actual feeds data for amounts)
   const totalFeedsRecorded = data.filter((a) => a.type === "feed").length;
 
+  // Total diapers count
+  const totalDiapersCount = todayDiapers.length;
+
+  // Total diapers recorded
+  const totalDiapersRecorded = data.filter((a) => a.type === "diaper").length;
+
   // Total sleep hours (we need to calculate from sleep durations)
   const totalSleepLogs = todaySleeps.length;
 
@@ -259,7 +288,12 @@ export function Dashboard() {
     <div className="space-y-10">
       {/* Header */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
-        <IconDashboard className="w-5 h-5 text-gray-500" />
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
         <span>/</span>
         <span className="text-gray-900">Dashboard</span>
       </div>
@@ -269,16 +303,10 @@ export function Dashboard() {
 
       {/* Notification Banners */}
       {showFeedReminder && (
-        <NotificationBanner
-          message={getFeedReminderMessage()}
-          type="feed"
-        />
+        <NotificationBanner message={getFeedReminderMessage()} type="feed" />
       )}
       {showDiaperAlert && (
-        <NotificationBanner
-          message={getDiaperAlertMessage()}
-          type="diaper"
-        />
+        <NotificationBanner message={getDiaperAlertMessage()} type="diaper" />
       )}
 
       <div className="space-y-1">
@@ -295,17 +323,20 @@ export function Dashboard() {
                 : "Overview"}
             </h2>
             <p className="text-gray-500 text-base">
-              Track and manage {selectedBaby ? `${selectedBaby.name}'s` : "your baby's"} daily activities
+              Track and manage{" "}
+              {selectedBaby ? `${selectedBaby.name}'s` : "your baby's"} daily
+              activities
             </p>
           </>
         )}
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1 */}
-        <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+        <Link
+          to="/feed"
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
@@ -354,11 +385,66 @@ export function Dashboard() {
           >
             {totalFeedsRecorded} feeds recorded total
           </p>
-        </div>
+        </Link>
 
         {/* Card 2 */}
-        <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+        <Link
+          to="/diaper"
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
+            colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+          }`}
+        >
+          <div
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+              colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+            }`}
+          >
+            <IconDiaper
+              className={`w-7 h-7 ${
+                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+              }`}
+            />
+          </div>
+          <p
+            className={`text-sm font-medium mb-2 ${
+              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+            }`}
+          >
+            Total Diapers Today
+          </p>
+          <div className="flex items-baseline gap-2">
+            <span
+              className={`text-4xl font-bold tracking-tight ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
+              {totalDiapersCount}
+            </span>
+            <span
+              className={`text-xl font-medium ${
+                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              }`}
+            >
+              Changes
+            </span>
+          </div>
+          <p
+            className={`text-sm mt-2 ${
+              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+            }`}
+          >
+            {totalDiapersRecorded} diaper changes recorded total
+          </p>
+        </Link>
+
+        {/* Card 3 */}
+        <Link
+          to="/sleep"
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
@@ -407,7 +493,7 @@ export function Dashboard() {
           >
             {todaySleeps.length} sleep logs today
           </p>
-        </div>
+        </Link>
       </div>
 
       {/* List / Table Section */}
@@ -560,41 +646,64 @@ export function Dashboard() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-6 border-t border-gray-200/60">
-              <div className="text-sm text-gray-500">
-                Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)} of {filteredData.length} activities
-              </div>
+            <div className="flex items-center justify-center pt-6 border-t border-gray-200/60">
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Previous
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
                 </button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                        currentPage === page
-                          ? colorScheme.id === "default"
-                            ? "bg-gray-900 text-white"
-                            : `${colorScheme.cardBg} text-white`
-                          : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? colorScheme.id === "default"
+                              ? "bg-gray-900 text-white"
+                              : `${colorScheme.cardBg} text-white`
+                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
                 </div>
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Next
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -610,7 +719,9 @@ export function Dashboard() {
               Delete Activities
             </h3>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete {selectedIds.size} {selectedIds.size === 1 ? 'activity' : 'activities'}? This action cannot be undone.
+              Are you sure you want to delete {selectedIds.size}{" "}
+              {selectedIds.size === 1 ? "activity" : "activities"}? This action
+              cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -625,7 +736,7 @@ export function Dashboard() {
                 disabled={isDeleting}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

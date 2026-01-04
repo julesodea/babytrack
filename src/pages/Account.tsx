@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { IconUser } from "../components/icons";
+import { Link } from "react-router";
+import { IconDashboard, IconUser } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 
 export function Account() {
@@ -36,6 +37,13 @@ export function Account() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
+        <span>/</span>
         <IconUser className="w-5 h-5 text-gray-500" />
         <span>/</span>
         <span className="text-gray-900">Account</span>

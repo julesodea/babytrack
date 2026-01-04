@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IconCalendar,
+  IconDashboard,
   IconDiaper,
   IconFilter,
   IconSearch,
@@ -131,6 +132,13 @@ export function Diaper() {
     <div className="space-y-10">
       {/* Header */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
+        <span>/</span>
         <IconDiaper className="w-5 h-5 text-gray-500" />
         <span>/</span>
         <span className="text-gray-900">Diaper Changes</span>
