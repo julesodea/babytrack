@@ -27,7 +27,10 @@ export function Sleep() {
 
   // Get today's date for default stats view
   const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(now.getDate()).padStart(2, "0")}`;
   const [statsDate, setStatsDate] = useState<string>(today);
   const [showStatsDateDropdown, setShowStatsDateDropdown] = useState(false);
 
@@ -43,7 +46,9 @@ export function Sleep() {
     mutationFn: (ids: string[]) => deleteSleeps(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sleeps", selectedBaby?.id] });
-      queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["activities", selectedBaby?.id],
+      });
       setSelectedIds(new Set());
       setShowDeleteModal(false);
     },
@@ -52,7 +57,8 @@ export function Sleep() {
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
-    const matchesSearch = !searchQuery ||
+    const matchesSearch =
+      !searchQuery ||
       item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.duration?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -86,7 +92,8 @@ export function Sleep() {
 
   // Calculate total sleep hours (simplified - just count the entries for now)
   const totalSleeps = napCount + overnightCount;
-  const lastSleep = selectedDateSleeps.length > 0 ? selectedDateSleeps[0] : null;
+  const lastSleep =
+    selectedDateSleeps.length > 0 ? selectedDateSleeps[0] : null;
 
   const uniqueDates = [...new Set(data.map((s) => s.date))].sort().reverse();
 
@@ -125,14 +132,13 @@ export function Sleep() {
 
       {/* Date Selector for Stats */}
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700">Viewing stats for:</span>
         <div className="relative">
           <button
             onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-50 shadow-sm"
           >
             <IconCalendar className="w-4 h-4 text-gray-400" />
-            {statsDate === today ? 'Today' : statsDate}
+            {statsDate === today ? "Today" : statsDate}
           </button>
           {showStatsDateDropdown && (
             <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[180px] max-h-[300px] overflow-y-auto">
@@ -142,25 +148,27 @@ export function Sleep() {
                   setShowStatsDateDropdown(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
-                  statsDate === today ? 'bg-gray-100 font-medium' : ''
+                  statsDate === today ? "bg-gray-100 font-medium" : ""
                 }`}
               >
                 Today ({today})
               </button>
-              {uniqueDates.filter(d => d !== today).map((date) => (
-                <button
-                  key={date}
-                  onClick={() => {
-                    setStatsDate(date);
-                    setShowStatsDateDropdown(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
-                    statsDate === date ? 'bg-gray-100 font-medium' : ''
-                  }`}
-                >
-                  {date}
-                </button>
-              ))}
+              {uniqueDates
+                .filter((d) => d !== today)
+                .map((date) => (
+                  <button
+                    key={date}
+                    onClick={() => {
+                      setStatsDate(date);
+                      setShowStatsDateDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
+                      statsDate === date ? "bg-gray-100 font-medium" : ""
+                    }`}
+                  >
+                    {date}
+                  </button>
+                ))}
             </div>
           )}
         </div>
@@ -194,7 +202,7 @@ export function Sleep() {
               colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
             }`}
           >
-            Sleep Sessions {statsDate === today ? 'Today' : `on ${statsDate}`}
+            Sleep Sessions {statsDate === today ? "Today" : `on ${statsDate}`}
           </p>
           <div className="flex items-baseline gap-2">
             <span
@@ -278,7 +286,11 @@ export function Sleep() {
                     : "text-white/60"
                 }`}
               >
-                {lastSleep.type ? lastSleep.type.charAt(0).toUpperCase() + lastSleep.type.slice(1) : ''} - {lastSleep.duration}
+                {lastSleep.type
+                  ? lastSleep.type.charAt(0).toUpperCase() +
+                    lastSleep.type.slice(1)
+                  : ""}{" "}
+                - {lastSleep.duration}
               </p>
             </>
           ) : (
@@ -464,7 +476,9 @@ export function Sleep() {
               Delete Sleep Logs
             </h3>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete {selectedIds.size} sleep {selectedIds.size === 1 ? 'log' : 'logs'}? This action cannot be undone.
+              Are you sure you want to delete {selectedIds.size} sleep{" "}
+              {selectedIds.size === 1 ? "log" : "logs"}? This action cannot be
+              undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -479,7 +493,7 @@ export function Sleep() {
                 disabled={deleteMutation.isPending}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
