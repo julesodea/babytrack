@@ -179,8 +179,8 @@ export function Diaper() {
         </p>
       </div>
 
-      {/* Date Selector for Stats */}
-      <div className="flex items-center gap-3">
+      {/* Date Selector for Stats + Add Button */}
+      <div className="flex items-center justify-between mb-4">
         <div className="relative">
           <button
             onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
@@ -221,6 +221,17 @@ export function Diaper() {
             </div>
           )}
         </div>
+        <Link
+          to="/diaper/new"
+          className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+            colorScheme.id === "default"
+              ? "bg-gray-900 hover:bg-gray-800"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+          }`}
+        >
+          <span className="text-lg leading-none">+</span>
+          Add Change
+        </Link>
       </div>
 
       {/* Cards Section */}
@@ -364,114 +375,103 @@ export function Diaper() {
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowDateDropdown(!showDateDropdown);
-                setShowTypeDropdown(false);
-              }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                dateFilter ? "border-gray-900" : "border-gray-200"
-              }`}
-            >
-              <IconCalendar className="w-5 h-5 text-gray-400" />
-              {dateFilter || "Show by date"}
-            </button>
-            {showDateDropdown && (
-              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
-                <button
-                  onClick={() => {
-                    setDateFilter("");
-                    setShowDateDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
-                >
-                  All dates
-                </button>
-                {uniqueDates.map((date) => (
+          <div className="flex gap-4">
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowDateDropdown(!showDateDropdown);
+                  setShowTypeDropdown(false);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                  dateFilter ? "border-gray-900" : "border-gray-200"
+                }`}
+              >
+                <IconCalendar className="w-5 h-5 text-gray-400" />
+                {dateFilter || "Show by date"}
+              </button>
+              {showDateDropdown && (
+                <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
                   <button
-                    key={date}
                     onClick={() => {
-                      setDateFilter(date);
+                      setDateFilter("");
                       setShowDateDropdown(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                   >
-                    {date}
+                    All dates
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowTypeDropdown(!showTypeDropdown);
-                setShowDateDropdown(false);
-              }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                typeFilter ? "border-gray-900" : "border-gray-200"
-              }`}
-            >
-              <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter
-                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
-                : "Type"}
-            </button>
-            {showTypeDropdown && (
-              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
-                <button
-                  onClick={() => {
-                    setTypeFilter("");
-                    setShowTypeDropdown(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
-                >
-                  All types
-                </button>
-                {["wet", "dirty", "both"].map((type) => (
+                  {uniqueDates.map((date) => (
+                    <button
+                      key={date}
+                      onClick={() => {
+                        setDateFilter(date);
+                        setShowDateDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
+                    >
+                      {date}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowTypeDropdown(!showTypeDropdown);
+                  setShowDateDropdown(false);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                  typeFilter ? "border-gray-900" : "border-gray-200"
+                }`}
+              >
+                <IconFilter className="w-5 h-5 text-gray-400" />
+                {typeFilter
+                  ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                  : "Type"}
+              </button>
+              {showTypeDropdown && (
+                <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
                   <button
-                    key={type}
                     onClick={() => {
-                      setTypeFilter(type);
+                      setTypeFilter("");
                       setShowTypeDropdown(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                   >
-                    {type}
+                    All types
                   </button>
-                ))}
-              </div>
-            )}
+                  {["wet", "dirty", "both"].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        setTypeFilter(type);
+                        setShowTypeDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Create Button + Table Header */}
+        {/* Table Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">
             Change History
           </h3>
-          <div className="flex items-center gap-2">
-            {selectedIds.size > 0 && (
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                Delete ({selectedIds.size})
-              </button>
-            )}
-            <Link
-              to="/diaper/new"
-              className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
-                colorScheme.id === "default"
-                  ? "bg-gray-900 hover:bg-gray-800"
-                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-              }`}
+          {selectedIds.size > 0 && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
             >
-              <span className="text-lg leading-none">+</span>
-              Add Change
-            </Link>
-          </div>
+              Delete ({selectedIds.size})
+            </button>
+          )}
         </div>
 
         {/* Table */}

@@ -516,7 +516,7 @@ export function Dashboard() {
                 setShowDateDropdown(!showDateDropdown);
                 setShowTypeDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
                 dateFilter ? "border-gray-900" : "border-gray-200"
               }`}
             >
@@ -549,7 +549,7 @@ export function Dashboard() {
                 setShowTypeDropdown(!showTypeDropdown);
                 setShowDateDropdown(false);
               }}
-              className={`flex items-center gap-2 px-4 py-3 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
                 typeFilter ? "border-gray-900" : "border-gray-200"
               }`}
             >

@@ -250,6 +250,25 @@ export function ActivityDetail() {
             className="space-y-6"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {'date' in activity && (
+                <div>
+                  <label
+                    htmlFor="date"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Date
+                  </label>
+                  <input
+                    id="date"
+                    type="date"
+                    value={activity.date}
+                    onChange={(e) =>
+                      setActivity({ ...activity, date: e.target.value })
+                    }
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+              )}
               {'type' in activity && getActivityType() === 'diaper' && (
                 <div>
                   <label
@@ -484,6 +503,19 @@ export function ActivityDetail() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {'date' in activity && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Date</p>
+                  <p className="text-lg font-medium text-gray-900">
+                    {new Date(activity.date + 'T00:00:00').toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500 mb-1">Activity Type</p>
                 <p className="text-lg font-medium text-gray-900 capitalize">

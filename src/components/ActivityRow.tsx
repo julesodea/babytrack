@@ -21,7 +21,7 @@ export function ActivityRow({
   selected = false,
   onSelect,
 }: ActivityRowProps) {
-  // Get day of week from date
+  // Get day of week and formatted date
   const getDayOfWeek = (dateString: string): string => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     // Parse date components directly to avoid timezone issues
@@ -30,7 +30,14 @@ export function ActivityRow({
     return days[date.getDay()];
   };
 
+  const formatDate = (dateString: string): string => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[month - 1]} ${day}`;
+  };
+
   const dayOfWeek = getDayOfWeek(date);
+  const formattedDate = formatDate(date);
   const handleCheckboxClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -76,8 +83,11 @@ export function ActivityRow({
           </div>
         </div>
         <div className="flex items-center justify-between pl-8">
-          <div className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-            {time}
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-gray-500">{formattedDate}</div>
+            <div className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+              {time}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[9px] font-bold">
@@ -102,6 +112,7 @@ export function ActivityRow({
           <p className="text-sm text-gray-900">{detail}</p>
         </div>
         <div className="col-span-3 flex items-center gap-2">
+          <span className="text-sm text-gray-500">{formattedDate}</span>
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
             {dayOfWeek}
           </span>
