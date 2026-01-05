@@ -1,17 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
-import { useState, useEffect } from 'react';
 
 export function Login() {
   const { signInWithGoogle, loading } = useAuth();
-  const [isPWA, setIsPWA] = useState(false);
-
-  useEffect(() => {
-    // Detect if running as standalone PWA
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || (window.navigator as any).standalone
-      || document.referrer.includes('android-app://');
-    setIsPWA(isStandalone);
-  }, []);
 
   if (loading) {
     return (
@@ -28,12 +18,6 @@ export function Login() {
           <h2 className="text-3xl font-bold text-gray-900">Baby Tracker</h2>
           <p className="mt-2 text-gray-600">Sign in to track your baby's activities</p>
         </div>
-        {isPWA && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-            <p className="font-medium">PWA Mode Detected</p>
-            <p className="mt-1 text-xs">When signing in, you may be redirected to Safari. After login, return to this app to continue.</p>
-          </div>
-        )}
         <button
           onClick={signInWithGoogle}
           className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
