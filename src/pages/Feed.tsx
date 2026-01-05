@@ -29,6 +29,12 @@ export function Feed() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Get today's date for default stats view
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const [statsDate, setStatsDate] = useState<string>(today);
+  const [showStatsDateDropdown, setShowStatsDateDropdown] = useState(false);
+
   // Query for user preferences
   const { data: preferences } = useQuery({
     queryKey: ["preferences", user?.id],
@@ -76,8 +82,6 @@ export function Feed() {
     return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? 'hour' : 'hours'}. Please check!`;
   };
 
-  const uniqueDates = [...new Set(data.map((f) => f.date))];
-
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
@@ -106,16 +110,16 @@ export function Feed() {
     deleteMutation.mutate(Array.from(selectedIds));
   };
 
-  // Calculate stats from real data
-  const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const todayFeeds = data.filter((f) => f.date === today);
-  const totalFeeds = todayFeeds.length;
-  const totalVolume = todayFeeds.reduce(
+  // Calculate stats from real data for selected date
+  const selectedDateFeeds = data.filter((f) => f.date === statsDate);
+  const totalFeeds = selectedDateFeeds.length;
+  const totalVolume = selectedDateFeeds.reduce(
     (sum, f) => sum + (parseInt(f.amount || "0") || 0),
     0
   );
-  const lastFeed = data.length > 0 ? data[0] : null;
+  const lastFeed = selectedDateFeeds.length > 0 ? selectedDateFeeds[0] : null;
+
+  const uniqueDates = [...new Set(data.map((f) => f.date))].sort().reverse();
 
   if (loading) {
     return (
@@ -158,6 +162,49 @@ export function Feed() {
         </p>
       </div>
 
+      {/* Date Selector for Stats */}
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-gray-700">Viewing stats for:</span>
+        <div className="relative">
+          <button
+            onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-50 shadow-sm"
+          >
+            <IconCalendar className="w-4 h-4 text-gray-400" />
+            {statsDate === today ? 'Today' : statsDate}
+          </button>
+          {showStatsDateDropdown && (
+            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[180px] max-h-[300px] overflow-y-auto">
+              <button
+                onClick={() => {
+                  setStatsDate(today);
+                  setShowStatsDateDropdown(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
+                  statsDate === today ? 'bg-gray-100 font-medium' : ''
+                }`}
+              >
+                Today ({today})
+              </button>
+              {uniqueDates.filter(d => d !== today).map((date) => (
+                <button
+                  key={date}
+                  onClick={() => {
+                    setStatsDate(date);
+                    setShowStatsDateDropdown(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
+                    statsDate === date ? 'bg-gray-100 font-medium' : ''
+                  }`}
+                >
+                  {date}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1 */}
@@ -186,7 +233,7 @@ export function Feed() {
               colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
             }`}
           >
-            Total Feeds Today
+            Total Feeds {statsDate === today ? 'Today' : `on ${statsDate}`}
           </p>
           <div className="flex items-baseline gap-2">
             <span

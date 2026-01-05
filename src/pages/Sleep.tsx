@@ -25,6 +25,12 @@ export function Sleep() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Get today's date for default stats view
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const [statsDate, setStatsDate] = useState<string>(today);
+  const [showStatsDateDropdown, setShowStatsDateDropdown] = useState(false);
+
   // Query for sleeps
   const { data = [], isLoading: loading } = useQuery({
     queryKey: ["sleeps", selectedBaby?.id],
@@ -42,8 +48,6 @@ export function Sleep() {
       setShowDeleteModal(false);
     },
   });
-
-  const uniqueDates = [...new Set(data.map((s) => s.date))];
 
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
@@ -73,18 +77,18 @@ export function Sleep() {
     deleteMutation.mutate(Array.from(selectedIds));
   };
 
-  // Calculate stats from real data
-  const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const todaySleeps = data.filter((s) => s.date === today);
-  const napCount = todaySleeps.filter((s) => s.type === "nap").length;
-  const overnightCount = todaySleeps.filter(
+  // Calculate stats from real data for selected date
+  const selectedDateSleeps = data.filter((s) => s.date === statsDate);
+  const napCount = selectedDateSleeps.filter((s) => s.type === "nap").length;
+  const overnightCount = selectedDateSleeps.filter(
     (s) => s.type === "overnight"
   ).length;
 
   // Calculate total sleep hours (simplified - just count the entries for now)
   const totalSleeps = napCount + overnightCount;
-  const lastSleep = data.length > 0 ? data[0] : null;
+  const lastSleep = selectedDateSleeps.length > 0 ? selectedDateSleeps[0] : null;
+
+  const uniqueDates = [...new Set(data.map((s) => s.date))].sort().reverse();
 
   if (loading) {
     return (
@@ -119,6 +123,49 @@ export function Sleep() {
         </p>
       </div>
 
+      {/* Date Selector for Stats */}
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-gray-700">Viewing stats for:</span>
+        <div className="relative">
+          <button
+            onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-50 shadow-sm"
+          >
+            <IconCalendar className="w-4 h-4 text-gray-400" />
+            {statsDate === today ? 'Today' : statsDate}
+          </button>
+          {showStatsDateDropdown && (
+            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[180px] max-h-[300px] overflow-y-auto">
+              <button
+                onClick={() => {
+                  setStatsDate(today);
+                  setShowStatsDateDropdown(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
+                  statsDate === today ? 'bg-gray-100 font-medium' : ''
+                }`}
+              >
+                Today ({today})
+              </button>
+              {uniqueDates.filter(d => d !== today).map((date) => (
+                <button
+                  key={date}
+                  onClick={() => {
+                    setStatsDate(date);
+                    setShowStatsDateDropdown(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
+                    statsDate === date ? 'bg-gray-100 font-medium' : ''
+                  }`}
+                >
+                  {date}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1 */}
@@ -147,7 +194,7 @@ export function Sleep() {
               colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
             }`}
           >
-            Sleep Sessions Today
+            Sleep Sessions {statsDate === today ? 'Today' : `on ${statsDate}`}
           </p>
           <div className="flex items-baseline gap-2">
             <span
@@ -231,7 +278,7 @@ export function Sleep() {
                     : "text-white/60"
                 }`}
               >
-                {lastSleep.type} - {lastSleep.duration}
+                {lastSleep.type ? lastSleep.type.charAt(0).toUpperCase() + lastSleep.type.slice(1) : ''} - {lastSleep.duration}
               </p>
             </>
           ) : (
