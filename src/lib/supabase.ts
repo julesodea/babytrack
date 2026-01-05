@@ -12,6 +12,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
+    // Use PKCE flow for better PWA/mobile support
+    flowType: 'pkce',
+    // Ensure storage works in standalone mode
+    storage: localStorage,
+    storageKey: 'baby-track-auth',
   },
   db: {
     schema: "public",

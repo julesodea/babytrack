@@ -3,6 +3,7 @@
   "short_name": "Baby Track",
   "description": "Keep track of your baby's activities - feeds, diapers, sleep and more",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
@@ -20,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
