@@ -367,22 +367,47 @@ export function ActivityDetail() {
                     >
                       End Time
                     </label>
-                    <input
-                      id="endTime"
-                      type="time"
-                      value={(activity as Sleep).end_time || ''}
-                      onChange={(e) => {
-                        const newEndTime = e.target.value;
-                        const sleepActivity = activity as Sleep;
-                        const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
-                        setActivity({
-                          ...sleepActivity,
-                          end_time: newEndTime,
-                          duration: calculatedDuration
-                        });
-                      }}
-                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        id="endTime"
+                        type="time"
+                        value={(activity as Sleep).end_time || ''}
+                        onChange={(e) => {
+                          const newEndTime = e.target.value;
+                          const sleepActivity = activity as Sleep;
+                          const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
+                          setActivity({
+                            ...sleepActivity,
+                            end_time: newEndTime,
+                            duration: calculatedDuration
+                          });
+                        }}
+                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      />
+                      {!(activity as Sleep).end_time && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const now = new Date();
+                            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                            const sleepActivity = activity as Sleep;
+                            const calculatedDuration = calculateDuration(sleepActivity.start_time, currentTime);
+                            setActivity({
+                              ...sleepActivity,
+                              end_time: currentTime,
+                              duration: calculatedDuration
+                            });
+                          }}
+                          className={`px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                            colorScheme.id === "default"
+                              ? "bg-gray-900 hover:bg-gray-800"
+                              : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+                          }`}
+                        >
+                          End Now
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label
