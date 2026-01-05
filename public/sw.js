@@ -1,5 +1,7 @@
 // Service Worker for Baby Track PWA
-const CACHE_NAME = 'baby-track-v1';
+// IMPORTANT: Increment this version number when you deploy updates
+const CACHE_VERSION = '1.0.1';
+const CACHE_NAME = `baby-track-v${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,26 +10,31 @@ const urlsToCache = [
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing new service worker...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(urlsToCache))
   );
+  // Force the waiting service worker to become the active one
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating new service worker...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
+  // Take control of all clients immediately
   self.clients.claim();
 });
 
