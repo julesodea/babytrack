@@ -281,13 +281,14 @@ export function ActivityDetail() {
                     id="diaperType"
                     value={(activity as Diaper).type || 'wet'}
                     onChange={(e) =>
-                      setActivity({ ...(activity as Diaper), type: e.target.value as 'wet' | 'dirty' | 'both' })
+                      setActivity({ ...(activity as Diaper), type: e.target.value as 'wet' | 'dirty' | 'both' | 'other' })
                     }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="wet">Wet</option>
                     <option value="dirty">Dirty</option>
                     <option value="both">Both</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               )}
