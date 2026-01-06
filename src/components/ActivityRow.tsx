@@ -78,36 +78,17 @@ export function ActivityRow({
       className="group block bg-white rounded-xl border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
     >
       {/* Mobile Layout */}
-      <div className="sm:hidden p-4 space-y-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3 flex-1">
-            <Checkbox />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-700 capitalize">
-                  {type}
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                  {dayOfWeek}
-                </span>
-              </div>
-              <p className="text-sm text-gray-900">{detail}</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center justify-between pl-8">
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-gray-500">{formattedDate}</div>
-            <div className="text-xs text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-              {time}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[9px] font-bold">
-              {user.charAt(0)}
-            </div>
-            <span className="text-xs text-gray-700">{user}</span>
-          </div>
+      <div className="sm:hidden p-3 flex items-center gap-2 overflow-hidden">
+        <Checkbox />
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-700 capitalize shrink-0">
+          {type}
+        </span>
+        <p className="text-xs text-gray-900 truncate flex-1 min-w-0">{detail}</p>
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 shrink-0">
+          {dayOfWeek}
+        </span>
+        <div className="text-[10px] text-gray-600 font-mono bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 shrink-0">
+          {time}
         </div>
       </div>
 
