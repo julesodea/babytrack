@@ -11,6 +11,7 @@ import { Layout } from "./components/Layout";
 import { Login } from "./pages";
 import { InviteAccept } from "./pages/InviteAccept";
 import { Dashboard } from "./pages";
+import { Search } from "./pages";
 
 // Lazy load all other pages for code splitting
 const ActivityDetail = lazy(() => import("./pages").then(m => ({ default: m.ActivityDetail })));
@@ -53,6 +54,7 @@ function App() {
                   </ProtectedRoute>
                 }>
                   <Route path="/" element={<Dashboard />} />
+                  <Route path="/search" element={<Search />} />
                   <Route path="/feed" element={<Feed />} />
                   <Route path="/feed/new" element={<FeedNew />} />
                   <Route path="/diaper" element={<Diaper />} />

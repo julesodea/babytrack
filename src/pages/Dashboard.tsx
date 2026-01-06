@@ -45,6 +45,7 @@ export function Dashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 24;
 
   // Query for user profile
@@ -186,7 +187,12 @@ export function Dashboard() {
   const filteredData = data.filter((item) => {
     const matchesDate = !dateFilter || item.date === dateFilter;
     const matchesType = !typeFilter || item.type === typeFilter;
-    return matchesDate && matchesType;
+    const matchesSearch =
+      !searchQuery ||
+      item.detail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDate && matchesType && matchesSearch;
   });
 
   // Pagination
@@ -507,76 +513,80 @@ export function Dashboard() {
             <input
               type="text"
               placeholder="Search activity logs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowDateDropdown(!showDateDropdown);
-                setShowTypeDropdown(false);
-              }}
-              className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                dateFilter ? "border-gray-900" : "border-gray-200"
-              }`}
-            >
-              <IconCalendar className="w-5 h-5 text-gray-400" />
-              {dateFilter || "Show by date"}
-            </button>
-            {showDateDropdown && (
-              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
-                <button
-                  onClick={() => handleDateFilterChange("")}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
-                >
-                  All dates
-                </button>
-                {uniqueDates.map((date) => (
+          <div className="flex gap-4">
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowDateDropdown(!showDateDropdown);
+                  setShowTypeDropdown(false);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                  dateFilter ? "border-gray-900" : "border-gray-200"
+                }`}
+              >
+                <IconCalendar className="w-5 h-5 text-gray-400" />
+                {dateFilter || "Show by date"}
+              </button>
+              {showDateDropdown && (
+                <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[160px]">
                   <button
-                    key={date}
-                    onClick={() => handleDateFilterChange(date)}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
+                    onClick={() => handleDateFilterChange("")}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                   >
-                    {date}
+                    All dates
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowTypeDropdown(!showTypeDropdown);
-                setShowDateDropdown(false);
-              }}
-              className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                typeFilter ? "border-gray-900" : "border-gray-200"
-              }`}
-            >
-              <IconFilter className="w-5 h-5 text-gray-400" />
-              {typeFilter
-                ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
-                : "Type"}
-            </button>
-            {showTypeDropdown && (
-              <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
-                <button
-                  onClick={() => handleTypeFilterChange("")}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
-                >
-                  All types
-                </button>
-                {["feed", "diaper", "sleep"].map((type) => (
+                  {uniqueDates.map((date) => (
+                    <button
+                      key={date}
+                      onClick={() => handleDateFilterChange(date)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl"
+                    >
+                      {date}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowTypeDropdown(!showTypeDropdown);
+                  setShowDateDropdown(false);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                  typeFilter ? "border-gray-900" : "border-gray-200"
+                }`}
+              >
+                <IconFilter className="w-5 h-5 text-gray-400" />
+                {typeFilter
+                  ? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+                  : "Type"}
+              </button>
+              {showTypeDropdown && (
+                <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[120px]">
                   <button
-                    key={type}
-                    onClick={() => handleTypeFilterChange(type)}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
+                    onClick={() => handleTypeFilterChange("")}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl"
                   >
-                    {type}
+                    All types
                   </button>
-                ))}
-              </div>
-            )}
+                  {["feed", "diaper", "sleep"].map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => handleTypeFilterChange(type)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl capitalize"
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

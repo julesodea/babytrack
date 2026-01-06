@@ -24,20 +24,35 @@ export function Layout() {
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
     if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     // Cleanup on unmount
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [sidebarOpen]);
 
+  // Command+K keyboard shortcut to open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        navigate("/search");
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
+
   const handleSignOut = async () => {
     await signOut();
-    navigate('/login');
+    navigate("/login");
   };
 
   const displayName = user?.user_metadata?.full_name || user?.email || "User";
@@ -61,7 +76,7 @@ export function Layout() {
           >
             <IconBottle className="w-4 h-4" />
           </div>
-          <h1 className="text-sm font-bold text-gray-900">Baby Tracker</h1>
+          <h1 className="text-sm font-bold text-gray-900">Baby Track</h1>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -92,27 +107,19 @@ export function Layout() {
         {/* Baby Selector */}
         <BabySelector />
 
-        {/* Sidebar Search */}
-        <div className="px-4 mb-2">
-          <div className="relative">
-            <IconSearch className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search anything"
-              className="w-full bg-gray-50 text-sm pl-9 pr-8 py-2 rounded-lg border-none focus:ring-2 focus:ring-gray-200 outline-none text-gray-600 placeholder-gray-400 transition-all hover:bg-gray-100 focus:bg-white"
-            />
-            <span className="hidden sm:block absolute right-3 top-2.5 text-[10px] text-gray-400 font-bold border border-gray-200 rounded px-1">
-              ⌘K
-            </span>
-          </div>
-        </div>
-
         {/* Navigation Links */}
         <nav className="flex-1 px-2 space-y-1 py-4 overflow-y-auto">
           <NavItem
             to="/"
             icon={<IconDashboard className="w-5 h-5" />}
             label="Dashboard"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <NavItem
+            to="/search"
+            icon={<IconSearch className="w-5 h-5" />}
+            label="Search"
+            badge="⌘K"
             onClick={() => setSidebarOpen(false)}
           />
           <NavItem
@@ -142,8 +149,18 @@ export function Layout() {
           <NavItem
             to="/profile"
             icon={
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             }
             label="Profile"

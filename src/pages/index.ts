@@ -8,5 +8,6 @@ export { Feed } from "./Feed";
 export { FeedNew } from "./FeedNew";
 export { Login } from "./Login";
 export { Preferences } from "./Preferences";
+export { Search } from "./Search";
 export { Sleep } from "./Sleep";
 export { SleepNew } from "./SleepNew";
