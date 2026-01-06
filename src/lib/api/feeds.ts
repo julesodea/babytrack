@@ -10,7 +10,8 @@ export async function getFeeds(babyId: string): Promise<Feed[]> {
     .from('feeds')
     .select('*')
     .eq('baby_id', babyId)
-    .order('created_at', { ascending: false });
+    .order('date', { ascending: false })
+    .order('time', { ascending: false });
 
   if (error) throw error;
   return data || [];
@@ -24,7 +25,8 @@ export async function getAllFeeds(): Promise<Feed[]> {
   const { data, error } = await supabase
     .from('feeds')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('date', { ascending: false })
+    .order('time', { ascending: false });
 
   if (error) throw error;
   return data || [];
