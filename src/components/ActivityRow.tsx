@@ -78,7 +78,7 @@ export function ActivityRow({
       className="group block bg-white rounded-xl border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
     >
       {/* Mobile Layout */}
-      <div className="sm:hidden p-3 flex items-center gap-2 overflow-hidden">
+      <div className="sm:hidden px-3 py-[18px] flex items-center gap-2 overflow-hidden">
         <Checkbox />
         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-700 capitalize shrink-0">
           {type}

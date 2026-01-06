@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-.vercel.json
+vercel.json
 
 # Environment files
 .env
