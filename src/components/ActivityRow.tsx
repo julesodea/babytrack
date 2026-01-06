@@ -31,7 +31,7 @@ export function ActivityRow({
   };
 
   const formatDate = (dateString: string): string => {
-    const [year, month, day] = dateString.split("-").map(Number);
+    const [_year, month, day] = dateString.split("-").map(Number);
     const months = [
       "Jan",
       "Feb",
