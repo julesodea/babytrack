@@ -31,7 +31,7 @@ export function ActivityRow({
   };
 
   const formatDate = (dateString: string): string => {
-    const [month, day] = dateString.split("-").map(Number);
+    const [year, month, day] = dateString.split("-").map(Number);
     const months = [
       "Jan",
       "Feb",
@@ -121,15 +121,16 @@ export function ActivityRow({
             {type}
           </span>
         </div>
-        <div className="col-span-4">
+        <div className="col-span-3">
           <p className="text-sm text-gray-900">{detail}</p>
         </div>
-        <div className="col-span-3 flex items-center gap-2">
-          <span className="text-sm text-gray-500">{formattedDate}</span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-            {dayOfWeek}
+        <div className="col-span-2 flex items-center">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 whitespace-nowrap">
+            {dayOfWeek} {formattedDate}
           </span>
-          <div className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+        </div>
+        <div className="col-span-2 flex items-center">
+          <div className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded-md border border-gray-100 whitespace-nowrap">
             {time}
           </div>
         </div>
