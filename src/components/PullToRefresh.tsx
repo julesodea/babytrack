@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface PullToRefreshProps {
@@ -9,8 +10,8 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
   const queryClient = useQueryClient();
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isPulling, setIsPulling] = useState(false);
   const startY = useRef(0);
+  const currentY = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const PULL_THRESHOLD = 80; // Distance needed to trigger refresh
@@ -20,29 +21,26 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
     const container = containerRef.current;
     if (!container) return;
 
-    let touchId: number | null = null;
-
     const handleTouchStart = (e: TouchEvent) => {
-      // Only start if we're at the top of the page
-      if (window.scrollY === 0 && !isRefreshing) {
-        touchId = e.touches[0].identifier;
+      // Check if container is scrolled to top
+      const scrollTop = container.scrollTop;
+
+      if (scrollTop === 0 && !isRefreshing) {
         startY.current = e.touches[0].clientY;
-        setIsPulling(true);
+        currentY.current = startY.current;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isPulling || isRefreshing) return;
+      if (isRefreshing || startY.current === 0) return;
 
-      // Find the touch that started the gesture
-      const touch = Array.from(e.touches).find(t => t.identifier === touchId);
-      if (!touch) return;
+      currentY.current = e.touches[0].clientY;
+      const distance = currentY.current - startY.current;
 
-      const currentY = touch.clientY;
-      const distance = currentY - startY.current;
+      // Check if still at top and pulling down
+      const scrollTop = container.scrollTop;
 
-      // Only allow pulling down when at top of page
-      if (distance > 0 && window.scrollY === 0) {
+      if (distance > 0 && scrollTop === 0) {
         // Prevent default scrolling behavior
         e.preventDefault();
 
@@ -53,10 +51,10 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
     };
 
     const handleTouchEnd = async () => {
-      if (!isPulling) return;
+      if (startY.current === 0) return;
 
-      setIsPulling(false);
-      touchId = null;
+      startY.current = 0;
+      currentY.current = 0;
 
       // Trigger refresh if pulled beyond threshold
       if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
@@ -89,24 +87,24 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
       container.removeEventListener('touchend', handleTouchEnd);
       container.removeEventListener('touchcancel', handleTouchEnd);
     };
-  }, [isPulling, pullDistance, isRefreshing, queryClient]);
+  }, [pullDistance, isRefreshing, queryClient]);
 
   const progress = Math.min(pullDistance / PULL_THRESHOLD, 1);
   const shouldShowSpinner = pullDistance > 20 || isRefreshing;
 
   return (
-    <div ref={containerRef} className="relative h-full">
+    <div ref={containerRef} className="relative h-full overflow-auto">
       {/* Pull indicator */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-center justify-center transition-opacity"
+        className="absolute top-0 left-0 right-0 flex items-center justify-center z-50 pointer-events-none"
         style={{
           height: `${Math.max(pullDistance, isRefreshing ? PULL_THRESHOLD : 0)}px`,
           opacity: shouldShowSpinner ? 1 : 0,
-          transition: isRefreshing || !isPulling ? 'height 0.3s ease-out, opacity 0.2s' : 'opacity 0.2s',
+          transition: pullDistance === 0 ? 'height 0.3s ease-out, opacity 0.2s' : 'opacity 0.2s',
         }}
       >
         <div
-          className="relative"
+          className="relative text-gray-600"
           style={{
             transform: isRefreshing ? 'none' : `scale(${progress})`,
             transition: isRefreshing ? 'transform 0.2s' : 'none',
@@ -116,7 +114,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
           <svg
             className={`w-6 h-6 ${isRefreshing ? 'animate-spin' : ''}`}
             style={{
-              opacity: progress,
+              opacity: Math.max(progress, 0.3),
             }}
             fill="none"
             viewBox="0 0 24 24"
@@ -142,7 +140,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
       <div
         style={{
           transform: `translateY(${pullDistance}px)`,
-          transition: isPulling ? 'none' : 'transform 0.3s ease-out',
+          transition: pullDistance === 0 ? 'transform 0.3s ease-out' : 'none',
         }}
       >
         {children}
