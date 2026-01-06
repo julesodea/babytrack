@@ -32,7 +32,7 @@ export function DiaperNew() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [diaper, setDiaper] = useState({
-    type: "wet" as "wet" | "dirty" | "both",
+    type: "wet" as "wet" | "dirty" | "both" | "other",
     time: getCurrentTime(),
     user: "",
     notes: "",
@@ -140,12 +140,13 @@ export function DiaperNew() {
               <select
                 id="type"
                 value={diaper.type}
-                onChange={(e) => setDiaper({ ...diaper, type: e.target.value as "wet" | "dirty" | "both" })}
+                onChange={(e) => setDiaper({ ...diaper, type: e.target.value as "wet" | "dirty" | "both" | "other" })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
               >
                 <option value="wet">Wet</option>
                 <option value="dirty">Dirty</option>
                 <option value="both">Both</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div>

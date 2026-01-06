@@ -131,7 +131,7 @@ export interface Database {
           detail: string | null;
           time: string;
           caregiver: string;
-          type: 'wet' | 'dirty' | 'both' | null;
+          type: 'wet' | 'dirty' | 'both' | 'other' | null;
           notes: string | null;
           date: string;
           created_at: string;
@@ -146,7 +146,7 @@ export interface Database {
           detail?: string | null;
           time: string;
           caregiver: string;
-          type?: 'wet' | 'dirty' | 'both' | null;
+          type?: 'wet' | 'dirty' | 'both' | 'other' | null;
           notes?: string | null;
           date: string;
         };
@@ -155,7 +155,7 @@ export interface Database {
           detail?: string | null;
           time?: string;
           caregiver?: string;
-          type?: 'wet' | 'dirty' | 'both' | null;
+          type?: 'wet' | 'dirty' | 'both' | 'other' | null;
           notes?: string | null;
           date?: string;
           updated_at?: string;

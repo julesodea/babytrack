@@ -448,7 +448,7 @@ export function Diaper() {
                   >
                     All types
                   </button>
-                  {["wet", "dirty", "both"].map((type) => (
+                  {["wet", "dirty", "both", "other"].map((type) => (
                     <button
                       key={type}
                       onClick={() => {
