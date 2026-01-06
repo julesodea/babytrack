@@ -12,6 +12,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const startY = useRef(0);
   const currentY = useRef(0);
+  const isPulling = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const PULL_THRESHOLD = 80; // Distance needed to trigger refresh
@@ -28,19 +29,20 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
       if (scrollTop === 0 && !isRefreshing) {
         startY.current = e.touches[0].clientY;
         currentY.current = startY.current;
+        isPulling.current = true;
+      } else {
+        isPulling.current = false;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (isRefreshing || startY.current === 0) return;
+      if (isRefreshing || !isPulling.current || startY.current === 0) return;
 
       currentY.current = e.touches[0].clientY;
       const distance = currentY.current - startY.current;
 
-      // Check if still at top and pulling down
-      const scrollTop = container.scrollTop;
-
-      if (distance > 0 && scrollTop === 0) {
+      // Only allow pull-to-refresh if we started at the top and pulling down
+      if (distance > 0) {
         // Prevent default scrolling behavior
         e.preventDefault();
 
@@ -53,11 +55,14 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
     const handleTouchEnd = async () => {
       if (startY.current === 0) return;
 
+      const wasPulling = isPulling.current;
+
       startY.current = 0;
       currentY.current = 0;
+      isPulling.current = false;
 
       // Trigger refresh if pulled beyond threshold
-      if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
+      if (wasPulling && pullDistance >= PULL_THRESHOLD && !isRefreshing) {
         setIsRefreshing(true);
 
         try {
