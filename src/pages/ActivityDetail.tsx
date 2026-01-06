@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { IconDashboard } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { useBaby } from "../contexts/BabyContext";
 import { getFeed, updateFeed } from "../lib/api/feeds";
 import { getDiaper, updateDiaper } from "../lib/api/diapers";
 import { getSleep, updateSleep } from "../lib/api/sleeps";
@@ -13,7 +15,9 @@ type Activity = Feed | Diaper | Sleep;
 export function ActivityDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { selectedBaby } = useBaby();
   const { colorScheme } = useColorScheme();
+  const queryClient = useQueryClient();
   const [activity, setActivity] = useState<Activity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -160,6 +164,12 @@ export function ActivityDetail() {
       } else if (activityType === 'sleep') {
         await updateSleep(id, activity as Sleep);
       }
+
+      // Invalidate queries to refresh the data everywhere
+      await queryClient.invalidateQueries({ queryKey: ["activities", selectedBaby?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["feeds", selectedBaby?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["diapers", selectedBaby?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["sleeps", selectedBaby?.id] });
 
       setIsEditing(false);
       await loadActivity(); // Reload to get updated data

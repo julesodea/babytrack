@@ -1,6 +1,6 @@
 // Service Worker for Baby Track PWA
 // IMPORTANT: Increment this version number when you deploy updates
-const CACHE_VERSION = "1.0.1";
+const CACHE_VERSION = "1.0.2";
 const CACHE_NAME = `baby-track-v${CACHE_VERSION}`;
 const urlsToCache = ["/", "/index.html", "/manifest.json"];
 
@@ -32,6 +32,12 @@ self.addEventListener("activate", (event) => {
 
 // Fetch event - network first, fallback to cache
 self.addEventListener("fetch", (event) => {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
