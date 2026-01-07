@@ -38,6 +38,14 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
     const handleTouchMove = (e: TouchEvent) => {
       if (isRefreshing || !isPulling.current || startY.current === 0) return;
 
+      // Re-check if we're still at the top during the pull
+      const scrollTop = container?.scrollTop || 0;
+      if (scrollTop > 0) {
+        isPulling.current = false;
+        setPullDistance(0);
+        return;
+      }
+
       currentY.current = e.touches[0].clientY;
       const distance = currentY.current - startY.current;
 
