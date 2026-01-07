@@ -178,15 +178,17 @@ export function FeedNew() {
                 htmlFor="amount"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Amount
+                Amount (ml)
               </label>
               <input
                 id="amount"
-                type="text"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 value={feed.amount}
                 onChange={(e) => setFeed({ ...feed, amount: e.target.value })}
-                placeholder="e.g., 120ml, 4oz"
+                placeholder="150"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
