@@ -33,17 +33,6 @@ export function ActivityDetail() {
   const loadActivity = async () => {
     if (!id) return;
 
-    // First, check if we have this activity in the cache from the lists
-    const cachedActivities = queryClient.getQueryData<any[]>(["activities", selectedBaby?.id]);
-    if (cachedActivities) {
-      const cachedActivity = cachedActivities.find((a: any) => a.id === id);
-      if (cachedActivity) {
-        setActivity(cachedActivity);
-        setLoading(false);
-        return;
-      }
-    }
-
     setLoading(true);
     setError("");
 
