@@ -74,7 +74,7 @@ export function ActivityRow({
 
   return (
     <Link
-      to={`/activity/${id}`}
+      to={`/activity/${id}?type=${type}`}
       className="group block bg-white rounded-xl border border-transparent hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
     >
       {/* Mobile Layout */}

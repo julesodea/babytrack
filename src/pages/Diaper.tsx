@@ -498,7 +498,7 @@ export function Diaper() {
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  type={item.type || "diaper"}
+                  type="diaper"
                   detail={item.detail || ""}
                   time={item.time}
                   user={item.caregiver}

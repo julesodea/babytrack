@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { IconDashboard } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,6 +14,7 @@ type Activity = Feed | Diaper | Sleep;
 
 export function ActivityDetail() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const { colorScheme } = useColorScheme();
@@ -32,11 +33,53 @@ export function ActivityDetail() {
   const loadActivity = async () => {
     if (!id) return;
 
+    // First, check if we have this activity in the cache from the lists
+    const cachedActivities = queryClient.getQueryData<any[]>(["activities", selectedBaby?.id]);
+    if (cachedActivities) {
+      const cachedActivity = cachedActivities.find((a: any) => a.id === id);
+      if (cachedActivity) {
+        setActivity(cachedActivity);
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
     setError("");
+
+    // Get the type hint from URL query params
+    const typeHint = searchParams.get('type');
+
     try {
-      // Try to fetch from feeds first
-      let data = await getFeed(id).catch(() => null);
+      let data = null;
+
+      // If we have a type hint, try that table first
+      if (typeHint === 'feed') {
+        data = await getFeed(id).catch(() => null);
+        if (data) {
+          setActivity(data);
+          setLoading(false);
+          return;
+        }
+      } else if (typeHint === 'diaper') {
+        data = await getDiaper(id).catch(() => null);
+        if (data) {
+          setActivity(data);
+          setLoading(false);
+          return;
+        }
+      } else if (typeHint === 'sleep') {
+        data = await getSleep(id).catch(() => null);
+        if (data) {
+          setActivity(data);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If type hint didn't work or wasn't provided, try all tables
+      // Try to fetch from feeds first (catch and suppress 404/406 errors)
+      data = await getFeed(id).catch(() => null);
       if (data) {
         setActivity(data);
         setLoading(false);

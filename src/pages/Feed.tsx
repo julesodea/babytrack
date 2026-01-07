@@ -488,7 +488,7 @@ export function Feed() {
                 <ActivityRow
                   key={item.id}
                   id={item.id}
-                  type={item.type || "feed"}
+                  type="feed"
                   detail={item.detail || ""}
                   time={item.time}
                   user={item.caregiver}
