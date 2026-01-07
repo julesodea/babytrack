@@ -34,8 +34,11 @@ export function FeedNew() {
   const [feed, setFeed] = useState({
     amount: "",
     time: getCurrentTime(),
+    date: getCurrentDate(),
     user: "",
     type: "bottle" as "bottle" | "breast" | "solid",
+    detail: "",
+    notes: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -78,11 +81,12 @@ export function FeedNew() {
         created_by_user_id: user.id,
         title: `${feedType} Feed`,
         amount: feed.amount,
-        detail: `${feed.amount}ml - ${feedType}`,
+        detail: feed.detail || `${feed.amount}ml - ${feedType}`,
         time: feed.time,
         caregiver: feed.user,
         type: feed.type,
-        date: getCurrentDate(),
+        notes: feed.notes || null,
+        date: feed.date,
       });
       // Invalidate queries to refresh the data
       await queryClient.invalidateQueries({ queryKey: ["activities"] });
@@ -132,6 +136,22 @@ export function FeedNew() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
+                htmlFor="date"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Date
+              </label>
+              <input
+                id="date"
+                type="date"
+                required
+                value={feed.date}
+                onChange={(e) => setFeed({ ...feed, date: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label
                 htmlFor="type"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -158,17 +178,31 @@ export function FeedNew() {
                 htmlFor="amount"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Amount (ml)
+                Amount
               </label>
               <input
                 id="amount"
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]*"
+                type="text"
                 required
                 value={feed.amount}
                 onChange={(e) => setFeed({ ...feed, amount: e.target.value })}
-                placeholder="e.g., 150"
+                placeholder="e.g., 120ml, 4oz"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Time
+              </label>
+              <input
+                id="time"
+                type="time"
+                required
+                value={feed.time}
+                onChange={(e) => setFeed({ ...feed, time: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
@@ -192,20 +226,36 @@ export function FeedNew() {
                 <option value="Other">Other</option>
               </select>
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label
-                htmlFor="time"
+                htmlFor="detail"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Time
+                Details
               </label>
-              <input
-                id="time"
-                type="time"
-                required
-                value={feed.time}
-                onChange={(e) => setFeed({ ...feed, time: e.target.value })}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              <textarea
+                id="detail"
+                value={feed.detail}
+                onChange={(e) => setFeed({ ...feed, detail: e.target.value })}
+                rows={3}
+                placeholder="Additional details..."
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Notes (optional)
+              </label>
+              <textarea
+                id="notes"
+                value={feed.notes}
+                onChange={(e) => setFeed({ ...feed, notes: e.target.value })}
+                rows={4}
+                placeholder="Any additional notes..."
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
               />
             </div>
           </div>

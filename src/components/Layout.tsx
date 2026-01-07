@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { NavItem } from "./NavItem";
 import { BabySelector } from "./BabySelector";
-import { PullToRefresh } from "./PullToRefresh";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -206,11 +205,9 @@ export function Layout() {
 
       {/* --- Main Content --- */}
       <main className="flex-1 lg:ml-72 pt-14 lg:pt-0">
-        <PullToRefresh>
-          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-12">
-            <Outlet />
-          </div>
-        </PullToRefresh>
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-12">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

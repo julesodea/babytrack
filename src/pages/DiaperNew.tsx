@@ -34,7 +34,9 @@ export function DiaperNew() {
   const [diaper, setDiaper] = useState({
     type: "wet" as "wet" | "dirty" | "both" | "other",
     time: getCurrentTime(),
+    date: getCurrentDate(),
     user: "",
+    detail: "",
     notes: "",
   });
   const [loading, setLoading] = useState(false);
@@ -77,12 +79,12 @@ export function DiaperNew() {
         baby_id: selectedBaby.id,
         created_by_user_id: user.id,
         title: `${diaperDetail} Diaper`,
-        detail: diaperDetail,
+        detail: diaper.detail || diaperDetail,
         time: diaper.time,
         caregiver: diaper.user,
         type: diaper.type,
         notes: diaper.notes || null,
-        date: getCurrentDate(),
+        date: diaper.date,
       });
       // Invalidate queries to refresh the data
       await queryClient.invalidateQueries({ queryKey: ["activities"] });
@@ -132,6 +134,22 @@ export function DiaperNew() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
+                htmlFor="date"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Date
+              </label>
+              <input
+                id="date"
+                type="date"
+                required
+                value={diaper.date}
+                onChange={(e) => setDiaper({ ...diaper, date: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label
                 htmlFor="type"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -148,6 +166,22 @@ export function DiaperNew() {
                 <option value="both">Both</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+            <div>
+              <label
+                htmlFor="time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Time
+              </label>
+              <input
+                id="time"
+                type="time"
+                required
+                value={diaper.time}
+                onChange={(e) => setDiaper({ ...diaper, time: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
             </div>
             <div>
               <label
@@ -171,6 +205,22 @@ export function DiaperNew() {
             </div>
             <div className="sm:col-span-2">
               <label
+                htmlFor="detail"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Details
+              </label>
+              <textarea
+                id="detail"
+                value={diaper.detail}
+                onChange={(e) => setDiaper({ ...diaper, detail: e.target.value })}
+                rows={3}
+                placeholder="Additional details..."
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
                 htmlFor="notes"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -182,25 +232,9 @@ export function DiaperNew() {
                 onChange={(e) =>
                   setDiaper({ ...diaper, notes: e.target.value })
                 }
-                rows={3}
+                rows={4}
                 placeholder="Any additional notes..."
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Time
-              </label>
-              <input
-                id="time"
-                type="time"
-                required
-                value={diaper.time}
-                onChange={(e) => setDiaper({ ...diaper, time: e.target.value })}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
           </div>

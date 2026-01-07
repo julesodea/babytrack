@@ -66,8 +66,11 @@ export function SleepNew() {
   const [sleep, setSleep] = useState({
     startTime: getCurrentTime(),
     endTime: getCurrentTime(),
+    date: getCurrentDate(),
     user: "",
     type: "nap" as "nap" | "overnight",
+    detail: "",
+    notes: "",
   });
   const [isOngoing, setIsOngoing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -113,13 +116,14 @@ export function SleepNew() {
         baby_id: selectedBaby.id,
         created_by_user_id: user.id,
         title: sleepType,
-        detail: isOngoing ? 'Ongoing sleep' : `${duration} sleep`,
+        detail: sleep.detail || (isOngoing ? 'Ongoing sleep' : `${duration} sleep`),
         duration: isOngoing ? 'Ongoing' : duration,
         start_time: sleep.startTime,
         end_time: isOngoing ? null : sleep.endTime,
         caregiver: sleep.user,
         type: sleep.type,
-        date: getCurrentDate(),
+        notes: sleep.notes || null,
+        date: sleep.date,
       });
       // Invalidate queries to refresh the data
       await queryClient.invalidateQueries({ queryKey: ["activities"] });
@@ -169,6 +173,22 @@ export function SleepNew() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
+                htmlFor="date"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Date
+              </label>
+              <input
+                id="date"
+                type="date"
+                required
+                value={sleep.date}
+                onChange={(e) => setSleep({ ...sleep, date: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label
                 htmlFor="type"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
@@ -182,26 +202,6 @@ export function SleepNew() {
               >
                 <option value="nap">Nap</option>
                 <option value="overnight">Overnight</option>
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="user"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Caregiver
-              </label>
-              <select
-                id="user"
-                required
-                value={sleep.user}
-                onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="">Select caregiver</option>
-                <option value="Mum">Mum</option>
-                <option value="Dad">Dad</option>
-                <option value="Other">Other</option>
               </select>
             </div>
             <div className="sm:col-span-2">
@@ -233,7 +233,7 @@ export function SleepNew() {
                 onChange={(e) =>
                   setSleep({ ...sleep, startTime: e.target.value })
                 }
-                className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
               />
             </div>
             <div>
@@ -252,7 +252,7 @@ export function SleepNew() {
                 onChange={(e) =>
                   setSleep({ ...sleep, endTime: e.target.value })
                 }
-                className={`px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
+                className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
                   isOngoing ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
               />
@@ -267,6 +267,58 @@ export function SleepNew() {
               <div className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 font-medium">
                 {duration || 'Select start and end time'}
               </div>
+            </div>
+            <div>
+              <label
+                htmlFor="user"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Caregiver
+              </label>
+              <select
+                id="user"
+                required
+                value={sleep.user}
+                onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+              >
+                <option value="">Select caregiver</option>
+                <option value="Mum">Mum</option>
+                <option value="Dad">Dad</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="detail"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Details
+              </label>
+              <textarea
+                id="detail"
+                value={sleep.detail}
+                onChange={(e) => setSleep({ ...sleep, detail: e.target.value })}
+                rows={3}
+                placeholder="Additional details..."
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Notes (optional)
+              </label>
+              <textarea
+                id="notes"
+                value={sleep.notes}
+                onChange={(e) => setSleep({ ...sleep, notes: e.target.value })}
+                rows={4}
+                placeholder="Any additional notes..."
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all resize-none"
+              />
             </div>
           </div>
 

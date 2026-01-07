@@ -113,10 +113,25 @@ export function ActivityDetail() {
   };
 
   const getActivityType = (): 'feed' | 'diaper' | 'sleep' | null => {
-    if (!activity) return null;
-    if ('amount' in activity) return 'feed';
-    if ('start_time' in activity) return 'sleep';
-    if ('time' in activity && !('start_time' in activity)) return 'diaper';
+    if (!activity || !('type' in activity) || !activity.type) return null;
+
+    const type = activity.type;
+
+    // Check feed types
+    if (type === 'bottle' || type === 'breast' || type === 'solid') {
+      return 'feed';
+    }
+
+    // Check diaper types
+    if (type === 'wet' || type === 'dirty' || type === 'both' || type === 'other') {
+      return 'diaper';
+    }
+
+    // Check sleep types
+    if (type === 'nap' || type === 'overnight') {
+      return 'sleep';
+    }
+
     return null;
   };
 
@@ -346,26 +361,46 @@ export function ActivityDetail() {
                 </div>
               )}
               {'type' in activity && getActivityType() === 'feed' && (
-                <div>
-                  <label
-                    htmlFor="feedType"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Feed Type
-                  </label>
-                  <select
-                    id="feedType"
-                    value={(activity as Feed).type || 'bottle'}
-                    onChange={(e) =>
-                      setActivity({ ...(activity as Feed), type: e.target.value as 'bottle' | 'breast' | 'solid' })
-                    }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="bottle">Bottle</option>
-                    <option value="breast">Breast</option>
-                    <option value="solid">Solid Food</option>
-                  </select>
-                </div>
+                <>
+                  <div>
+                    <label
+                      htmlFor="feedType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Feed Type
+                    </label>
+                    <select
+                      id="feedType"
+                      value={(activity as Feed).type || 'bottle'}
+                      onChange={(e) =>
+                        setActivity({ ...(activity as Feed), type: e.target.value as 'bottle' | 'breast' | 'solid' })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
+                    >
+                      <option value="bottle">Bottle</option>
+                      <option value="breast">Breast</option>
+                      <option value="solid">Solid Food</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="amount"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Amount
+                    </label>
+                    <input
+                      id="amount"
+                      type="text"
+                      value={(activity as Feed).amount || ''}
+                      onChange={(e) =>
+                        setActivity({ ...(activity as Feed), amount: e.target.value })
+                      }
+                      placeholder="e.g., 120ml, 4oz"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                </>
               )}
               {'type' in activity && getActivityType() === 'sleep' && (
                 <div>
@@ -595,12 +630,6 @@ export function ActivityDetail() {
                   </p>
                 </div>
               )}
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Activity Type</p>
-                <p className="text-lg font-medium text-gray-900 capitalize">
-                  {activityType}
-                </p>
-              </div>
               {'type' in activity && activity.type && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">
@@ -608,6 +637,14 @@ export function ActivityDetail() {
                   </p>
                   <p className="text-lg font-medium text-gray-900 capitalize">
                     {activity.type}
+                  </p>
+                </div>
+              )}
+              {getActivityType() === 'feed' && 'amount' in activity && (activity as Feed).amount && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Amount</p>
+                  <p className="text-lg font-medium text-gray-900">
+                    {(activity as Feed).amount}
                   </p>
                 </div>
               )}
