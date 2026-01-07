@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
-import { IconDashboard, IconFilter } from "../components/icons";
+import { IconDashboard, IconFilter, IconRefresh } from "../components/icons";
 import { useColorScheme, colorSchemes } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile, updateProfile } from "../lib/api/profiles";
 import { getPreferences, upsertPreferences } from "../lib/api/preferences";
 import { Link } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Preferences() {
   const { colorScheme, setColorScheme } = useColorScheme();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshSuccess, setRefreshSuccess] = useState(false);
   const [settings, setSettings] = useState({
     feedReminders: true,
     feedReminderInterval: 3,
@@ -66,6 +70,24 @@ export function Preferences() {
       console.error("Failed to load preferences:", err);
     } finally {
       setIsLoadingPreferences(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setRefreshSuccess(false);
+    try {
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+      await queryClient.invalidateQueries({ queryKey: ["feeds"] });
+      await queryClient.invalidateQueries({ queryKey: ["diapers"] });
+      await queryClient.invalidateQueries({ queryKey: ["sleeps"] });
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({ queryKey: ["preferences"] });
+      setRefreshSuccess(true);
+      setTimeout(() => setRefreshSuccess(false), 3000);
+    } finally {
+      // Add a small delay so the animation is visible
+      setTimeout(() => setIsRefreshing(false), 500);
     }
   };
 
@@ -515,6 +537,34 @@ export function Preferences() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Data Management */}
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Data Management
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            Refresh all cached data to ensure you have the latest information
+          </p>
+
+          {refreshSuccess && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+              Data refreshed successfully!
+            </div>
+          )}
+
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <IconRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? "Refreshing..." : "Refresh All Data"}
+          </button>
+          <p className="text-xs text-gray-500 mt-3">
+            This will reload all activities, feeds, diapers, sleeps, and settings from the server
+          </p>
         </div>
 
         {/* Save Button */}
