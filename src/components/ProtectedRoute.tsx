@@ -1,5 +1,6 @@
 import { Navigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
+import { IconBottle } from "./icons";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,8 +11,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse text-gray-500">Loading...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-400">
+        <IconBottle className="w-16 h-16 text-white mb-4 animate-pulse" />
+        <h1 className="text-2xl font-semibold text-white">Baby Track</h1>
       </div>
     );
   }

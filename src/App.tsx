@@ -6,6 +6,7 @@ import { BabyProvider } from "./contexts/BabyContext";
 import { ColorSchemeProvider } from "./context/ColorSchemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
+import { IconBottle } from "./components/icons";
 
 // Eager load critical pages (public routes)
 import { Login } from "./pages";
@@ -14,18 +15,38 @@ import { Dashboard } from "./pages";
 import { Search } from "./pages";
 
 // Lazy load all other pages for code splitting
-const ActivityDetail = lazy(() => import("./pages").then(m => ({ default: m.ActivityDetail })));
-const ActivityNew = lazy(() => import("./pages").then(m => ({ default: m.ActivityNew })));
-const Diaper = lazy(() => import("./pages").then(m => ({ default: m.Diaper })));
-const DiaperNew = lazy(() => import("./pages").then(m => ({ default: m.DiaperNew })));
-const Feed = lazy(() => import("./pages").then(m => ({ default: m.Feed })));
-const FeedNew = lazy(() => import("./pages").then(m => ({ default: m.FeedNew })));
-const Preferences = lazy(() => import("./pages").then(m => ({ default: m.Preferences })));
-const Sleep = lazy(() => import("./pages").then(m => ({ default: m.Sleep })));
-const SleepNew = lazy(() => import("./pages").then(m => ({ default: m.SleepNew })));
-const BabyNew = lazy(() => import("./pages/BabyNew").then(m => ({ default: m.BabyNew })));
-const BabyManage = lazy(() => import("./pages/BabyManage").then(m => ({ default: m.BabyManage })));
-const Profile = lazy(() => import("./pages/Profile").then(m => ({ default: m.Profile })));
+const ActivityDetail = lazy(() =>
+  import("./pages").then((m) => ({ default: m.ActivityDetail }))
+);
+const ActivityNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.ActivityNew }))
+);
+const Diaper = lazy(() =>
+  import("./pages").then((m) => ({ default: m.Diaper }))
+);
+const DiaperNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.DiaperNew }))
+);
+const Feed = lazy(() => import("./pages").then((m) => ({ default: m.Feed })));
+const FeedNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.FeedNew }))
+);
+const Preferences = lazy(() =>
+  import("./pages").then((m) => ({ default: m.Preferences }))
+);
+const Sleep = lazy(() => import("./pages").then((m) => ({ default: m.Sleep })));
+const SleepNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.SleepNew }))
+);
+const BabyNew = lazy(() =>
+  import("./pages/BabyNew").then((m) => ({ default: m.BabyNew }))
+);
+const BabyManage = lazy(() =>
+  import("./pages/BabyManage").then((m) => ({ default: m.BabyManage }))
+);
+const Profile = lazy(() =>
+  import("./pages/Profile").then((m) => ({ default: m.Profile }))
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,15 +65,26 @@ function App() {
       <AuthProvider>
         <BabyProvider>
           <ColorSchemeProvider>
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+            <Suspense
+              fallback={
+                <div className="flex flex-col items-center justify-center min-h-screen bg-blue-400">
+                  <IconBottle className="w-16 h-16 text-white mb-4 animate-pulse" />
+                  <h1 className="text-2xl font-semibold text-white">
+                    Baby Track
+                  </h1>
+                </div>
+              }
+            >
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/invites/accept" element={<InviteAccept />} />
-                <Route element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }>
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }
+                >
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/feed" element={<Feed />} />
