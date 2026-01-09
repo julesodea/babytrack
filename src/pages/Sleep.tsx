@@ -64,7 +64,7 @@ export function Sleep() {
       item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.duration?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+      (item.notes && item.notes.trim() && item.notes.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDate && matchesType && matchesSearch;
   });
 

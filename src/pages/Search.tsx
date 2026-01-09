@@ -15,6 +15,7 @@ interface ActivityItem {
   user: string;
   type: "feed" | "diaper" | "sleep";
   date: string;
+  notes: string | null;
   created_at: string;
 }
 
@@ -53,6 +54,7 @@ export function Search() {
         user: f.caregiver,
         type: "feed" as const,
         date: f.date,
+        notes: f.notes,
         created_at: f.created_at,
       }));
 
@@ -64,6 +66,7 @@ export function Search() {
         user: d.caregiver,
         type: "diaper" as const,
         date: d.date,
+        notes: d.notes,
         created_at: d.created_at,
       }));
 
@@ -75,6 +78,7 @@ export function Search() {
         user: s.caregiver,
         type: "sleep" as const,
         date: s.date,
+        notes: s.notes,
         created_at: s.created_at,
       }));
 
@@ -104,7 +108,8 @@ export function Search() {
       item.user.toLowerCase().includes(query) ||
       item.type.toLowerCase().includes(query) ||
       item.date.includes(query) ||
-      item.time.includes(query)
+      item.time.includes(query) ||
+      (item.notes && item.notes.trim() && item.notes.toLowerCase().includes(query))
     );
   });
 
@@ -137,7 +142,7 @@ export function Search() {
         <IconSearch className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
         <input
           type="text"
-          placeholder="Search by activity, caregiver, type, date, or time..."
+          placeholder="Search by activity, caregiver, type, date, time, or notes..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           autoFocus

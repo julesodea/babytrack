@@ -29,6 +29,7 @@ interface ActivityItem {
   user: string;
   type: "feed" | "diaper" | "sleep";
   date: string;
+  notes: string | null;
   created_at: string;
 }
 
@@ -82,6 +83,7 @@ export function Dashboard() {
         user: f.caregiver,
         type: "feed" as const,
         date: f.date,
+        notes: f.notes,
         created_at: f.created_at,
       }));
 
@@ -93,6 +95,7 @@ export function Dashboard() {
         user: d.caregiver,
         type: "diaper" as const,
         date: d.date,
+        notes: d.notes,
         created_at: d.created_at,
       }));
 
@@ -104,6 +107,7 @@ export function Dashboard() {
         user: s.caregiver,
         type: "sleep" as const,
         date: s.date,
+        notes: s.notes,
         created_at: s.created_at,
       }));
 
@@ -191,7 +195,8 @@ export function Dashboard() {
       !searchQuery ||
       item.detail.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchQuery.toLowerCase());
+      item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.notes && item.notes.trim() && item.notes.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDate && matchesType && matchesSearch;
   });
 

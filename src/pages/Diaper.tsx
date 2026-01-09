@@ -106,7 +106,7 @@ export function Diaper() {
       !searchQuery ||
       item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+      (item.notes && item.notes.trim() && item.notes.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDate && matchesType && matchesSearch;
   });
 
