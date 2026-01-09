@@ -337,9 +337,22 @@ export function ActivityDetail() {
                   <select
                     id="diaperType"
                     value={(activity as Diaper).type || 'wet'}
-                    onChange={(e) =>
-                      setActivity({ ...(activity as Diaper), type: e.target.value as 'wet' | 'dirty' | 'both' | 'other' })
-                    }
+                    onChange={(e) => {
+                      const newType = e.target.value as 'wet' | 'dirty' | 'both' | 'other';
+                      const diaperActivity = activity as Diaper;
+                      const oldTypeDetail = diaperActivity.type ? diaperActivity.type.charAt(0).toUpperCase() + diaperActivity.type.slice(1) : '';
+                      const newTypeDetail = newType.charAt(0).toUpperCase() + newType.slice(1);
+                      // If current detail matches the old type, update it to the new type
+                      // Otherwise, keep the custom detail
+                      const newDetail = (diaperActivity.detail === oldTypeDetail || !diaperActivity.detail)
+                        ? newTypeDetail
+                        : diaperActivity.detail;
+                      setActivity({ 
+                        ...diaperActivity, 
+                        type: newType,
+                        detail: newDetail
+                      });
+                    }}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                   >
                     <option value="wet">Wet</option>
@@ -361,9 +374,23 @@ export function ActivityDetail() {
                     <select
                       id="feedType"
                       value={(activity as Feed).type || 'bottle'}
-                      onChange={(e) =>
-                        setActivity({ ...(activity as Feed), type: e.target.value as 'bottle' | 'breast' | 'solid' })
-                      }
+                      onChange={(e) => {
+                        const newType = e.target.value as 'bottle' | 'breast' | 'solid';
+                        const feedActivity = activity as Feed;
+                        const oldFeedType = feedActivity.type ? feedActivity.type.charAt(0).toUpperCase() + feedActivity.type.slice(1) : '';
+                        const newFeedType = newType.charAt(0).toUpperCase() + newType.slice(1);
+                        const oldAutoDetail = feedActivity.amount ? `${feedActivity.amount}ml - ${oldFeedType}` : '';
+                        // If current detail matches the auto-generated pattern, update it
+                        // Otherwise, keep the custom detail
+                        const newDetail = (feedActivity.detail === oldAutoDetail || !feedActivity.detail) && feedActivity.amount
+                          ? `${feedActivity.amount}ml - ${newFeedType}`
+                          : feedActivity.detail || '';
+                        setActivity({ 
+                          ...feedActivity, 
+                          type: newType,
+                          detail: newDetail
+                        });
+                      }}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
                     >
                       <option value="bottle">Bottle</option>
@@ -384,9 +411,22 @@ export function ActivityDetail() {
                       inputMode="numeric"
                       pattern="[0-9]*"
                       value={(activity as Feed).amount || ''}
-                      onChange={(e) =>
-                        setActivity({ ...(activity as Feed), amount: e.target.value })
-                      }
+                      onChange={(e) => {
+                        const newAmount = e.target.value;
+                        const feedActivity = activity as Feed;
+                        const feedType = feedActivity.type ? feedActivity.type.charAt(0).toUpperCase() + feedActivity.type.slice(1) : 'Bottle';
+                        const oldAutoDetail = feedActivity.amount ? `${feedActivity.amount}ml - ${feedType}` : '';
+                        // If current detail matches the auto-generated pattern, update it
+                        // Otherwise, keep the custom detail
+                        const newDetail = (feedActivity.detail === oldAutoDetail || !feedActivity.detail) && newAmount
+                          ? `${newAmount}ml - ${feedType}`
+                          : feedActivity.detail || '';
+                        setActivity({ 
+                          ...feedActivity, 
+                          amount: newAmount,
+                          detail: newDetail
+                        });
+                      }}
                       placeholder="150"
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                     />
@@ -431,10 +471,14 @@ export function ActivityDetail() {
                         const newStartTime = e.target.value;
                         const sleepActivity = activity as Sleep;
                         const calculatedDuration = calculateDuration(newStartTime, sleepActivity.end_time);
+                        const newDetail = sleepActivity.end_time 
+                          ? `${calculatedDuration} sleep`
+                          : (sleepActivity.detail || 'Ongoing sleep');
                         setActivity({
                           ...sleepActivity,
                           start_time: newStartTime,
-                          duration: calculatedDuration
+                          duration: calculatedDuration,
+                          detail: newDetail
                         });
                       }}
                       className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
@@ -456,10 +500,14 @@ export function ActivityDetail() {
                           const newEndTime = e.target.value;
                           const sleepActivity = activity as Sleep;
                           const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
+                          const newDetail = newEndTime 
+                            ? `${calculatedDuration} sleep`
+                            : 'Ongoing sleep';
                           setActivity({
                             ...sleepActivity,
                             end_time: newEndTime,
-                            duration: calculatedDuration
+                            duration: calculatedDuration,
+                            detail: newDetail
                           });
                         }}
                         className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
@@ -475,7 +523,8 @@ export function ActivityDetail() {
                             setActivity({
                               ...sleepActivity,
                               end_time: currentTime,
-                              duration: calculatedDuration
+                              duration: calculatedDuration,
+                              detail: `${calculatedDuration} sleep`
                             });
                           }}
                           className={`px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
