@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-400">
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-blue-400 z-50">
         <IconBottle className="w-16 h-16 text-white mb-4 animate-pulse" />
         <h1 className="text-2xl font-semibold text-white">Baby Track</h1>
       </div>
