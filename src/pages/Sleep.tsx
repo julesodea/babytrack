@@ -35,6 +35,7 @@ export function Sleep() {
   )}-${String(now.getDate()).padStart(2, "0")}`;
   const [statsDate, setStatsDate] = useState<string>(today);
   const [showStatsDateDropdown, setShowStatsDateDropdown] = useState(false);
+  const [viewMode, setViewMode] = useState<"stats" | "graph">("stats");
 
   // Query for sleeps
   const { data = [], isLoading: loading } = useQuery({
@@ -104,6 +105,35 @@ export function Sleep() {
 
   const uniqueDates = [...new Set(data.map((s) => s.date))].sort().reverse();
 
+  // Calculate last 7 days data for graph
+  const getLast7DaysData = () => {
+    const days = [];
+    const counts = [];
+    const napCounts = [];
+    const overnightCounts = [];
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      const daySleeps = data.filter(s => s.date === dateStr);
+      const naps = daySleeps.filter(s => s.type === "nap").length;
+      const overnight = daySleeps.filter(s => s.type === "overnight").length;
+      
+      days.push(dateStr.slice(5)); // MM-DD format
+      counts.push(daySleeps.length);
+      napCounts.push(naps);
+      overnightCounts.push(overnight);
+    }
+    
+    const maxCount = Math.max(...counts, 1);
+    const maxTypeCount = Math.max(...napCounts, ...overnightCounts, 1);
+    
+    return { days, counts, napCounts, overnightCounts, maxCount, maxTypeCount };
+  };
+
+  const graphData = getLast7DaysData();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -137,47 +167,73 @@ export function Sleep() {
         </p>
       </div>
 
-      {/* Date Selector for Stats + Add Button */}
+      {/* Date Selector for Stats + View Toggle + Add Button */}
       <div className="flex items-center justify-between mb-4">
-        <div className="relative">
-          <button
-            onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-50 shadow-sm"
-          >
-            <IconCalendar className="w-4 h-4 text-gray-400" />
-            {statsDate === today ? "Today" : statsDate}
-          </button>
-          {showStatsDateDropdown && (
-            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[180px] max-h-[300px] overflow-y-auto">
+        <div className="flex items-center gap-3">
+          {viewMode === "stats" && (
+            <div className="relative">
               <button
-                onClick={() => {
-                  setStatsDate(today);
-                  setShowStatsDateDropdown(false);
-                }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
-                  statsDate === today ? "bg-gray-100 font-medium" : ""
-                }`}
+                onClick={() => setShowStatsDateDropdown(!showStatsDateDropdown)}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-50 shadow-sm"
               >
-                Today ({today})
+                <IconCalendar className="w-4 h-4 text-gray-400" />
+                {statsDate === today ? "Today" : statsDate}
               </button>
-              {uniqueDates
-                .filter((d) => d !== today)
-                .map((date) => (
+              {showStatsDateDropdown && (
+                <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[180px] max-h-[300px] overflow-y-auto">
                   <button
-                    key={date}
                     onClick={() => {
-                      setStatsDate(date);
+                      setStatsDate(today);
                       setShowStatsDateDropdown(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
-                      statsDate === date ? "bg-gray-100 font-medium" : ""
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
+                      statsDate === today ? "bg-gray-100 font-medium" : ""
                     }`}
                   >
-                    {date}
+                    Today ({today})
                   </button>
-                ))}
+                  {uniqueDates
+                    .filter((d) => d !== today)
+                    .map((date) => (
+                      <button
+                        key={date}
+                        onClick={() => {
+                          setStatsDate(date);
+                          setShowStatsDateDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
+                          statsDate === date ? "bg-gray-100 font-medium" : ""
+                        }`}
+                      >
+                        {date}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
           )}
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("stats")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "stats"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Stats
+            </button>
+            <button
+              onClick={() => setViewMode("graph")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "graph"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Graph
+            </button>
+          </div>
         </div>
         <Link
           to="/sleep/new"
@@ -193,135 +249,289 @@ export function Sleep() {
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card 1 */}
-        <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
-        >
+      {viewMode === "stats" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card 1 */}
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
               colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
             }`}
           >
-            <IconMoon
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
-              }`}
-            />
-          </div>
-          <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
-          >
-            Sleep Sessions {statsDate === today ? "Today" : `on ${statsDate}`}
-          </p>
-          <div className="flex items-baseline gap-2">
-            <span
-              className={`text-4xl font-bold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+                colorScheme.id === "default"
+                  ? "bg-gray-50 border border-gray-100"
+                  : "bg-white/20"
               }`}
             >
-              {totalSleeps}
-            </span>
-            <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+              <IconMoon
+                className={`w-7 h-7 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+            </div>
+            <p
+              className={`text-sm font-medium mb-2 ${
+                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
               }`}
             >
-              Sessions
-            </span>
-          </div>
-          <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
-          >
-            {napCount} Naps + {overnightCount} Overnight
-          </p>
-        </div>
-
-        {/* Card 2 */}
-        <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
-        >
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
-            }`}
-          >
-            <IconCalendar
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
-              }`}
-            />
-          </div>
-          <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
-          >
-            Last Sleep
-          </p>
-          {lastSleep ? (
-            <>
-              <div className="flex items-baseline gap-2">
-                <span
-                  className={`text-4xl font-bold tracking-tight ${
-                    colorScheme.id === "default"
-                      ? "text-gray-900"
-                      : "text-white"
-                  }`}
-                >
-                  {lastSleep.start_time?.split(" ")[0] || "-"}
-                </span>
-                <span
-                  className={`text-xl font-medium ${
-                    colorScheme.id === "default"
-                      ? "text-gray-400"
-                      : "text-white/70"
-                  }`}
-                >
-                  {lastSleep.start_time?.split(" ")[1] || ""}
-                </span>
-              </div>
-              <p
-                className={`text-sm mt-2 ${
-                  colorScheme.id === "default"
-                    ? "text-gray-400"
-                    : "text-white/60"
+              Sleep Sessions {statsDate === today ? "Today" : `on ${statsDate}`}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span
+                className={`text-4xl font-bold tracking-tight ${
+                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
                 }`}
               >
-                {lastSleep.type
-                  ? lastSleep.type.charAt(0).toUpperCase() +
-                    lastSleep.type.slice(1)
-                  : ""}{" "}
-                - {lastSleep.duration}
-              </p>
-            </>
-          ) : (
+                {totalSleeps}
+              </span>
+              <span
+                className={`text-xl font-medium ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                }`}
+              >
+                Sessions
+              </span>
+            </div>
             <p
-              className={`text-lg ${
+              className={`text-sm mt-2 ${
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
               }`}
             >
-              No sleeps logged yet
+              {napCount} Naps + {overnightCount} Overnight
             </p>
-          )}
+          </div>
+
+          {/* Card 2 */}
+          <div
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+              colorScheme.id === "default"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+            }`}
+          >
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+                colorScheme.id === "default"
+                  ? "bg-gray-50 border border-gray-100"
+                  : "bg-white/20"
+              }`}
+            >
+              <IconCalendar
+                className={`w-7 h-7 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+            </div>
+            <p
+              className={`text-sm font-medium mb-2 ${
+                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
+            >
+              Last Sleep
+            </p>
+            {lastSleep ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`text-4xl font-bold tracking-tight ${
+                      colorScheme.id === "default"
+                        ? "text-gray-900"
+                        : "text-white"
+                    }`}
+                  >
+                    {lastSleep.start_time?.split(" ")[0] || "-"}
+                  </span>
+                  <span
+                    className={`text-xl font-medium ${
+                      colorScheme.id === "default"
+                        ? "text-gray-400"
+                        : "text-white/70"
+                    }`}
+                  >
+                    {lastSleep.start_time?.split(" ")[1] || ""}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm mt-2 ${
+                    colorScheme.id === "default"
+                      ? "text-gray-400"
+                      : "text-white/60"
+                  }`}
+                >
+                  {lastSleep.type
+                    ? lastSleep.type.charAt(0).toUpperCase() +
+                      lastSleep.type.slice(1)
+                    : ""}{" "}
+                  - {lastSleep.duration}
+                </p>
+              </>
+            ) : (
+              <p
+                className={`text-lg ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
+              >
+                No sleeps logged yet
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Graph Card 1: Total Sleep Sessions */}
+          <div
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+              colorScheme.id === "default"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} border-transparent`
+            }`}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <IconMoon
+                className={`w-6 h-6 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+              <h3
+                className={`text-base font-semibold ${
+                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
+              >
+                Sleep Sessions - 7 Days
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {graphData.days.map((day, i) => (
+                <div key={day} className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-medium w-12 flex-shrink-0 ${
+                      colorScheme.id === "default"
+                        ? "text-gray-500"
+                        : "text-white/70"
+                    }`}
+                  >
+                    {day}
+                  </span>
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
+                    <div
+                      className={`h-8 rounded-md transition-all ${
+                        colorScheme.id === "default"
+                          ? "bg-indigo-500"
+                          : "bg-white/30"
+                      }`}
+                      style={{
+                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
+                        minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
+                      }}
+                    ></div>
+                    <span
+                      className={`text-sm font-semibold min-w-[24px] flex-shrink-0 ${
+                        colorScheme.id === "default"
+                          ? "text-gray-900"
+                          : "text-white"
+                      }`}
+                    >
+                      {graphData.counts[i]}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Graph Card 2: Naps vs Overnight */}
+          <div
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+              colorScheme.id === "default"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} border-transparent`
+            }`}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <IconCalendar
+                className={`w-6 h-6 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+              <h3
+                className={`text-base font-semibold ${
+                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
+              >
+                Naps vs Overnight - 7 Days
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {graphData.days.map((day, i) => (
+                <div key={day} className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-medium w-12 flex-shrink-0 ${
+                      colorScheme.id === "default"
+                        ? "text-gray-500"
+                        : "text-white/70"
+                    }`}
+                  >
+                    {day}
+                  </span>
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
+                    {graphData.napCounts[i] > 0 && (
+                      <div className="flex-1 flex items-center gap-1 min-w-0">
+                        <div
+                          className={`h-8 rounded-md transition-all ${
+                            colorScheme.id === "default"
+                              ? "bg-sky-400"
+                              : "bg-white/30"
+                          }`}
+                          style={{
+                            width: `${(graphData.napCounts[i] / graphData.maxTypeCount) * 100}%`,
+                            minWidth: "20px",
+                          }}
+                        ></div>
+                        <span
+                          className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${
+                            colorScheme.id === "default"
+                              ? "text-gray-900"
+                              : "text-white"
+                          }`}
+                        >
+                          {graphData.napCounts[i]}N
+                        </span>
+                      </div>
+                    )}
+                    {graphData.overnightCounts[i] > 0 && (
+                      <div className="flex-1 flex items-center gap-1 min-w-0">
+                        <div
+                          className={`h-8 rounded-md transition-all ${
+                            colorScheme.id === "default"
+                              ? "bg-violet-500"
+                              : "bg-white/30"
+                          }`}
+                          style={{
+                            width: `${(graphData.overnightCounts[i] / graphData.maxTypeCount) * 100}%`,
+                            minWidth: "20px",
+                          }}
+                        ></div>
+                        <span
+                          className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${
+                            colorScheme.id === "default"
+                              ? "text-gray-900"
+                              : "text-white"
+                          }`}
+                        >
+                          {graphData.overnightCounts[i]}O
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* List / Table Section */}
       <div className="space-y-6 pt-4">
