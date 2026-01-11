@@ -468,7 +468,9 @@ export function Diaper() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
+                        width: graphData.counts[i] > 0 
+                          ? `${20 + (graphData.counts[i] / graphData.maxCount) * 80}%`
+                          : "0%",
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
@@ -530,7 +532,7 @@ export function Diaper() {
                             : "bg-white/30"
                         }`}
                         style={{
-                          width: `${(graphData.wetCounts[i] / graphData.maxTypeCount) * 100}%`,
+                          width: `${20 + (graphData.wetCounts[i] / graphData.maxTypeCount) * 80}%`,
                           minWidth: graphData.wetCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>
@@ -552,7 +554,7 @@ export function Diaper() {
                             : "bg-white/30"
                         }`}
                         style={{
-                          width: `${(graphData.dirtyCounts[i] / graphData.maxTypeCount) * 100}%`,
+                          width: `${20 + (graphData.dirtyCounts[i] / graphData.maxTypeCount) * 80}%`,
                           minWidth: graphData.dirtyCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>

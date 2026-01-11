@@ -457,7 +457,9 @@ export function Feed() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
+                        width: graphData.counts[i] > 0 
+                          ? `${20 + (graphData.counts[i] / graphData.maxCount) * 80}%`
+                          : "0%",
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
@@ -518,7 +520,9 @@ export function Feed() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: `${(graphData.volumes[i] / graphData.maxVolume) * 100}%`,
+                        width: graphData.volumes[i] > 0 
+                          ? `${20 + (graphData.volumes[i] / graphData.maxVolume) * 80}%`
+                          : "0%",
                         minWidth: graphData.volumes[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>

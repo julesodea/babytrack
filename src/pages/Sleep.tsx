@@ -423,7 +423,9 @@ export function Sleep() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
+                        width: graphData.counts[i] > 0 
+                          ? `${20 + (graphData.counts[i] / graphData.maxCount) * 80}%`
+                          : "0%",
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
@@ -486,7 +488,7 @@ export function Sleep() {
                               : "bg-white/30"
                           }`}
                           style={{
-                            width: `${(graphData.napCounts[i] / graphData.maxTypeCount) * 100}%`,
+                            width: `${20 + (graphData.napCounts[i] / graphData.maxTypeCount) * 80}%`,
                             minWidth: "20px",
                           }}
                         ></div>
@@ -510,7 +512,7 @@ export function Sleep() {
                               : "bg-white/30"
                           }`}
                           style={{
-                            width: `${(graphData.overnightCounts[i] / graphData.maxTypeCount) * 100}%`,
+                            width: `${20 + (graphData.overnightCounts[i] / graphData.maxTypeCount) * 80}%`,
                             minWidth: "20px",
                           }}
                         ></div>
