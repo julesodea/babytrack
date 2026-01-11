@@ -468,9 +468,7 @@ export function Diaper() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: graphData.counts[i] > 0 
-                          ? `${20 + (graphData.counts[i] / graphData.maxCount) * 80}%`
-                          : "0%",
+                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
@@ -532,7 +530,7 @@ export function Diaper() {
                             : "bg-white/30"
                         }`}
                         style={{
-                          width: `${20 + (graphData.wetCounts[i] / graphData.maxTypeCount) * 80}%`,
+                          width: `${(graphData.wetCounts[i] / graphData.maxTypeCount) * 100}%`,
                           minWidth: graphData.wetCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>
@@ -554,7 +552,7 @@ export function Diaper() {
                             : "bg-white/30"
                         }`}
                         style={{
-                          width: `${20 + (graphData.dirtyCounts[i] / graphData.maxTypeCount) * 80}%`,
+                          width: `${(graphData.dirtyCounts[i] / graphData.maxTypeCount) * 100}%`,
                           minWidth: graphData.dirtyCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>
@@ -581,13 +579,13 @@ export function Diaper() {
         {/* Filter Bar */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <IconSearch className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
+            <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search diaper changes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
+              className="w-full h-10 bg-white pl-12 pr-4 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-100 outline-none shadow-sm placeholder-gray-400"
             />
           </div>
           <div className="flex gap-4">
@@ -597,7 +595,7 @@ export function Diaper() {
                   setShowDateDropdown(!showDateDropdown);
                   setShowTypeDropdown(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
                   dateFilter ? "border-gray-900" : "border-gray-200"
                 }`}
               >
@@ -636,7 +634,7 @@ export function Diaper() {
                   setShowTypeDropdown(!showTypeDropdown);
                   setShowDateDropdown(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
                   typeFilter ? "border-gray-900" : "border-gray-200"
                 }`}
               >
