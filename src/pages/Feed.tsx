@@ -104,7 +104,9 @@ export function Feed() {
       item.detail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.caregiver?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.amount?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.notes && item.notes.trim() && item.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+      (item.notes &&
+        item.notes.trim() &&
+        item.notes.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDate && matchesType && matchesSearch;
   });
 
@@ -146,23 +148,28 @@ export function Feed() {
     const days = [];
     const counts = [];
     const volumes = [];
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-      const dayFeeds = data.filter(f => f.date === dateStr);
-      const dayVolume = dayFeeds.reduce((sum, f) => sum + (parseInt(f.amount || "0") || 0), 0);
-      
+      const dateStr = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      const dayFeeds = data.filter((f) => f.date === dateStr);
+      const dayVolume = dayFeeds.reduce(
+        (sum, f) => sum + (parseInt(f.amount || "0") || 0),
+        0
+      );
+
       days.push(dateStr.slice(5)); // MM-DD format
       counts.push(dayFeeds.length);
       volumes.push(dayVolume);
     }
-    
+
     const maxCount = Math.max(...counts, 1);
-    const minVolume = Math.min(...volumes.filter(v => v > 0));
+    const minVolume = Math.min(...volumes.filter((v) => v > 0));
     const maxVolume = Math.max(...volumes, 1);
-    
+
     return { days, counts, volumes, maxCount, minVolume, maxVolume };
   };
 
@@ -328,7 +335,9 @@ export function Feed() {
               </span>
               <span
                 className={`text-xl font-medium ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                  colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/70"
                 }`}
               >
                 Feeds
@@ -406,7 +415,9 @@ export function Feed() {
             ) : (
               <p
                 className={`text-lg ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/60"
                 }`}
               >
                 No feeds logged yet
@@ -416,68 +427,7 @@ export function Feed() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Graph Card 1: Feed Count */}
-          <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} border-transparent`
-            }`}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <IconBottle
-                className={`w-6 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
-              />
-              <h3
-                className={`text-base font-semibold ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
-              >
-                Feed Count - 7 Days
-              </h3>
-            </div>
-            <div className="space-y-3">
-              {graphData.days.map((day, i) => (
-                <div key={day} className="flex items-center gap-3">
-                  <span
-                    className={`text-xs font-medium w-12 ${
-                      colorScheme.id === "default"
-                        ? "text-gray-500"
-                        : "text-white/70"
-                    }`}
-                  >
-                    {day}
-                  </span>
-                  <div className="flex-1 flex items-center gap-2">
-                    <div
-                      className={`h-8 rounded-md transition-all ${
-                        colorScheme.id === "default"
-                          ? "bg-blue-500"
-                          : "bg-white/30"
-                      }`}
-                      style={{
-                        width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
-                        minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
-                      }}
-                    ></div>
-                    <span
-                      className={`text-sm font-semibold min-w-[24px] ${
-                        colorScheme.id === "default"
-                          ? "text-gray-900"
-                          : "text-white"
-                      }`}
-                    >
-                      {graphData.counts[i]}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Graph Card 2: Volume */}
+          {/* Graph Card 1: Volume */}
           <div
             className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
               colorScheme.id === "default"
@@ -519,9 +469,15 @@ export function Feed() {
                           : "bg-white/30"
                       }`}
                       style={{
-                        width: graphData.volumes[i] > 0
-                          ? `${20 + ((graphData.volumes[i] - graphData.minVolume) / (graphData.maxVolume - graphData.minVolume)) * 80}%`
-                          : "0%",
+                        width:
+                          graphData.volumes[i] > 0
+                            ? `${
+                                20 +
+                                ((graphData.volumes[i] - graphData.minVolume) /
+                                  (graphData.maxVolume - graphData.minVolume)) *
+                                  80
+                              }%`
+                            : "0%",
                         minWidth: graphData.volumes[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
@@ -533,6 +489,69 @@ export function Feed() {
                       }`}
                     >
                       {graphData.volumes[i]}ml
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Graph Card 2: Feed Count */}
+          <div
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+              colorScheme.id === "default"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} border-transparent`
+            }`}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <IconBottle
+                className={`w-6 h-6 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+              <h3
+                className={`text-base font-semibold ${
+                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
+              >
+                Feed Count - 7 Days
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {graphData.days.map((day, i) => (
+                <div key={day} className="flex items-center gap-3">
+                  <span
+                    className={`text-xs font-medium w-12 ${
+                      colorScheme.id === "default"
+                        ? "text-gray-500"
+                        : "text-white/70"
+                    }`}
+                  >
+                    {day}
+                  </span>
+                  <div className="flex-1 flex items-center gap-2">
+                    <div
+                      className={`h-8 rounded-md transition-all ${
+                        colorScheme.id === "default"
+                          ? "bg-blue-500"
+                          : "bg-white/30"
+                      }`}
+                      style={{
+                        width: `${
+                          (graphData.counts[i] / graphData.maxCount) * 100
+                        }%`,
+                        minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
+                      }}
+                    ></div>
+                    <span
+                      className={`text-sm font-semibold min-w-[24px] ${
+                        colorScheme.id === "default"
+                          ? "text-gray-900"
+                          : "text-white"
+                      }`}
+                    >
+                      {graphData.counts[i]}
                     </span>
                   </div>
                 </div>
