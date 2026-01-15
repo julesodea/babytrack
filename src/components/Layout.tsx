@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 import { NavItem } from "./NavItem";
 import { BabySelector } from "./BabySelector";
 import { useColorScheme } from "../context/ColorSchemeContext";
@@ -68,7 +68,7 @@ export function Layout() {
     <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3">
           <div
             className={`w-8 h-8 rounded-lg flex items-center justify-center text-white ${
               colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg
@@ -77,7 +77,7 @@ export function Layout() {
             <IconBottle className="w-4 h-4" />
           </div>
           <h1 className="text-sm font-bold text-gray-900">Baby Track</h1>
-        </div>
+        </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
