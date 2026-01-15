@@ -125,7 +125,7 @@ export function Layout() {
           <NavItem
             to="/feed"
             icon={<IconBottle className="w-5 h-5" />}
-            label="Feed Logs"
+            label="Feed"
             onClick={() => setSidebarOpen(false)}
           />
           <NavItem
