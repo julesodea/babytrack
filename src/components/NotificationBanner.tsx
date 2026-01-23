@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 interface NotificationBannerProps {
   message: string;
   type: "feed" | "diaper";
@@ -15,7 +17,7 @@ export function NotificationBanner({
   const iconColor = type === "feed" ? "text-blue-600" : "text-orange-600";
 
   return (
-    <div
+    <Link to={type === "feed" ? "/feed" : "/diaper"}
       className={`${bgColor} ${borderColor} border rounded-lg p-4 flex items-start gap-3 mb-6`}
     >
       <div className="flex-shrink-0 mt-0.5">
@@ -51,6 +53,6 @@ export function NotificationBanner({
           </svg>
         </button>
       )}
-    </div>
+    </Link>
   );
 }
