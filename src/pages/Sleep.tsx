@@ -254,7 +254,7 @@ export function Sleep() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card 1 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
               colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
@@ -307,7 +307,7 @@ export function Sleep() {
 
           {/* Card 2 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
               colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`

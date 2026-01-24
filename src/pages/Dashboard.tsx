@@ -350,7 +350,7 @@ export function Dashboard() {
         {/* Card 1 */}
         <Link
           to="/feed"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
@@ -404,7 +404,7 @@ export function Dashboard() {
         {/* Card 2 */}
         <Link
           to="/diaper"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
@@ -458,7 +458,7 @@ export function Dashboard() {
         {/* Card 3 */}
         <Link
           to="/sleep"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
