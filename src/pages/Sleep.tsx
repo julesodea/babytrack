@@ -138,7 +138,7 @@ export function Sleep() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse text-gray-500">Loading sleep logs...</div>
+        <IconMoon className="w-8 h-8 text-gray-400 animate-pulse" />
       </div>
     );
   }
