@@ -137,7 +137,7 @@ export function Sleep() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen w-full -mt-20">
+      <div className="flex items-center justify-center h-screen w-full">
         <IconMoon className="w-8 h-8 text-gray-400 animate-pulse" />
       </div>
     );
