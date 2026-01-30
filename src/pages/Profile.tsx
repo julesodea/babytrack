@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile, updateProfile } from "../lib/api/profiles";
 import { useColorScheme } from "../context/ColorSchemeContext";
+import { IconDashboard } from "../components/icons";
 
 export function Profile() {
   const navigate = useNavigate();
@@ -62,42 +63,49 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-12">
         <div className="animate-pulse text-gray-500">Loading profile...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pt-20 lg:pt-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <button
-            onClick={() => navigate("/")}
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            ← Back to Dashboard
-          </button>
-        </div>
+    <div className="space-y-10">
+      {/* Header */}
+      <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900">Profile</span>
+      </div>
 
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+      <div className="space-y-1">
+        <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
           Profile Settings
-        </h1>
+        </h2>
+        <p className="text-gray-500 text-base">
+          Manage your account information
+        </p>
+      </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+          {error}
+        </div>
+      )}
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
-            {success}
-          </div>
-        )}
+      {success && (
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+          {success}
+        </div>
+      )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <form onSubmit={handleSave} className="space-y-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <form onSubmit={handleSave} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -152,7 +160,6 @@ export function Profile() {
             </div>
           </form>
         </div>
-      </div>
     </div>
   );
 }
