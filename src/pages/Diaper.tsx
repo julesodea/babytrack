@@ -179,7 +179,7 @@ export function Diaper() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-screen w-full -mt-20">
         <IconDiaper className="w-8 h-8 text-gray-400 animate-pulse" />
       </div>
     );
@@ -463,7 +463,7 @@ export function Diaper() {
                     <div
                       className={`h-8 rounded-md transition-all ${
                         colorScheme.id === "default"
-                          ? "bg-purple-500"
+                          ? "bg-gray-600"
                           : "bg-white/30"
                       }`}
                       style={{
@@ -525,7 +525,7 @@ export function Diaper() {
                       <div
                         className={`h-8 rounded-md transition-all ${
                           colorScheme.id === "default"
-                            ? "bg-blue-400"
+                            ? "bg-gray-400"
                             : "bg-white/30"
                         }`}
                         style={{
@@ -547,7 +547,7 @@ export function Diaper() {
                       <div
                         className={`h-8 rounded-md transition-all ${
                           colorScheme.id === "default"
-                            ? "bg-amber-500"
+                            ? "bg-gray-500"
                             : "bg-white/30"
                         }`}
                         style={{

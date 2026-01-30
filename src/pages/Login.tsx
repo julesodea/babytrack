@@ -5,22 +5,22 @@ export function Login() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-pulse text-gray-500">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-blue-400">
+        <div className="animate-pulse text-white">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-blue-400">
+      <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Baby Tracker</h2>
-          <p className="mt-2 text-gray-600">Sign in to track your baby's activities</p>
+          <h2 className="text-4xl font-bold text-white mb-3">Baby Tracker</h2>
+          <p className="mt-2 text-white text-lg">Sign in to track your baby's activities</p>
         </div>
         <button
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-white bg-white/10 hover:bg-white/20 transition-colors cursor-pointer backdrop-blur-sm font-medium"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
