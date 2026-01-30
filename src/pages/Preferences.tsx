@@ -121,7 +121,7 @@ export function Preferences() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Header */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <Link
