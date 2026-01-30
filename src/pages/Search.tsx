@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { IconSearch } from "../components/icons";
+import { IconSearch, IconDashboard } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
 import { useBaby } from "../contexts/BabyContext";
 import { getFeeds } from "../lib/api/feeds";
@@ -127,6 +127,18 @@ export function Search() {
 
   return (
     <div className="space-y-10">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
+        <Link
+          to="/"
+          className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+        >
+          <IconDashboard className="w-5 h-5" />
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900">Search</span>
+      </div>
+
       {/* Header */}
       <div className="space-y-1">
         <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
