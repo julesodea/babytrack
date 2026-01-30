@@ -76,7 +76,7 @@ export function Layout() {
           >
             <IconBottle className="w-4 h-4" />
           </div>
-          <h1 className="text-sm font-bold text-gray-900">Baby Track</h1>
+          <h1 className="text-sm font-semibold text-gray-900">Baby Track</h1>
         </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -185,7 +185,7 @@ export function Layout() {
                   className="w-8 h-8 rounded-full"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
                   {initials}
                 </div>
               )}

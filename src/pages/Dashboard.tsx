@@ -331,7 +331,7 @@ export function Dashboard() {
           </>
         ) : (
           <>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {fullName
                 ? `Welcome back, ${fullName.split(" ")[0]}`
                 : "Overview"}
@@ -378,7 +378,7 @@ export function Dashboard() {
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-bold tracking-tight ${
+              className={`text-4xl font-semibold tracking-tight ${
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
@@ -432,7 +432,7 @@ export function Dashboard() {
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-bold tracking-tight ${
+              className={`text-4xl font-semibold tracking-tight ${
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >
@@ -486,7 +486,7 @@ export function Dashboard() {
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-bold tracking-tight ${
+              className={`text-4xl font-semibold tracking-tight ${
                 colorScheme.id === "default" ? "text-gray-900" : "text-white"
               }`}
             >

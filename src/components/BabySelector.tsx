@@ -50,7 +50,7 @@ export function BabySelector() {
             )}
           </div>
           <div>
-            <h3 className="text-sm font-bold text-gray-900 leading-tight text-left">
+            <h3 className="text-sm font-semibold text-gray-900 leading-tight text-left">
               {selectedBaby?.name || "Select Baby"}
             </h3>
           </div>
@@ -81,7 +81,7 @@ export function BabySelector() {
                     baby.id === selectedBaby?.id ? "bg-gray-50" : ""
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     {baby.avatar_url ? (
                       <img
                         src={baby.avatar_url}

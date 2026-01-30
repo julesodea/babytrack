@@ -15,7 +15,7 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-blue-400">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-white mb-3">Baby Tracker</h2>
+          <h2 className="text-4xl font-semibold text-white mb-3">Baby Tracker</h2>
           <p className="mt-2 text-white text-lg">Sign in to track your baby's activities</p>
         </div>
         <button

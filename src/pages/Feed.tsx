@@ -206,7 +206,7 @@ export function Feed() {
       )}
 
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
           Feed Logs
         </h2>
         <p className="text-gray-500 text-base">
@@ -328,7 +328,7 @@ export function Feed() {
             </p>
             <div className="flex items-baseline gap-2">
               <span
-                className={`text-4xl font-bold tracking-tight ${
+                className={`text-4xl font-semibold tracking-tight ${
                   colorScheme.id === "default" ? "text-gray-900" : "text-white"
                 }`}
               >
@@ -385,7 +385,7 @@ export function Feed() {
               <>
                 <div className="flex items-baseline gap-2">
                   <span
-                    className={`text-4xl font-bold tracking-tight ${
+                    className={`text-4xl font-semibold tracking-tight ${
                       colorScheme.id === "default"
                         ? "text-gray-900"
                         : "text-white"

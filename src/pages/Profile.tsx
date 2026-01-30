@@ -80,7 +80,7 @@ export function Profile() {
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
           Profile Settings
         </h1>
 

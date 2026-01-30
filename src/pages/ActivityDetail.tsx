@@ -265,7 +265,7 @@ export function ActivityDetail() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
             {isEditing ? "Edit Activity" : title}
           </h2>
           <p className="text-gray-500 text-base">
@@ -730,7 +730,7 @@ export function ActivityDetail() {
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Caregiver</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-semibold">
                       {caregiver.charAt(0)}
                     </div>
                     <p className="text-lg font-medium text-gray-900">

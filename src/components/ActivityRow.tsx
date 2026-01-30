@@ -116,7 +116,7 @@ export function ActivityRow({
           </div>
         </div>
         <div className="col-span-2 flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-semibold">
             {user.charAt(0)}
           </div>
           <span className="text-sm text-gray-700">{user}</span>

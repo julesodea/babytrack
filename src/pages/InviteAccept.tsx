@@ -71,7 +71,7 @@ export function InviteAccept() {
         {status === 'loading' && (
           <>
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Processing Invitation
             </h2>
             <p className="text-gray-600">Please wait...</p>
@@ -95,7 +95,7 @@ export function InviteAccept() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Success!
             </h2>
             <p className="text-gray-600 mb-4">{message}</p>
@@ -122,7 +122,7 @@ export function InviteAccept() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Error
             </h2>
             <p className="text-gray-600 mb-4">{message}</p>
@@ -152,7 +152,7 @@ export function InviteAccept() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Invitation Not Found
             </h2>
             <p className="text-gray-600 mb-4">{message}</p>

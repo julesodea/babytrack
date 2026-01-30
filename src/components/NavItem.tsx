@@ -46,7 +46,7 @@ export function NavItem({ to, icon, label, badge, onClick }: NavItemProps) {
       </div>
       {badge && (
         <span
-          className={`text-[10px] font-bold border rounded px-1 ${
+          className={`text-[10px] font-semibold border rounded px-1 ${
             isActive
               ? colorScheme.id === "default"
                 ? "text-gray-400 border-gray-200"

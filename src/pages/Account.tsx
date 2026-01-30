@@ -50,7 +50,7 @@ export function Account() {
       </div>
 
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
           Account
         </h2>
         <p className="text-gray-500 text-base">
@@ -65,7 +65,7 @@ export function Account() {
           <div className="flex flex-col items-center">
             <div className="relative">
               <div className="w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">
+                <span className="text-2xl font-semibold text-white">
                   {profile.initials}
                 </span>
               </div>

@@ -122,7 +122,7 @@ export function FeedNew() {
 
       {/* Header */}
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
           Log New Feed
         </h2>
         <p className="text-gray-500 text-base">

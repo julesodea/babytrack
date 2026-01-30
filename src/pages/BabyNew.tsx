@@ -47,7 +47,7 @@ export function BabyNew() {
     <div className="min-h-screen bg-gray-50 p-4 pt-20 lg:pt-4">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
             Add a Baby
           </h1>
           <p className="text-sm text-gray-600 mb-6">

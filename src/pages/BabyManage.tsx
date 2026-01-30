@@ -196,7 +196,7 @@ export function BabyManage() {
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
           Manage Babies & Sharing
         </h1>
 
@@ -262,7 +262,7 @@ export function BabyManage() {
                   <>
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h2 className="text-lg font-bold text-gray-900">
+                        <h2 className="text-lg font-semibold text-gray-900">
                           {baby.name}
                         </h2>
                         {baby.birth_date && (
