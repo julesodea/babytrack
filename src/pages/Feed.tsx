@@ -89,12 +89,10 @@ export function Feed() {
   const getFeedReminderMessage = () => {
     const hours = Math.floor(hoursSinceLastFeed);
     if (hours === Infinity)
-      return `${
-        selectedBaby?.name || "Baby"
-      } hasn't been fed yet. Please check!`;
-    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${
-      hours === 1 ? "hour" : "hours"
-    }. Please check!`;
+      return `${selectedBaby?.name || "Baby"
+        } hasn't been fed yet. Please check!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? "hour" : "hours"
+      }. Please check!`;
   };
 
   const filteredData = data.filter((item) => {
@@ -233,9 +231,8 @@ export function Feed() {
                       setStatsDate(today);
                       setShowStatsDateDropdown(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
-                      statsDate === today ? "bg-gray-100 font-medium" : ""
-                    }`}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${statsDate === today ? "bg-gray-100 font-medium" : ""
+                      }`}
                   >
                     Today ({today})
                   </button>
@@ -248,9 +245,8 @@ export function Feed() {
                           setStatsDate(date);
                           setShowStatsDateDropdown(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
-                          statsDate === date ? "bg-gray-100 font-medium" : ""
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${statsDate === date ? "bg-gray-100 font-medium" : ""
+                          }`}
                       >
                         {date}
                       </button>
@@ -262,21 +258,19 @@ export function Feed() {
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode("stats")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                viewMode === "stats"
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "stats"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
             >
               Stats
             </button>
             <button
               onClick={() => setViewMode("graph")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                viewMode === "graph"
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "graph"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
             >
               Graph
             </button>
@@ -284,11 +278,10 @@ export function Feed() {
         </div>
         <Link
           to="/feed/new"
-          className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
-            colorScheme.id === "default"
+          className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${colorScheme.id === "default"
               ? "bg-gray-900 hover:bg-gray-800"
               : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-          }`}
+            }`}
         >
           <span className="text-lg leading-none">+</span>
           Add Feed
@@ -300,54 +293,47 @@ export function Feed() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card 1 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-            }`}
+              }`}
           >
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-                colorScheme.id === "default"
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
                   ? "bg-gray-50 border border-gray-100"
                   : "bg-white/20"
-              }`}
+                }`}
             >
               <IconBottle
-                className={`w-7 h-7 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
             </div>
             <p
-              className={`text-sm font-medium mb-2 ${
-                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-              }`}
+              className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+                }`}
             >
               Total Feeds {statsDate === today ? "Today" : `on ${statsDate}`}
             </p>
             <div className="flex items-baseline gap-2">
               <span
-                className={`text-4xl font-semibold tracking-tight ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
                 {totalFeeds}
               </span>
               <span
-                className={`text-xl font-medium ${
-                  colorScheme.id === "default"
+                className={`text-xl font-medium ${colorScheme.id === "default"
                     ? "text-gray-400"
                     : "text-white/70"
-                }`}
+                  }`}
               >
                 Feeds
               </span>
             </div>
             <p
-              className={`text-sm mt-2 ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-              }`}
+              className={`text-sm mt-2 ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
             >
               {totalVolume}ml Total Volume
             </p>
@@ -355,29 +341,25 @@ export function Feed() {
 
           {/* Card 2 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-            }`}
+              }`}
           >
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-                colorScheme.id === "default"
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
                   ? "bg-gray-50 border border-gray-100"
                   : "bg-white/20"
-              }`}
+                }`}
             >
               <IconCalendar
-                className={`w-7 h-7 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
             </div>
             <p
-              className={`text-sm font-medium mb-2 ${
-                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-              }`}
+              className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+                }`}
             >
               Last Feed
             </p>
@@ -385,41 +367,37 @@ export function Feed() {
               <>
                 <div className="flex items-baseline gap-2">
                   <span
-                    className={`text-4xl font-semibold tracking-tight ${
-                      colorScheme.id === "default"
+                    className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default"
                         ? "text-gray-900"
                         : "text-white"
-                    }`}
+                      }`}
                   >
                     {lastFeed.time.split(" ")[0]}
                   </span>
                   <span
-                    className={`text-xl font-medium ${
-                      colorScheme.id === "default"
+                    className={`text-xl font-medium ${colorScheme.id === "default"
                         ? "text-gray-400"
                         : "text-white/70"
-                    }`}
+                      }`}
                   >
                     {lastFeed.time.split(" ")[1] || ""}
                   </span>
                 </div>
                 <p
-                  className={`text-sm mt-2 ${
-                    colorScheme.id === "default"
+                  className={`text-sm mt-2 ${colorScheme.id === "default"
                       ? "text-gray-400"
                       : "text-white/60"
-                  }`}
+                    }`}
                 >
                   {lastFeed.detail}
                 </p>
               </>
             ) : (
               <p
-                className={`text-lg ${
-                  colorScheme.id === "default"
+                className={`text-lg ${colorScheme.id === "default"
                     ? "text-gray-400"
                     : "text-white/60"
-                }`}
+                  }`}
               >
                 No feeds logged yet
               </p>
@@ -430,64 +408,57 @@ export function Feed() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Graph Card 1: Volume */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} border-transparent`
-            }`}
+              }`}
           >
             <div className="flex items-center gap-3 mb-6">
               <IconCalendar
-                className={`w-6 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-6 h-6 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
               <h3
-                className={`text-base font-semibold ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-base font-semibold ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
-                Volume (ml) - 7 Days
+                Volume - 7 Days
               </h3>
             </div>
             <div className="space-y-3">
               {graphData.days.map((day, i) => (
                 <div key={day} className="flex items-center gap-3">
                   <span
-                    className={`text-xs font-medium w-12 ${
-                      colorScheme.id === "default"
+                    className={`text-xs font-medium w-12 ${colorScheme.id === "default"
                         ? "text-gray-500"
                         : "text-white/70"
-                    }`}
+                      }`}
                   >
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2">
                     <div
-                      className={`h-8 rounded-md transition-all ${
-                        colorScheme.id === "default"
+                      className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
                           ? "bg-gray-400"
                           : "bg-white/30"
-                      }`}
+                        }`}
                       style={{
                         width:
                           graphData.volumes[i] > 0
-                            ? `${
-                                20 +
-                                ((graphData.volumes[i] - graphData.minVolume) /
-                                  (graphData.maxVolume - graphData.minVolume)) *
-                                  80
-                              }%`
+                            ? `${20 +
+                            ((graphData.volumes[i] - graphData.minVolume) /
+                              (graphData.maxVolume - graphData.minVolume)) *
+                            80
+                            }%`
                             : "0%",
                         minWidth: graphData.volumes[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
                     <span
-                      className={`text-sm font-semibold min-w-[48px] ${
-                        colorScheme.id === "default"
+                      className={`text-sm font-semibold min-w-[48px] ${colorScheme.id === "default"
                           ? "text-gray-900"
                           : "text-white"
-                      }`}
+                        }`}
                     >
                       {graphData.volumes[i]}ml
                     </span>
@@ -499,22 +470,19 @@ export function Feed() {
 
           {/* Graph Card 2: Feed Count */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
                 ? "bg-white border-gray-100"
                 : `${colorScheme.cardBg} border-transparent`
-            }`}
+              }`}
           >
             <div className="flex items-center gap-3 mb-6">
               <IconBottle
-                className={`w-6 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-6 h-6 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
               <h3
-                className={`text-base font-semibold ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-base font-semibold ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
                 Feed Count - 7 Days
               </h3>
@@ -523,34 +491,30 @@ export function Feed() {
               {graphData.days.map((day, i) => (
                 <div key={day} className="flex items-center gap-3">
                   <span
-                    className={`text-xs font-medium w-12 ${
-                      colorScheme.id === "default"
+                    className={`text-xs font-medium w-12 ${colorScheme.id === "default"
                         ? "text-gray-500"
                         : "text-white/70"
-                    }`}
+                      }`}
                   >
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2">
                     <div
-                      className={`h-8 rounded-md transition-all ${
-                        colorScheme.id === "default"
+                      className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
                           ? "bg-gray-600"
                           : "bg-white/30"
-                      }`}
+                        }`}
                       style={{
-                        width: `${
-                          (graphData.counts[i] / graphData.maxCount) * 100
-                        }%`,
+                        width: `${(graphData.counts[i] / graphData.maxCount) * 100
+                          }%`,
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
                     <span
-                      className={`text-sm font-semibold min-w-[24px] ${
-                        colorScheme.id === "default"
+                      className={`text-sm font-semibold min-w-[24px] ${colorScheme.id === "default"
                           ? "text-gray-900"
                           : "text-white"
-                      }`}
+                        }`}
                     >
                       {graphData.counts[i]}
                     </span>
@@ -583,9 +547,8 @@ export function Feed() {
                   setShowDateDropdown(!showDateDropdown);
                   setShowTypeDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  dateFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconCalendar className="w-5 h-5 text-gray-400" />
                 {dateFilter || "Show by date"}
@@ -622,9 +585,8 @@ export function Feed() {
                   setShowTypeDropdown(!showTypeDropdown);
                   setShowDateDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  typeFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconFilter className="w-5 h-5 text-gray-400" />
                 {typeFilter
