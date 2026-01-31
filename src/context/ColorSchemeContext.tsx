@@ -18,6 +18,20 @@ export interface ColorScheme {
   cardBgHover: string;
 }
 
+// Map color scheme IDs to hex colors for meta theme-color
+export const colorHexMap: Record<string, string> = {
+  default: "#111827", // gray-900
+  blue: "#60a5fa", // blue-400
+  purple: "#c084fc", // purple-400
+  green: "#4ade80", // green-400
+  rose: "#fb7185", // rose-400
+  amber: "#fbbf24", // amber-400
+  teal: "#2dd4bf", // teal-400
+  sage: "#A3B18A",
+  forest: "#588157",
+  dark: "#1f2937", // gray-800
+};
+
 export const colorSchemes: ColorScheme[] = [
   {
     id: "default",
@@ -90,31 +104,54 @@ const ColorSchemeContext = createContext<ColorSchemeContextType | undefined>(
   undefined
 );
 
-const STORAGE_KEY = "baby-tracker-color-scheme";
-const SESSION_LOADED_KEY = "baby-tracker-loaded-from-supabase";
+const CACHE_KEY = "baby-tracker-color-scheme";
+
+// Helper to get cached color scheme from localStorage
+function getCachedColorScheme(): ColorScheme {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const found = colorSchemes.find((s) => s.id === cached);
+      if (found) return found;
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return colorSchemes[0];
+}
+
+// Helper to cache color scheme to localStorage
+function cacheColorScheme(schemeId: string) {
+  try {
+    localStorage.setItem(CACHE_KEY, schemeId);
+  } catch {
+    // Ignore localStorage errors
+  }
+}
 
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [hasLoadedFromSupabase, setHasLoadedFromSupabase] = useState(() => {
-    return sessionStorage.getItem(SESSION_LOADED_KEY) === "true";
-  });
-  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(() => {
-    // Try localStorage first for immediate UI
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const found = colorSchemes.find((s) => s.id === parsed.id);
-      if (found) return found;
-    }
-    return colorSchemes[0];
-  });
+  // Initialize from localStorage cache for instant display
+  const [colorScheme, setColorSchemeState] = useState<ColorScheme>(getCachedColorScheme);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load color scheme from Supabase when user logs in (only once)
+  // Load color scheme from Supabase when user logs in
   useEffect(() => {
-    if (user && !hasLoadedFromSupabase) {
+    if (user) {
       loadColorScheme();
+    } else {
+      setIsLoading(false);
     }
-  }, [user, hasLoadedFromSupabase]);
+  }, [user]);
+
+  // Update theme-color meta tag when color scheme changes
+  useEffect(() => {
+    const themeColor = colorHexMap[colorScheme.id] || colorHexMap.default;
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", themeColor);
+    }
+  }, [colorScheme]);
 
   const loadColorScheme = async () => {
     if (!user) return;
@@ -124,32 +161,23 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
       if (profile && profile.color_scheme) {
         const found = colorSchemes.find((s) => s.id === profile.color_scheme);
         if (found) {
-          // Only update if different from current localStorage value
-          const saved = localStorage.getItem(STORAGE_KEY);
-          const currentId = saved ? JSON.parse(saved).id : null;
-
-          if (currentId !== found.id) {
-            setColorSchemeState(found);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ id: found.id }));
-          }
+          setColorSchemeState(found);
+          cacheColorScheme(found.id); // Update cache with Supabase value
         }
       }
-      setHasLoadedFromSupabase(true);
-      sessionStorage.setItem(SESSION_LOADED_KEY, "true");
     } catch (error) {
       console.error("Failed to load color scheme from profile:", error);
-      setHasLoadedFromSupabase(true);
-      sessionStorage.setItem(SESSION_LOADED_KEY, "true");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const setColorScheme = async (scheme: ColorScheme) => {
+    // Optimistically update UI and cache
     setColorSchemeState(scheme);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ id: scheme.id }));
-    setHasLoadedFromSupabase(true); // Prevent overwriting this change
-    sessionStorage.setItem(SESSION_LOADED_KEY, "true");
+    cacheColorScheme(scheme.id);
 
-    // Save to Supabase if user is logged in
+    // Save to Supabase
     if (user) {
       try {
         await updateColorSchemeAPI(user.id, scheme.id);
