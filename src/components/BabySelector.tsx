@@ -14,9 +14,8 @@ export function BabySelector() {
       <div className="p-4">
         <Link
           to="/babies/new"
-          className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed hover:bg-gray-50 transition-colors ${
-            colorScheme.id === "default" ? "border-gray-300" : "border-gray-400"
-          }`}
+          className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed hover:bg-gray-50 transition-colors ${colorScheme.id === "default" ? "border-gray-300" : "border-gray-400"
+            }`}
         >
           <span className="text-lg">+</span>
           <span className="text-sm font-medium">Add Your First Baby</span>
@@ -33,9 +32,8 @@ export function BabySelector() {
       >
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm ${
-              colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg
-            }`}
+            className={`w-10 h-10 rounded-[100px] flex items-center justify-center text-white shadow-sm ${colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg
+              }`}
           >
             {selectedBaby?.avatar_url ? (
               <img
@@ -56,9 +54,8 @@ export function BabySelector() {
           </div>
         </div>
         <IconChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform ${
-            dropdownOpen ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -77,9 +74,8 @@ export function BabySelector() {
                     setSelectedBaby(baby);
                     setDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 p-3 hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors ${
-                    baby.id === selectedBaby?.id ? "bg-gray-50" : ""
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors ${baby.id === selectedBaby?.id ? "bg-gray-50" : ""
+                    }`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-sm font-semibold flex-shrink-0">
                     {baby.avatar_url ? (
