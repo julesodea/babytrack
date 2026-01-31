@@ -133,14 +133,11 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   // Initialize from localStorage cache for instant display
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(getCachedColorScheme);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Load color scheme from Supabase when user logs in
   useEffect(() => {
     if (user) {
       loadColorScheme();
-    } else {
-      setIsLoading(false);
     }
   }, [user]);
 
@@ -167,8 +164,6 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Failed to load color scheme from profile:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 

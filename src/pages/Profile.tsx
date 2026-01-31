@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { getProfile, updateProfile } from "../lib/api/profiles";
 import { useColorScheme } from "../context/ColorSchemeContext";
-import { IconDashboard } from "../components/icons";
+import { IconDashboard, IconUser } from "../components/icons";
 
 export function Profile() {
   const navigate = useNavigate();
@@ -63,8 +63,8 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-pulse text-gray-500">Loading profile...</div>
+      <div className="flex items-center justify-center h-screen w-full">
+        <IconUser className="w-8 h-8 text-gray-400 animate-pulse" />
       </div>
     );
   }
@@ -106,60 +106,59 @@ export function Profile() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSave} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={user?.email || ""}
-                disabled
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Email cannot be changed
-              </p>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              value={user?.email || ""}
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Email cannot be changed
+            </p>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                This name will be displayed when you share babies with other
-                caregivers
-              </p>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Enter your full name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              This name will be displayed when you share babies with other
+              caregivers
+            </p>
+          </div>
 
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className={`px-6 py-2 rounded-lg text-white font-medium transition-colors ${
-                  colorScheme.id === "default"
-                    ? "bg-gray-900 hover:bg-gray-800"
-                    : colorScheme.cardBg + " hover:opacity-90"
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={saving}
+              className={`px-6 py-2 rounded-lg text-white font-medium transition-colors ${colorScheme.id === "default"
+                  ? "bg-gray-900 hover:bg-gray-800"
+                  : colorScheme.cardBg + " hover:opacity-90"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/")}
-                className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
