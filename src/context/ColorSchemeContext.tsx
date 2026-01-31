@@ -91,9 +91,13 @@ const ColorSchemeContext = createContext<ColorSchemeContextType | undefined>(
 );
 
 const STORAGE_KEY = "baby-tracker-color-scheme";
+const SESSION_LOADED_KEY = "baby-tracker-loaded-from-supabase";
 
 export function ColorSchemeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const [hasLoadedFromSupabase, setHasLoadedFromSupabase] = useState(() => {
+    return sessionStorage.getItem(SESSION_LOADED_KEY) === "true";
+  });
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>(() => {
     // Try localStorage first for immediate UI
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -105,12 +109,12 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
     return colorSchemes[0];
   });
 
-  // Load color scheme from Supabase when user logs in
+  // Load color scheme from Supabase when user logs in (only once)
   useEffect(() => {
-    if (user) {
+    if (user && !hasLoadedFromSupabase) {
       loadColorScheme();
     }
-  }, [user]);
+  }, [user, hasLoadedFromSupabase]);
 
   const loadColorScheme = async () => {
     if (!user) return;
@@ -120,18 +124,30 @@ export function ColorSchemeProvider({ children }: { children: ReactNode }) {
       if (profile && profile.color_scheme) {
         const found = colorSchemes.find((s) => s.id === profile.color_scheme);
         if (found) {
-          setColorSchemeState(found);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ id: found.id }));
+          // Only update if different from current localStorage value
+          const saved = localStorage.getItem(STORAGE_KEY);
+          const currentId = saved ? JSON.parse(saved).id : null;
+
+          if (currentId !== found.id) {
+            setColorSchemeState(found);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ id: found.id }));
+          }
         }
       }
+      setHasLoadedFromSupabase(true);
+      sessionStorage.setItem(SESSION_LOADED_KEY, "true");
     } catch (error) {
       console.error("Failed to load color scheme from profile:", error);
+      setHasLoadedFromSupabase(true);
+      sessionStorage.setItem(SESSION_LOADED_KEY, "true");
     }
   };
 
   const setColorScheme = async (scheme: ColorScheme) => {
     setColorSchemeState(scheme);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ id: scheme.id }));
+    setHasLoadedFromSupabase(true); // Prevent overwriting this change
+    sessionStorage.setItem(SESSION_LOADED_KEY, "true");
 
     // Save to Supabase if user is logged in
     if (user) {
