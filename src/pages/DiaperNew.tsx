@@ -129,7 +129,7 @@ export function DiaperNew() {
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
