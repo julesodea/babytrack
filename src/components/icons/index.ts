@@ -1,6 +1,7 @@
 export { IconBottle } from "./IconBottle";
 export { IconCalendar } from "./IconCalendar";
 export { IconChevronDown } from "./IconChevronDown";
+export { IconClock } from "./IconClock";
 export { IconClose } from "./IconClose";
 export { IconDashboard } from "./IconDashboard";
 export { IconDiaper } from "./IconDiaper";

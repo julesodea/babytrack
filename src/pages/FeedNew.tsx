@@ -1,29 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconBottle, IconDashboard } from "../components/icons";
+import { IconBottle, IconDashboard, IconUser } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { createFeed } from "../lib/api/feeds";
 import { getPreferences } from "../lib/api/preferences";
-
-// Helper function to get current time in HH:MM format
-const getCurrentTime = (): string => {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-};
-
-// Helper function to get current date in YYYY-MM-DD format (local timezone)
-const getCurrentDate = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import { getCurrentTime, getCurrentDate } from "../utils/dateTime";
+import { DatePicker } from "../components/DatePicker";
+import { TimePicker } from "../components/TimePicker";
+import { Select } from "../components/Select";
 
 export function FeedNew() {
   const { colorScheme } = useColorScheme();
@@ -131,7 +118,7 @@ export function FeedNew() {
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-sm">
+      <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -141,13 +128,11 @@ export function FeedNew() {
               >
                 Date
               </label>
-              <input
-                id="date"
-                type="date"
-                required
+              <DatePicker
                 value={feed.date}
-                onChange={(e) => setFeed({ ...feed, date: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                onChange={(date) => setFeed({ ...feed, date })}
+                id="date"
+                required
               />
             </div>
             <div>
@@ -157,21 +142,22 @@ export function FeedNew() {
               >
                 Feed Type
               </label>
-              <select
+              <Select
                 id="type"
                 value={feed.type}
-                onChange={(e) =>
+                onChange={(type) =>
                   setFeed({
                     ...feed,
-                    type: e.target.value as "bottle" | "breast" | "solid",
+                    type: type as "bottle" | "breast" | "solid",
                   })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="bottle">Bottle</option>
-                <option value="breast">Breast</option>
-                <option value="solid">Solid Food</option>
-              </select>
+                options={[
+                  { value: "bottle", label: "Bottle" },
+                  { value: "breast", label: "Breast" },
+                  { value: "solid", label: "Solid Food" },
+                ]}
+                icon={<IconBottle className="w-4 h-4 text-gray-400" />}
+              />
             </div>
             <div>
               <label
@@ -199,13 +185,11 @@ export function FeedNew() {
               >
                 Time
               </label>
-              <input
-                id="time"
-                type="time"
-                required
+              <TimePicker
                 value={feed.time}
-                onChange={(e) => setFeed({ ...feed, time: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                onChange={(time) => setFeed({ ...feed, time })}
+                id="time"
+                required
               />
             </div>
             <div>
@@ -215,18 +199,19 @@ export function FeedNew() {
               >
                 Caregiver
               </label>
-              <select
+              <Select
                 id="user"
-                required
                 value={feed.user}
-                onChange={(e) => setFeed({ ...feed, user: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="">Select caregiver</option>
-                <option value="Mum">Mum</option>
-                <option value="Dad">Dad</option>
-                <option value="Other">Other</option>
-              </select>
+                onChange={(user) => setFeed({ ...feed, user })}
+                options={[
+                  { value: "Mum", label: "Mum" },
+                  { value: "Dad", label: "Dad" },
+                  { value: "Other", label: "Other" },
+                ]}
+                placeholder="Select caregiver"
+                required
+                icon={<IconUser className="w-4 h-4 text-gray-400" />}
+              />
             </div>
             <div className="sm:col-span-2">
               <label

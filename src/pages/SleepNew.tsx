@@ -1,29 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDashboard, IconMoon } from "../components/icons";
+import { IconDashboard, IconMoon, IconUser } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { createSleep } from "../lib/api/sleeps";
 import { getPreferences } from "../lib/api/preferences";
-
-// Helper function to get current time in HH:MM format
-const getCurrentTime = (): string => {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
-};
-
-// Helper function to get current date in YYYY-MM-DD format (local timezone)
-const getCurrentDate = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import { getCurrentTime, getCurrentDate } from "../utils/dateTime";
+import { DatePicker } from "../components/DatePicker";
+import { TimePicker } from "../components/TimePicker";
+import { Select } from "../components/Select";
 
 // Helper function to calculate duration between two times
 const calculateDuration = (startTime: string, endTime: string): string => {
@@ -168,7 +155,7 @@ export function SleepNew() {
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-2xl p-4 sm:p-8 border border-gray-100 shadow-sm">
+      <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -178,13 +165,11 @@ export function SleepNew() {
               >
                 Date
               </label>
-              <input
-                id="date"
-                type="date"
-                required
+              <DatePicker
                 value={sleep.date}
-                onChange={(e) => setSleep({ ...sleep, date: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                onChange={(date) => setSleep({ ...sleep, date })}
+                id="date"
+                required
               />
             </div>
             <div>
@@ -194,15 +179,16 @@ export function SleepNew() {
               >
                 Sleep Type
               </label>
-              <select
+              <Select
                 id="type"
                 value={sleep.type}
-                onChange={(e) => setSleep({ ...sleep, type: e.target.value as "nap" | "overnight" })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="nap">Nap</option>
-                <option value="overnight">Overnight</option>
-              </select>
+                onChange={(type) => setSleep({ ...sleep, type: type as "nap" | "overnight" })}
+                options={[
+                  { value: "nap", label: "Nap" },
+                  { value: "overnight", label: "Overnight" },
+                ]}
+                icon={<IconMoon className="w-4 h-4 text-gray-400" />}
+              />
             </div>
             <div className="sm:col-span-2">
               <label className="flex items-center gap-3 cursor-pointer">
@@ -225,15 +211,11 @@ export function SleepNew() {
               >
                 Start Time
               </label>
-              <input
-                id="startTime"
-                type="time"
-                required
+              <TimePicker
                 value={sleep.startTime}
-                onChange={(e) =>
-                  setSleep({ ...sleep, startTime: e.target.value })
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                onChange={(startTime) => setSleep({ ...sleep, startTime })}
+                id="startTime"
+                required
               />
             </div>
             <div>
@@ -243,18 +225,12 @@ export function SleepNew() {
               >
                 End Time
               </label>
-              <input
+              <TimePicker
+                value={sleep.endTime}
+                onChange={(endTime) => setSleep({ ...sleep, endTime })}
                 id="endTime"
-                type="time"
                 required={!isOngoing}
                 disabled={isOngoing}
-                value={sleep.endTime}
-                onChange={(e) =>
-                  setSleep({ ...sleep, endTime: e.target.value })
-                }
-                className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all ${
-                  isOngoing ? 'bg-gray-100 cursor-not-allowed' : ''
-                }`}
               />
             </div>
             <div>
@@ -275,18 +251,19 @@ export function SleepNew() {
               >
                 Caregiver
               </label>
-              <select
+              <Select
                 id="user"
-                required
                 value={sleep.user}
-                onChange={(e) => setSleep({ ...sleep, user: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="">Select caregiver</option>
-                <option value="Mum">Mum</option>
-                <option value="Dad">Dad</option>
-                <option value="Other">Other</option>
-              </select>
+                onChange={(user) => setSleep({ ...sleep, user })}
+                options={[
+                  { value: "Mum", label: "Mum" },
+                  { value: "Dad", label: "Dad" },
+                  { value: "Other", label: "Other" },
+                ]}
+                placeholder="Select caregiver"
+                required
+                icon={<IconUser className="w-4 h-4 text-gray-400" />}
+              />
             </div>
             <div className="sm:col-span-2">
               <label
