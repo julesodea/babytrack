@@ -1,7 +1,5 @@
 # Baby Track
 
-<a href="https://babytrackapp.vercel.app" target="_blank">Link</a>
-
 Provide users with tracking options to keep on top of baby monitoring.
 
 Provide monitoring for:
@@ -9,3 +7,5 @@ Provide monitoring for:
 - Diaper Changes
 - Sleeps
 - Child sharing with Parents
+
+[Baby Track](https://babytrackapp.vercel.app)
