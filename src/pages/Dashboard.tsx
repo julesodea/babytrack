@@ -397,7 +397,7 @@ export function Dashboard() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {totalFeedsRecorded} feeds recorded total
+            {totalFeedsRecorded} Total Feeds Recorded
           </p>
         </Link>
 
@@ -451,7 +451,7 @@ export function Dashboard() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {totalDiapersRecorded} diaper changes recorded total
+            {totalDiapersRecorded} Total Diaper Changes Recorded
           </p>
         </Link>
 
@@ -505,7 +505,7 @@ export function Dashboard() {
               colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
             }`}
           >
-            {todaySleeps.length} sleep logs today
+            {todaySleeps.length} Sleep Logs Today
           </p>
         </Link>
       </div>
