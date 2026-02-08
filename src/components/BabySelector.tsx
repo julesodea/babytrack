@@ -48,9 +48,9 @@ export function BabySelector() {
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 leading-tight text-left">
+            <div className="text-sm font-semibold text-gray-900 leading-tight text-left">
               {selectedBaby?.name || "Select Baby"}
-            </h3>
+            </div>
           </div>
         </div>
         <IconChevronDown

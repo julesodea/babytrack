@@ -81,6 +81,7 @@ export function Layout() {
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
         >
           {sidebarOpen ? (
             <IconClose className="w-6 h-6 text-gray-600" />
