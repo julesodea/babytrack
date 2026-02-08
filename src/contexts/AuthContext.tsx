@@ -48,14 +48,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeoutId);
 
       if (error) {
-        console.error("❌ Error fetching profile:", error);
+        console.error("❌ Error fetching profile:", error.message || JSON.stringify(error));
         setProfile(null);
       } else {
         setProfile(data);
       }
     } catch (err) {
       clearTimeout(timeoutId);
-      console.error("💥 Exception in fetchProfile:", err);
+      console.error("💥 Exception in fetchProfile:", err instanceof Error ? err.message : String(err));
       setProfile(null);
     }
   };
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setLoading(false);
             })
             .catch((err) => {
-              console.error("❌ fetchProfile failed:", err);
+              console.error("❌ fetchProfile failed:", err instanceof Error ? err.message : String(err));
               setLoading(false);
             });
         } else {

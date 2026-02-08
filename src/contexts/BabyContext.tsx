@@ -47,7 +47,7 @@ export function BabyProvider({ children }: { children: ReactNode }) {
         setSelectedBaby(null);
       }
     } catch (error) {
-      console.error('Failed to load babies:', error);
+      console.error('Failed to load babies:', error instanceof Error ? error.message : String(error));
       setBabies([]);
       setSelectedBaby(null);
     } finally {
