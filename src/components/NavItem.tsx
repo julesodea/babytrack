@@ -49,9 +49,9 @@ export function NavItem({ to, icon, label, badge, onClick }: NavItemProps) {
           className={`text-[10px] font-semibold border rounded px-1 ${
             isActive
               ? colorScheme.id === "default"
-                ? "text-gray-400 border-gray-200"
+                ? "text-gray-600 border-gray-300"
                 : "text-white border-white/30"
-              : "text-gray-400 border-gray-200"
+              : "text-gray-600 border-gray-300"
           }`}
         >
           {badge}

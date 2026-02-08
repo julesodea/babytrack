@@ -142,7 +142,7 @@ export function Layout() {
           />
 
           <div className="pt-6 pb-2 px-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
               Settings
             </p>
           </div>
