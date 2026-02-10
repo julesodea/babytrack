@@ -10,6 +10,8 @@ import { getDiaper, updateDiaper } from "../lib/api/diapers";
 import { getSleep, updateSleep } from "../lib/api/sleeps";
 import type { Feed, Diaper, Sleep } from "../types/database";
 import { Select } from "../components/Select";
+import { DatePicker } from "../components/DatePicker";
+import { TimePicker } from "../components/TimePicker";
 
 type Activity = Feed | Diaper | Sleep;
 
@@ -318,14 +320,13 @@ export function ActivityDetail() {
                   >
                     Date
                   </label>
-                  <input
+                  <DatePicker
                     id="date"
-                    type="date"
                     value={activity.date}
-                    onChange={(e) =>
-                      setActivity({ ...activity, date: e.target.value })
+                    onChange={(date) =>
+                      setActivity({ ...activity, date })
                     }
-                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    required
                   />
                 </div>
               )}
@@ -472,15 +473,13 @@ export function ActivityDetail() {
                     >
                       Start Time
                     </label>
-                    <input
+                    <TimePicker
                       id="startTime"
-                      type="time"
                       value={(activity as Sleep).start_time || ''}
-                      onChange={(e) => {
-                        const newStartTime = e.target.value;
+                      onChange={(newStartTime) => {
                         const sleepActivity = activity as Sleep;
                         const calculatedDuration = calculateDuration(newStartTime, sleepActivity.end_time);
-                        const newDetail = sleepActivity.end_time 
+                        const newDetail = sleepActivity.end_time
                           ? `${calculatedDuration} sleep`
                           : (sleepActivity.detail || 'Ongoing sleep');
                         setActivity({
@@ -490,7 +489,7 @@ export function ActivityDetail() {
                           detail: newDetail
                         });
                       }}
-                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      required
                     />
                   </div>
                   <div>
@@ -501,26 +500,25 @@ export function ActivityDetail() {
                       End Time
                     </label>
                     <div className="flex gap-2">
-                      <input
-                        id="endTime"
-                        type="time"
-                        value={(activity as Sleep).end_time || ''}
-                        onChange={(e) => {
-                          const newEndTime = e.target.value;
-                          const sleepActivity = activity as Sleep;
-                          const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
-                          const newDetail = newEndTime 
-                            ? `${calculatedDuration} sleep`
-                            : 'Ongoing sleep';
-                          setActivity({
-                            ...sleepActivity,
-                            end_time: newEndTime,
-                            duration: calculatedDuration,
-                            detail: newDetail
-                          });
-                        }}
-                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
-                      />
+                      <div className="flex-1">
+                        <TimePicker
+                          id="endTime"
+                          value={(activity as Sleep).end_time || ''}
+                          onChange={(newEndTime) => {
+                            const sleepActivity = activity as Sleep;
+                            const calculatedDuration = calculateDuration(sleepActivity.start_time, newEndTime);
+                            const newDetail = newEndTime
+                              ? `${calculatedDuration} sleep`
+                              : 'Ongoing sleep';
+                            setActivity({
+                              ...sleepActivity,
+                              end_time: newEndTime,
+                              duration: calculatedDuration,
+                              detail: newDetail
+                            });
+                          }}
+                        />
+                      </div>
                       {!(activity as Sleep).end_time && (
                         <button
                           type="button"
@@ -568,14 +566,13 @@ export function ActivityDetail() {
                     >
                       Time
                     </label>
-                    <input
+                    <TimePicker
                       id="time"
-                      type="time"
                       value={activity.time}
-                      onChange={(e) =>
-                        setActivity({ ...activity, time: e.target.value })
+                      onChange={(time) =>
+                        setActivity({ ...activity, time })
                       }
-                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                      required
                     />
                   </div>
                 )
