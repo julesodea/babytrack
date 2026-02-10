@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDashboard } from "../components/icons";
+import { IconDashboard, IconDiaper, IconBottle, IconMoon, IconUser } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
@@ -9,6 +9,7 @@ import { getFeed, updateFeed } from "../lib/api/feeds";
 import { getDiaper, updateDiaper } from "../lib/api/diapers";
 import { getSleep, updateSleep } from "../lib/api/sleeps";
 import type { Feed, Diaper, Sleep } from "../types/database";
+import { Select } from "../components/Select";
 
 type Activity = Feed | Diaper | Sleep;
 
@@ -336,11 +337,11 @@ export function ActivityDetail() {
                   >
                     Type
                   </label>
-                  <select
+                  <Select
                     id="diaperType"
                     value={(activity as Diaper).type || 'wet'}
-                    onChange={(e) => {
-                      const newType = e.target.value as 'wet' | 'dirty' | 'both' | 'other';
+                    onChange={(value) => {
+                      const newType = value as 'wet' | 'dirty' | 'both' | 'other';
                       const diaperActivity = activity as Diaper;
                       const oldTypeDetail = diaperActivity.type ? diaperActivity.type.charAt(0).toUpperCase() + diaperActivity.type.slice(1) : '';
                       const newTypeDetail = newType.charAt(0).toUpperCase() + newType.slice(1);
@@ -349,19 +350,20 @@ export function ActivityDetail() {
                       const newDetail = (diaperActivity.detail === oldTypeDetail || !diaperActivity.detail)
                         ? newTypeDetail
                         : diaperActivity.detail;
-                      setActivity({ 
-                        ...diaperActivity, 
+                      setActivity({
+                        ...diaperActivity,
                         type: newType,
                         detail: newDetail
                       });
                     }}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="wet">Wet</option>
-                    <option value="dirty">Dirty</option>
-                    <option value="both">Both</option>
-                    <option value="other">Other</option>
-                  </select>
+                    options={[
+                      { value: "wet", label: "Wet" },
+                      { value: "dirty", label: "Dirty" },
+                      { value: "both", label: "Both" },
+                      { value: "other", label: "Other" },
+                    ]}
+                    icon={<IconDiaper className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
               )}
               {'type' in activity && getActivityType() === 'feed' && (
@@ -373,11 +375,11 @@ export function ActivityDetail() {
                     >
                       Feed Type
                     </label>
-                    <select
+                    <Select
                       id="feedType"
                       value={(activity as Feed).type || 'bottle'}
-                      onChange={(e) => {
-                        const newType = e.target.value as 'bottle' | 'breast' | 'solid';
+                      onChange={(value) => {
+                        const newType = value as 'bottle' | 'breast' | 'solid';
                         const feedActivity = activity as Feed;
                         const oldFeedType = feedActivity.type ? feedActivity.type.charAt(0).toUpperCase() + feedActivity.type.slice(1) : '';
                         const newFeedType = newType.charAt(0).toUpperCase() + newType.slice(1);
@@ -387,18 +389,19 @@ export function ActivityDetail() {
                         const newDetail = (feedActivity.detail === oldAutoDetail || !feedActivity.detail) && feedActivity.amount
                           ? `${feedActivity.amount}ml - ${newFeedType}`
                           : feedActivity.detail || '';
-                        setActivity({ 
-                          ...feedActivity, 
+                        setActivity({
+                          ...feedActivity,
                           type: newType,
                           detail: newDetail
                         });
                       }}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                    >
-                      <option value="bottle">Bottle</option>
-                      <option value="breast">Breast</option>
-                      <option value="solid">Solid Food</option>
-                    </select>
+                      options={[
+                        { value: "bottle", label: "Bottle" },
+                        { value: "breast", label: "Breast" },
+                        { value: "solid", label: "Solid Food" },
+                      ]}
+                      icon={<IconBottle className="w-4 h-4 text-gray-400" />}
+                    />
                   </div>
                   <div>
                     <label
@@ -446,17 +449,18 @@ export function ActivityDetail() {
                   >
                     Sleep Type
                   </label>
-                  <select
+                  <Select
                     id="sleepType"
                     value={(activity as Sleep).type || 'nap'}
-                    onChange={(e) =>
-                      setActivity({ ...(activity as Sleep), type: e.target.value as 'nap' | 'overnight' })
+                    onChange={(value) =>
+                      setActivity({ ...(activity as Sleep), type: value as 'nap' | 'overnight' })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="nap">Nap</option>
-                    <option value="overnight">Overnight</option>
-                  </select>
+                    options={[
+                      { value: "nap", label: "Nap" },
+                      { value: "overnight", label: "Overnight" },
+                    ]}
+                    icon={<IconMoon className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
               )}
               {getActivityType() === 'sleep' && 'start_time' in activity ? (
@@ -584,18 +588,19 @@ export function ActivityDetail() {
                   >
                     Caregiver
                   </label>
-                  <select
+                  <Select
                     id="caregiver"
                     value={activity.caregiver}
-                    onChange={(e) =>
-                      setActivity({ ...activity, caregiver: e.target.value })
+                    onChange={(value) =>
+                      setActivity({ ...activity, caregiver: value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="Mum">Mum</option>
-                    <option value="Dad">Dad</option>
-                    <option value="Other">Other</option>
-                  </select>
+                    options={[
+                      { value: "Mum", label: "Mum" },
+                      { value: "Dad", label: "Dad" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    icon={<IconUser className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
               )}
               {'detail' in activity && (

@@ -61,10 +61,10 @@ export function Dropdown({
         disabled={disabled}
         className={`w-full flex items-center justify-between px-4 py-2.5 ${
           icon ? "pl-10" : ""
-        } border border-gray-200 rounded-lg text-sm transition-all ${
+        } border border-gray-200 rounded-xl text-sm transition-all shadow-sm ${
           disabled
             ? "bg-gray-100 cursor-not-allowed text-gray-500"
-            : "bg-white hover:border-gray-300 cursor-pointer"
+            : "bg-white hover:bg-gray-50 cursor-pointer"
         } ${isOpen ? "ring-2 ring-gray-200 border-gray-300" : ""}`}
       >
         {icon && (
@@ -92,14 +92,14 @@ export function Dropdown({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
             {options.map((option) => (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => handleSelect(option.value)}
-                className={`w-full px-4 py-2.5 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg transition-colors text-left ${
-                  option.value === value ? "bg-gray-50 font-medium" : ""
+                className={`w-full px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors text-left ${
+                  option.value === value ? "bg-gray-100 font-medium" : ""
                 }`}
               >
                 <span className="text-gray-900">{option.label}</span>
