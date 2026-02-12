@@ -31,22 +31,21 @@ export function FeedNew() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user) {
-      loadDefaultCaregiver();
-    }
-  }, [user]);
-
-  const loadDefaultCaregiver = async () => {
     if (!user) return;
-    try {
-      const preferences = await getPreferences(user.id);
-      if (preferences?.default_caregiver) {
-        setFeed((prev) => ({ ...prev, user: preferences.default_caregiver! }));
+
+    const loadDefaultCaregiver = async () => {
+      try {
+        const preferences = await getPreferences(user.id);
+        if (preferences?.default_caregiver) {
+          setFeed((prev) => ({ ...prev, user: preferences.default_caregiver! }));
+        }
+      } catch (error) {
+        console.error("Failed to load preferences:", error);
       }
-    } catch (error) {
-      console.error("Failed to load preferences:", error);
-    }
-  };
+    };
+
+    loadDefaultCaregiver();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

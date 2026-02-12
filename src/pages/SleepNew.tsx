@@ -64,22 +64,21 @@ export function SleepNew() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user) {
-      loadDefaultCaregiver();
-    }
-  }, [user]);
-
-  const loadDefaultCaregiver = async () => {
     if (!user) return;
-    try {
-      const preferences = await getPreferences(user.id);
-      if (preferences?.default_caregiver) {
-        setSleep(prev => ({ ...prev, user: preferences.default_caregiver! }));
+
+    const loadDefaultCaregiver = async () => {
+      try {
+        const preferences = await getPreferences(user.id);
+        if (preferences?.default_caregiver) {
+          setSleep(prev => ({ ...prev, user: preferences.default_caregiver! }));
+        }
+      } catch (error) {
+        console.error("Failed to load preferences:", error);
       }
-    } catch (error) {
-      console.error("Failed to load preferences:", error);
-    }
-  };
+    };
+
+    loadDefaultCaregiver();
+  }, [user]);
 
   // Auto-calculate duration when start or end time changes
   const duration = isOngoing ? "Ongoing" : calculateDuration(sleep.startTime, sleep.endTime);

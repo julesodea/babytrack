@@ -67,7 +67,7 @@ export function Layout() {
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+      <header className="lg:hidden fixed left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
         <Link to="/" className="flex items-center gap-3">
           <div
             className={`w-8 h-8 rounded-lg flex items-center justify-center text-white ${
@@ -104,6 +104,7 @@ export function Layout() {
         className={`w-72 bg-white border-r border-gray-100 flex flex-col fixed h-full z-40 transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         {/* Baby Selector */}
         <BabySelector />
@@ -205,7 +206,7 @@ export function Layout() {
       </aside>
 
       {/* --- Main Content --- */}
-      <main className="flex-1 lg:ml-72 pt-14 lg:pt-0">
+      <main className="flex-1 lg:ml-72 lg:pt-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}>
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-12">
           <Outlet />
         </div>

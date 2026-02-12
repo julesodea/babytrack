@@ -30,22 +30,21 @@ export function DiaperNew() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user) {
-      loadDefaultCaregiver();
-    }
-  }, [user]);
-
-  const loadDefaultCaregiver = async () => {
     if (!user) return;
-    try {
-      const preferences = await getPreferences(user.id);
-      if (preferences?.default_caregiver) {
-        setDiaper(prev => ({ ...prev, user: preferences.default_caregiver! }));
+
+    const loadDefaultCaregiver = async () => {
+      try {
+        const preferences = await getPreferences(user.id);
+        if (preferences?.default_caregiver) {
+          setDiaper(prev => ({ ...prev, user: preferences.default_caregiver! }));
+        }
+      } catch (error) {
+        console.error("Failed to load preferences:", error);
       }
-    } catch (error) {
-      console.error("Failed to load preferences:", error);
-    }
-  };
+    };
+
+    loadDefaultCaregiver();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,11 +234,10 @@ export function DiaperNew() {
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                colorScheme.id === "default"
+              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-              }`}
+                }`}
             >
               {loading ? "Saving..." : "Log Change"}
             </button>
