@@ -12,6 +12,7 @@ import {
   IconFilter,
   IconMenu,
   IconMoon,
+  IconPill,
   IconSearch,
 } from "./icons";
 
@@ -140,6 +141,12 @@ export function Layout() {
             to="/sleep"
             icon={<IconMoon className="w-5 h-5" />}
             label="Sleep"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <NavItem
+            to="/medicine"
+            icon={<IconPill className="w-5 h-5" />}
+            label="Medicine"
             onClick={() => setSidebarOpen(false)}
           />
 

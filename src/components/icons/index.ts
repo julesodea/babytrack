@@ -9,6 +9,7 @@ export { IconFilter } from "./IconFilter";
 export { IconLogo } from "./IconLogo";
 export { IconMenu } from "./IconMenu";
 export { IconMoon } from "./IconMoon";
+export { IconPill } from "./IconPill";
 export { IconRefresh } from "./IconRefresh";
 export { IconSearch } from "./IconSearch";
 export { IconUser } from "./IconUser";

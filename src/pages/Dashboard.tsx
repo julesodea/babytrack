@@ -8,6 +8,7 @@ import {
   IconDiaper,
   IconFilter,
   IconMoon,
+  IconPill,
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
@@ -22,13 +23,14 @@ import { getPreferences } from "../lib/api/preferences";
 import { getFeeds, deleteFeeds } from "../lib/api/feeds";
 import { getDiapers, deleteDiapers } from "../lib/api/diapers";
 import { getSleeps, deleteSleeps } from "../lib/api/sleeps";
+import { getMedicines, deleteMedicines } from "../lib/api/medicines";
 
 interface ActivityItem {
   id: string;
   detail: string;
   time: string;
   user: string;
-  type: "feed" | "diaper" | "sleep";
+  type: "feed" | "diaper" | "sleep" | "medicine";
   date: string;
   notes: string | null;
   created_at: string;
@@ -70,10 +72,11 @@ export function Dashboard() {
     queryFn: async () => {
       if (!selectedBaby) return [];
 
-      const [feeds, diapers, sleeps] = await Promise.all([
+      const [feeds, diapers, sleeps, medicines] = await Promise.all([
         getFeeds(selectedBaby.id),
         getDiapers(selectedBaby.id),
         getSleeps(selectedBaby.id),
+        getMedicines(selectedBaby.id),
       ]);
 
       // Map feeds to ActivityItem format
@@ -112,11 +115,24 @@ export function Dashboard() {
         created_at: s.created_at,
       }));
 
+      // Map medicines to ActivityItem format
+      const medicineActivities: ActivityItem[] = medicines.map((m) => ({
+        id: m.id,
+        detail: m.detail || "",
+        time: m.time,
+        user: m.caregiver,
+        type: "medicine" as const,
+        date: m.date,
+        notes: m.notes,
+        created_at: m.created_at,
+      }));
+
       // Combine all activities and sort by date + time (most recent first)
       const allActivities = [
         ...feedActivities,
         ...diaperActivities,
         ...sleepActivities,
+        ...medicineActivities,
       ];
       allActivities.sort((a, b) => {
         // Create datetime strings for comparison
@@ -241,6 +257,7 @@ export function Dashboard() {
       const feedIds: string[] = [];
       const diaperIds: string[] = [];
       const sleepIds: string[] = [];
+      const medicineIds: string[] = [];
 
       selectedIds.forEach((id) => {
         const activity = data.find((a) => a.id === id);
@@ -248,6 +265,7 @@ export function Dashboard() {
           if (activity.type === "feed") feedIds.push(id);
           else if (activity.type === "diaper") diaperIds.push(id);
           else if (activity.type === "sleep") sleepIds.push(id);
+          else if (activity.type === "medicine") medicineIds.push(id);
         }
       });
 
@@ -256,6 +274,7 @@ export function Dashboard() {
         feedIds.length > 0 ? deleteFeeds(feedIds) : Promise.resolve(),
         diaperIds.length > 0 ? deleteDiapers(diaperIds) : Promise.resolve(),
         sleepIds.length > 0 ? deleteSleeps(sleepIds) : Promise.resolve(),
+        medicineIds.length > 0 ? deleteMedicines(medicineIds) : Promise.resolve(),
       ]);
 
       // Invalidate queries to refresh the data
@@ -582,7 +601,7 @@ export function Dashboard() {
                   >
                     All types
                   </button>
-                  {["feed", "diaper", "sleep"].map((type) => (
+                  {["feed", "diaper", "sleep", "medicine"].map((type) => (
                     <button
                       key={type}
                       onClick={() => handleTypeFilterChange(type)}

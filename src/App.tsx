@@ -31,6 +31,12 @@ const Feed = lazy(() => import("./pages").then((m) => ({ default: m.Feed })));
 const FeedNew = lazy(() =>
   import("./pages").then((m) => ({ default: m.FeedNew }))
 );
+const Medicine = lazy(() =>
+  import("./pages").then((m) => ({ default: m.Medicine }))
+);
+const MedicineNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.MedicineNew }))
+);
 const Preferences = lazy(() =>
   import("./pages").then((m) => ({ default: m.Preferences }))
 );
@@ -84,6 +90,8 @@ function App() {
                   <Route path="/diaper/new" element={<DiaperNew />} />
                   <Route path="/sleep" element={<Sleep />} />
                   <Route path="/sleep/new" element={<SleepNew />} />
+                  <Route path="/medicine" element={<Medicine />} />
+                  <Route path="/medicine/new" element={<MedicineNew />} />
                   <Route path="/settings" element={<Preferences />} />
                   <Route path="/activity/new" element={<ActivityNew />} />
                   <Route path="/activity/:id" element={<ActivityDetail />} />

@@ -207,6 +207,49 @@ export interface Database {
           updated_at?: string;
         };
       };
+      medicines: {
+        Row: {
+          id: string;
+          user_id: string;
+          baby_id: string;
+          created_by_user_id: string | null;
+          title: string;
+          medicine_name: string;
+          dosage: string;
+          detail: string | null;
+          time: string;
+          caregiver: string;
+          notes: string | null;
+          date: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          baby_id: string;
+          created_by_user_id?: string | null;
+          title: string;
+          medicine_name: string;
+          dosage: string;
+          detail?: string | null;
+          time: string;
+          caregiver: string;
+          notes?: string | null;
+          date: string;
+        };
+        Update: {
+          title?: string;
+          medicine_name?: string;
+          dosage?: string;
+          detail?: string | null;
+          time?: string;
+          caregiver?: string;
+          notes?: string | null;
+          date?: string;
+          updated_at?: string;
+        };
+      };
       preferences: {
         Row: {
           id: string;
@@ -260,6 +303,7 @@ export type BabyShare = Database['public']['Tables']['baby_shares']['Row'];
 export type Feed = Database['public']['Tables']['feeds']['Row'];
 export type Diaper = Database['public']['Tables']['diapers']['Row'];
 export type Sleep = Database['public']['Tables']['sleeps']['Row'];
+export type Medicine = Database['public']['Tables']['medicines']['Row'];
 export type Preferences = Database['public']['Tables']['preferences']['Row'];
 
 export type BabyShareInsert = Database['public']['Tables']['baby_shares']['Insert'];
@@ -270,5 +314,7 @@ export type DiaperInsert = Database['public']['Tables']['diapers']['Insert'];
 export type DiaperUpdate = Database['public']['Tables']['diapers']['Update'];
 export type SleepInsert = Database['public']['Tables']['sleeps']['Insert'];
 export type SleepUpdate = Database['public']['Tables']['sleeps']['Update'];
+export type MedicineInsert = Database['public']['Tables']['medicines']['Insert'];
+export type MedicineUpdate = Database['public']['Tables']['medicines']['Update'];
 export type PreferencesInsert = Database['public']['Tables']['preferences']['Insert'];
 export type PreferencesUpdate = Database['public']['Tables']['preferences']['Update'];

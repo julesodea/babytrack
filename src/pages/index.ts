@@ -7,6 +7,8 @@ export { DiaperNew } from "./DiaperNew";
 export { Feed } from "./Feed";
 export { FeedNew } from "./FeedNew";
 export { Login } from "./Login";
+export { Medicine } from "./Medicine";
+export { MedicineNew } from "./MedicineNew";
 export { Preferences } from "./Preferences";
 export { Search } from "./Search";
 export { Sleep } from "./Sleep";

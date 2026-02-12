@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDashboard, IconDiaper, IconBottle, IconMoon, IconUser } from "../components/icons";
+import { IconDashboard, IconDiaper, IconBottle, IconMoon, IconPill, IconUser } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getFeed, updateFeed } from "../lib/api/feeds";
 import { getDiaper, updateDiaper } from "../lib/api/diapers";
 import { getSleep, updateSleep } from "../lib/api/sleeps";
-import type { Feed, Diaper, Sleep } from "../types/database";
+import { getMedicine, updateMedicine } from "../lib/api/medicines";
+import type { Feed, Diaper, Sleep, Medicine } from "../types/database";
 import { Select } from "../components/Select";
 import { DatePicker } from "../components/DatePicker";
 import { TimePicker } from "../components/TimePicker";
 
-type Activity = Feed | Diaper | Sleep;
+type Activity = Feed | Diaper | Sleep | Medicine;
 
 export function ActivityDetail() {
   const { id } = useParams();
@@ -67,6 +68,13 @@ export function ActivityDetail() {
           setLoading(false);
           return;
         }
+      } else if (typeHint === 'medicine') {
+        data = await getMedicine(id).catch(() => null);
+        if (data) {
+          setActivity(data);
+          setLoading(false);
+          return;
+        }
       }
 
       // If type hint didn't work or wasn't provided, try all tables
@@ -94,6 +102,14 @@ export function ActivityDetail() {
         return;
       }
 
+      // Try medicines
+      data = await getMedicine(id).catch(() => null);
+      if (data) {
+        setActivity(data);
+        setLoading(false);
+        return;
+      }
+
       // Not found in any table
       setActivity(null);
       setLoading(false);
@@ -104,8 +120,15 @@ export function ActivityDetail() {
     }
   };
 
-  const getActivityType = (): 'feed' | 'diaper' | 'sleep' | null => {
-    if (!activity || !('type' in activity) || !activity.type) return null;
+  const getActivityType = (): 'feed' | 'diaper' | 'sleep' | 'medicine' | null => {
+    if (!activity) return null;
+
+    // Check for medicine (has medicine_name and dosage fields)
+    if ('medicine_name' in activity && 'dosage' in activity) {
+      return 'medicine';
+    }
+
+    if (!('type' in activity) || !activity.type) return null;
 
     const type = activity.type;
 
@@ -214,6 +237,8 @@ export function ActivityDetail() {
         await updateDiaper(id, activity as Diaper);
       } else if (activityType === 'sleep') {
         await updateSleep(id, activity as Sleep);
+      } else if (activityType === 'medicine') {
+        await updateMedicine(id, activity as Medicine);
       }
 
       // Invalidate queries to refresh the data everywhere
@@ -221,6 +246,7 @@ export function ActivityDetail() {
       await queryClient.invalidateQueries({ queryKey: ["feeds", selectedBaby?.id] });
       await queryClient.invalidateQueries({ queryKey: ["diapers", selectedBaby?.id] });
       await queryClient.invalidateQueries({ queryKey: ["sleeps", selectedBaby?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["medicines", selectedBaby?.id] });
 
       setIsEditing(false);
       await loadActivity(); // Reload to get updated data
@@ -280,10 +306,10 @@ export function ActivityDetail() {
           </p>
           {!isEditing && (
             <Link
-              to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : '/sleep'}
+              to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : activityType === 'sleep' ? '/sleep' : '/medicine'}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors mt-3"
             >
-              ← Back to {activityType === 'feed' ? 'Feed Logs' : activityType === 'diaper' ? 'Diaper Changes' : 'Sleep Logs'}
+              ← Back to {activityType === 'feed' ? 'Feed Logs' : activityType === 'diaper' ? 'Diaper Changes' : activityType === 'sleep' ? 'Sleep Logs' : 'Medicine Logs'}
             </Link>
           )}
         </div>
@@ -437,6 +463,75 @@ export function ActivityDetail() {
                         });
                       }}
                       placeholder="150"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                </>
+              )}
+              {getActivityType() === 'medicine' && 'medicine_name' in activity && (
+                <>
+                  <div>
+                    <label
+                      htmlFor="medicineName"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Medicine Name
+                    </label>
+                    <input
+                      id="medicineName"
+                      type="text"
+                      required
+                      value={(activity as Medicine).medicine_name}
+                      onChange={(e) => {
+                        const newMedicineName = e.target.value;
+                        const medicineActivity = activity as Medicine;
+                        const oldAutoDetail = medicineActivity.medicine_name && medicineActivity.dosage
+                          ? `${medicineActivity.medicine_name} - ${medicineActivity.dosage}`
+                          : '';
+                        const isAutoGenerated = !medicineActivity.detail || medicineActivity.detail === oldAutoDetail;
+                        const newDetail = isAutoGenerated && medicineActivity.dosage
+                          ? `${newMedicineName} - ${medicineActivity.dosage}`
+                          : medicineActivity.detail || '';
+                        setActivity({
+                          ...medicineActivity,
+                          medicine_name: newMedicineName,
+                          title: newMedicineName,
+                          detail: newDetail
+                        });
+                      }}
+                      placeholder="e.g., Tylenol, Calpol"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="dosage"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Dosage
+                    </label>
+                    <input
+                      id="dosage"
+                      type="text"
+                      required
+                      value={(activity as Medicine).dosage}
+                      onChange={(e) => {
+                        const newDosage = e.target.value;
+                        const medicineActivity = activity as Medicine;
+                        const oldAutoDetail = medicineActivity.medicine_name && medicineActivity.dosage
+                          ? `${medicineActivity.medicine_name} - ${medicineActivity.dosage}`
+                          : '';
+                        const isAutoGenerated = !medicineActivity.detail || medicineActivity.detail === oldAutoDetail;
+                        const newDetail = isAutoGenerated && medicineActivity.medicine_name
+                          ? `${medicineActivity.medicine_name} - ${newDosage}`
+                          : medicineActivity.detail || '';
+                        setActivity({
+                          ...medicineActivity,
+                          dosage: newDosage,
+                          detail: newDetail
+                        });
+                      }}
+                      placeholder="e.g., 5ml, 2.5mg"
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
                     />
                   </div>

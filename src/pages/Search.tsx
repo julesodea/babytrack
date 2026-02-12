@@ -7,13 +7,14 @@ import { useBaby } from "../contexts/BabyContext";
 import { getFeeds } from "../lib/api/feeds";
 import { getDiapers } from "../lib/api/diapers";
 import { getSleeps } from "../lib/api/sleeps";
+import { getMedicines } from "../lib/api/medicines";
 
 interface ActivityItem {
   id: string;
   detail: string;
   time: string;
   user: string;
-  type: "feed" | "diaper" | "sleep";
+  type: "feed" | "diaper" | "sleep" | "medicine";
   date: string;
   notes: string | null;
   created_at: string;
@@ -40,10 +41,11 @@ export function Search() {
     queryFn: async () => {
       if (!selectedBaby) return [];
 
-      const [feeds, diapers, sleeps] = await Promise.all([
+      const [feeds, diapers, sleeps, medicines] = await Promise.all([
         getFeeds(selectedBaby.id),
         getDiapers(selectedBaby.id),
         getSleeps(selectedBaby.id),
+        getMedicines(selectedBaby.id),
       ]);
 
       // Map feeds to ActivityItem format
@@ -82,11 +84,24 @@ export function Search() {
         created_at: s.created_at,
       }));
 
+      // Map medicines to ActivityItem format
+      const medicineActivities: ActivityItem[] = medicines.map((m) => ({
+        id: m.id,
+        detail: m.detail || "",
+        time: m.time,
+        user: m.caregiver,
+        type: "medicine" as const,
+        date: m.date,
+        notes: m.notes,
+        created_at: m.created_at,
+      }));
+
       // Combine all activities and sort by date + time (most recent first)
       const allActivities = [
         ...feedActivities,
         ...diaperActivities,
         ...sleepActivities,
+        ...medicineActivities,
       ];
       allActivities.sort((a, b) => {
         const dateTimeA = `${a.date}T${a.time}`;
