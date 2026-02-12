@@ -14,7 +14,7 @@ export function IconPill({ className }: IconProps) {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.5}
-        d="M7 7H17V17H7V7ZM12 9V15M9 12H15"
+        d="M5 5H19V19H5V5ZM12 8V16M8 12H16"
       />
     </svg>
   );
