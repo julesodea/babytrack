@@ -10,7 +10,6 @@ import {
 import { ActivityRow } from "../components/ActivityRow";
 import { Pagination } from "../components/Pagination";
 import { useColorScheme } from "../context/ColorSchemeContext";
-import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
 import { getMedicines, deleteMedicines } from "../lib/api/medicines";
 
