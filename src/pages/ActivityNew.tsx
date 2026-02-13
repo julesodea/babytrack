@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDashboard } from "../components/icons";
+import { IconDashboard, IconBottle, IconDiaper, IconMoon, IconUser, IconCalendar } from "../components/icons";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useBaby } from "../contexts/BabyContext";
@@ -9,6 +9,8 @@ import { createFeed } from "../lib/api/feeds";
 import { createDiaper } from "../lib/api/diapers";
 import { createSleep } from "../lib/api/sleeps";
 import { getPreferences } from "../lib/api/preferences";
+import { Select } from "../components/Select";
+import { TimePicker } from "../components/TimePicker";
 
 // Helper function to get current time in HH:MM format
 const getCurrentTime = (): string => {
@@ -243,18 +245,19 @@ export function ActivityNew() {
               >
                 Activity Type
               </label>
-              <select
+              <Select
                 id="activityType"
                 value={activityType}
-                onChange={(e) =>
-                  setActivityType(e.target.value as "feed" | "diaper" | "sleep")
+                onChange={(value) =>
+                  setActivityType(value as "feed" | "diaper" | "sleep")
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-              >
-                <option value="feed">Feed</option>
-                <option value="diaper">Diaper</option>
-                <option value="sleep">Sleep</option>
-              </select>
+                options={[
+                  { value: "feed", label: "Feed" },
+                  { value: "diaper", label: "Diaper" },
+                  { value: "sleep", label: "Sleep" },
+                ]}
+                icon={<IconCalendar className="w-4 h-4 text-gray-400" />}
+              />
             </div>
 
             {/* Feed Fields */}
@@ -267,21 +270,22 @@ export function ActivityNew() {
                   >
                     Feed Type
                   </label>
-                  <select
+                  <Select
                     id="feedType"
                     value={feedData.type}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setFeedData({
                         ...feedData,
-                        type: e.target.value as "bottle" | "breast" | "solid",
+                        type: value as "bottle" | "breast" | "solid",
                       })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="bottle">Bottle</option>
-                    <option value="breast">Breast</option>
-                    <option value="solid">Solid Food</option>
-                  </select>
+                    options={[
+                      { value: "bottle", label: "Bottle" },
+                      { value: "breast", label: "Breast" },
+                      { value: "solid", label: "Solid Food" },
+                    ]}
+                    icon={<IconBottle className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
                 <div>
                   <label
@@ -311,15 +315,13 @@ export function ActivityNew() {
                   >
                     Time
                   </label>
-                  <input
+                  <TimePicker
                     id="feedTime"
-                    type="time"
-                    required
                     value={feedData.time}
-                    onChange={(e) =>
-                      setFeedData({ ...feedData, time: e.target.value })
+                    onChange={(time) =>
+                      setFeedData({ ...feedData, time })
                     }
-                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
+                    required
                   />
                 </div>
                 <div>
@@ -329,20 +331,21 @@ export function ActivityNew() {
                   >
                     Caregiver
                   </label>
-                  <select
+                  <Select
                     id="feedCaregiver"
                     required
                     value={feedData.caregiver}
-                    onChange={(e) =>
-                      setFeedData({ ...feedData, caregiver: e.target.value })
+                    onChange={(value) =>
+                      setFeedData({ ...feedData, caregiver: value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="">Select caregiver</option>
-                    <option value="Mum">Mum</option>
-                    <option value="Dad">Dad</option>
-                    <option value="Other">Other</option>
-                  </select>
+                    options={[
+                      { value: "Mum", label: "Mum" },
+                      { value: "Dad", label: "Dad" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    placeholder="Select caregiver"
+                    icon={<IconUser className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
               </>
             )}
@@ -357,21 +360,22 @@ export function ActivityNew() {
                   >
                     Diaper Type
                   </label>
-                  <select
+                  <Select
                     id="diaperType"
                     value={diaperData.type}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setDiaperData({
                         ...diaperData,
-                        type: e.target.value as "wet" | "dirty" | "both",
+                        type: value as "wet" | "dirty" | "both",
                       })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="wet">Wet</option>
-                    <option value="dirty">Dirty</option>
-                    <option value="both">Both</option>
-                  </select>
+                    options={[
+                      { value: "wet", label: "Wet" },
+                      { value: "dirty", label: "Dirty" },
+                      { value: "both", label: "Both" },
+                    ]}
+                    icon={<IconDiaper className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
                 <div>
                   <label
@@ -380,15 +384,13 @@ export function ActivityNew() {
                   >
                     Time
                   </label>
-                  <input
+                  <TimePicker
                     id="diaperTime"
-                    type="time"
-                    required
                     value={diaperData.time}
-                    onChange={(e) =>
-                      setDiaperData({ ...diaperData, time: e.target.value })
+                    onChange={(time) =>
+                      setDiaperData({ ...diaperData, time })
                     }
-                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
+                    required
                   />
                 </div>
                 <div>
@@ -398,23 +400,24 @@ export function ActivityNew() {
                   >
                     Caregiver
                   </label>
-                  <select
+                  <Select
                     id="diaperCaregiver"
                     required
                     value={diaperData.caregiver}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setDiaperData({
                         ...diaperData,
-                        caregiver: e.target.value,
+                        caregiver: value,
                       })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="">Select caregiver</option>
-                    <option value="Mum">Mum</option>
-                    <option value="Dad">Dad</option>
-                    <option value="Other">Other</option>
-                  </select>
+                    options={[
+                      { value: "Mum", label: "Mum" },
+                      { value: "Dad", label: "Dad" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    placeholder="Select caregiver"
+                    icon={<IconUser className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label
@@ -447,20 +450,21 @@ export function ActivityNew() {
                   >
                     Sleep Type
                   </label>
-                  <select
+                  <Select
                     id="sleepType"
                     value={sleepData.type}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setSleepData({
                         ...sleepData,
-                        type: e.target.value as "nap" | "overnight",
+                        type: value as "nap" | "overnight",
                       })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="nap">Nap</option>
-                    <option value="overnight">Overnight</option>
-                  </select>
+                    options={[
+                      { value: "nap", label: "Nap" },
+                      { value: "overnight", label: "Overnight" },
+                    ]}
+                    icon={<IconMoon className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
                 <div>
                   <label
@@ -469,15 +473,13 @@ export function ActivityNew() {
                   >
                     Start Time
                   </label>
-                  <input
+                  <TimePicker
                     id="startTime"
-                    type="time"
-                    required
                     value={sleepData.startTime}
-                    onChange={(e) =>
-                      setSleepData({ ...sleepData, startTime: e.target.value })
+                    onChange={(time) =>
+                      setSleepData({ ...sleepData, startTime: time })
                     }
-                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left"
+                    required
                   />
                 </div>
                 <div>
@@ -487,18 +489,14 @@ export function ActivityNew() {
                   >
                     End Time
                   </label>
-                  <input
+                  <TimePicker
                     id="endTime"
-                    type="time"
+                    value={sleepData.endTime}
+                    onChange={(time) =>
+                      setSleepData({ ...sleepData, endTime: time })
+                    }
                     required={!isOngoing}
                     disabled={isOngoing}
-                    value={sleepData.endTime}
-                    onChange={(e) =>
-                      setSleepData({ ...sleepData, endTime: e.target.value })
-                    }
-                    className={`px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all text-left ${
-                      isOngoing ? "bg-gray-100 cursor-not-allowed" : ""
-                    }`}
                   />
                 </div>
                 <div>
@@ -542,20 +540,21 @@ export function ActivityNew() {
                   >
                     Caregiver
                   </label>
-                  <select
+                  <Select
                     id="sleepCaregiver"
                     required
                     value={sleepData.caregiver}
-                    onChange={(e) =>
-                      setSleepData({ ...sleepData, caregiver: e.target.value })
+                    onChange={(value) =>
+                      setSleepData({ ...sleepData, caregiver: value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all bg-white"
-                  >
-                    <option value="">Select caregiver</option>
-                    <option value="Mum">Mum</option>
-                    <option value="Dad">Dad</option>
-                    <option value="Other">Other</option>
-                  </select>
+                    options={[
+                      { value: "Mum", label: "Mum" },
+                      { value: "Dad", label: "Dad" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    placeholder="Select caregiver"
+                    icon={<IconUser className="w-4 h-4 text-gray-400" />}
+                  />
                 </div>
               </>
             )}

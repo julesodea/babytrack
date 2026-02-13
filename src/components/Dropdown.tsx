@@ -61,7 +61,7 @@ export function Dropdown({
         disabled={disabled}
         className={`w-full flex items-center justify-between px-4 py-2.5 ${
           icon ? "pl-10" : ""
-        } border border-gray-200 rounded-xl text-sm transition-all shadow-sm ${
+        } border border-gray-200 rounded-xl text-sm transition-all ${
           disabled
             ? "bg-gray-100 cursor-not-allowed text-gray-500"
             : "bg-white hover:bg-gray-50 cursor-pointer"
