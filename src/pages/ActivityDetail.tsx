@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { IconDashboard, IconDiaper, IconBottle, IconMoon, IconPill, IconUser } from "../components/icons";
+import { IconDashboard, IconDiaper, IconBottle, IconMoon, IconUser } from "../components/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { useColorScheme } from "../context/ColorSchemeContext";
 import { useBaby } from "../contexts/BabyContext";
