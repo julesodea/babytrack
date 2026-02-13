@@ -8,7 +8,6 @@ import {
   IconDiaper,
   IconFilter,
   IconMoon,
-  IconPill,
   IconSearch,
 } from "../components/icons";
 import { ActivityRow } from "../components/ActivityRow";
