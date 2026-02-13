@@ -16,7 +16,6 @@ import { getMedicines, deleteMedicines } from "../lib/api/medicines";
 
 export function Medicine() {
   const { colorScheme } = useColorScheme();
-  const { user } = useAuth();
   const { selectedBaby } = useBaby();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
