@@ -30,7 +30,9 @@ export function TimePicker({
   useEffect(() => {
     const parsed = parseTimeString(value);
     setSelectedHour(parsed.hour);
-    setSelectedMinute(parsed.minute);
+    // Round minute to nearest 5
+    const roundedMinute = Math.round(parsed.minute / 5) * 5;
+    setSelectedMinute(roundedMinute === 60 ? 55 : roundedMinute);
     setSelectedPeriod(parsed.period);
   }, [value]);
 
@@ -55,8 +57,8 @@ export function TimePicker({
   // Generate hour options (1-12)
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  // Generate minute options (0-59)
-  const minutes = Array.from({ length: 60 }, (_, i) => i);
+  // Generate minute options in 5-minute increments (0, 5, 10, ..., 55)
+  const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
 
   // Format display value
   const displayValue = `${selectedHour}:${String(selectedMinute).padStart(2, "0")} ${selectedPeriod}`;
@@ -90,20 +92,20 @@ export function TimePicker({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4">
-            <div className="space-y-3">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3">
+            <div className="space-y-2.5">
               {/* Hour Selection */}
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">
                   Hour
                 </label>
-                <div className="grid grid-cols-6 gap-1 max-h-32 overflow-y-auto">
+                <div className="grid grid-cols-6 gap-1">
                   {hours.map((h) => (
                     <button
                       key={h}
                       type="button"
                       onClick={() => handleHourChange(h)}
-                      className={`px-2 py-2 text-sm text-center rounded-md transition-colors ${
+                      className={`px-2 py-1.5 text-sm text-center rounded-md transition-colors ${
                         selectedHour === h
                           ? `${colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg} text-white`
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
@@ -120,13 +122,13 @@ export function TimePicker({
                 <label className="block text-xs font-medium text-gray-600 mb-1">
                   Minute
                 </label>
-                <div className="grid grid-cols-10 gap-1 max-h-40 overflow-y-auto">
+                <div className="grid grid-cols-6 gap-1">
                   {minutes.map((m) => (
                     <button
                       key={m}
                       type="button"
                       onClick={() => handleMinuteChange(m)}
-                      className={`py-2 text-xs text-center rounded-md transition-colors ${
+                      className={`px-2 py-1.5 text-sm text-center rounded-md transition-colors ${
                         selectedMinute === m
                           ? `${colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg} text-white`
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
@@ -140,14 +142,11 @@ export function TimePicker({
 
               {/* Period Selection */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Period
-                </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-1.5">
                   <button
                     type="button"
                     onClick={() => handlePeriodChange("AM")}
-                    className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                    className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
                       selectedPeriod === "AM"
                         ? `${colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg} text-white`
                         : "bg-gray-50 text-gray-700 hover:bg-gray-100"
@@ -158,7 +157,7 @@ export function TimePicker({
                   <button
                     type="button"
                     onClick={() => handlePeriodChange("PM")}
-                    className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                    className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
                       selectedPeriod === "PM"
                         ? `${colorScheme.id === "default" ? "bg-gray-900" : colorScheme.cardBg} text-white`
                         : "bg-gray-50 text-gray-700 hover:bg-gray-100"
@@ -170,17 +169,17 @@ export function TimePicker({
               </div>
             </div>
 
-            {/* Done button */}
+            {/* Select button */}
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className={`w-full mt-3 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full mt-2.5 px-4 py-1.5 text-white rounded-lg text-sm font-medium transition-colors ${
                 colorScheme.id === "default"
                   ? "bg-gray-900 hover:bg-gray-800"
                   : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
               }`}
             >
-              Done
+              Select
             </button>
           </div>
         </>
