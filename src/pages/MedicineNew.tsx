@@ -86,7 +86,7 @@ export function MedicineNew() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       {/* Breadcrumb */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <Link
@@ -118,7 +118,7 @@ export function MedicineNew() {
 
       {/* Form Card */}
       <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="medicine-log-form" onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
@@ -242,27 +242,31 @@ export function MedicineNew() {
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
-
-          <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                colorScheme.id === "default"
-                  ? "bg-gray-900 hover:bg-gray-800"
-                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-              }`}
-            >
-              {loading ? "Saving..." : "Log Medicine"}
-            </button>
-            <Link
-              to="/medicine"
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-            >
-              Cancel
-            </Link>
-          </div>
         </form>
+      </div>
+
+      {/* Sticky log buttons */}
+      <div className="fixed bottom-0 left-0 right-0 lg:left-72 z-20 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] px-4 sm:px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+          <button
+            type="submit"
+            form="medicine-log-form"
+            disabled={loading}
+            className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+              colorScheme.id === "default"
+                ? "bg-gray-900 hover:bg-gray-800"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            }`}
+          >
+            {loading ? "Saving..." : "Log Medicine"}
+          </button>
+          <Link
+            to="/medicine"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+          >
+            Cancel
+          </Link>
+        </div>
       </div>
     </div>
   );

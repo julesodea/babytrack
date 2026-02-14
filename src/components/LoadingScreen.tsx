@@ -3,7 +3,10 @@ import { useColorScheme, colorHexMap } from "../context/ColorSchemeContext";
 
 export function LoadingScreen() {
   const { colorScheme } = useColorScheme();
-  const backgroundColor = colorHexMap[colorScheme.id] || colorHexMap.default;
+  const backgroundColor =
+    colorScheme.id === "default"
+      ? colorHexMap.blue
+      : colorHexMap[colorScheme.id] || colorHexMap.default;
 
   return (
     <div
