@@ -166,7 +166,8 @@ export function Feed() {
     }
 
     const maxCount = Math.max(...counts, 1);
-    const minVolume = Math.min(...volumes.filter((v) => v > 0));
+    const nonZeroVols = volumes.filter((v) => v > 0);
+    const minVolume = nonZeroVols.length > 0 ? Math.min(...nonZeroVols) : 0;
     const maxVolume = Math.max(...volumes, 1);
 
     return { days, counts, volumes, maxCount, minVolume, maxVolume };
@@ -438,25 +439,26 @@ export function Feed() {
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2">
-                    <div
-                      className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
-                          ? "bg-gray-400"
-                          : "bg-white/30"
-                        }`}
-                      style={{
-                        width:
-                          graphData.volumes[i] > 0
-                            ? `${20 +
-                            ((graphData.volumes[i] - graphData.minVolume) /
-                              (graphData.maxVolume - graphData.minVolume)) *
-                            80
-                            }%`
-                            : "0%",
-                        minWidth: graphData.volumes[i] > 0 ? "24px" : "0px",
-                      }}
-                    ></div>
+                    <div className="flex-1">
+                      <div
+                        className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
+                            ? "bg-gray-400"
+                            : "bg-white/30"
+                          }`}
+                        style={{
+                          width: (() => {
+                            const v = graphData.volumes[i];
+                            if (v === 0) return "0%";
+                            const range = graphData.maxVolume - graphData.minVolume;
+                            if (range === 0) return "100%";
+                            return `${20 + ((v - graphData.minVolume) / range) * 80}%`;
+                          })(),
+                          minWidth: graphData.volumes[i] > 0 ? "24px" : "0px",
+                        }}
+                      ></div>
+                    </div>
                     <span
-                      className={`text-sm font-semibold min-w-[48px] ${colorScheme.id === "default"
+                      className={`text-sm font-semibold w-[52px] text-right ${colorScheme.id === "default"
                           ? "text-gray-900"
                           : "text-white"
                         }`}
@@ -500,19 +502,20 @@ export function Feed() {
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2">
-                    <div
-                      className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
-                          ? "bg-gray-600"
-                          : "bg-white/30"
-                        }`}
-                      style={{
-                        width: `${(graphData.counts[i] / graphData.maxCount) * 100
-                          }%`,
-                        minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
-                      }}
-                    ></div>
+                    <div className="flex-1">
+                      <div
+                        className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
+                            ? "bg-gray-600"
+                            : "bg-white/30"
+                          }`}
+                        style={{
+                          width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
+                          minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
+                        }}
+                      ></div>
+                    </div>
                     <span
-                      className={`text-sm font-semibold min-w-[24px] ${colorScheme.id === "default"
+                      className={`text-sm font-semibold w-6 text-right ${colorScheme.id === "default"
                           ? "text-gray-900"
                           : "text-white"
                         }`}
