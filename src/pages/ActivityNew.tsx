@@ -205,7 +205,7 @@ export function ActivityNew() {
   };
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-3 text-gray-400 text-sm font-medium">
         <Link
@@ -568,9 +568,8 @@ export function ActivityNew() {
         </form>
       </div>
 
-      {/* Sticky log buttons */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-72 z-20 bg-white/95 backdrop-blur-sm border-t border-gray-100 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] px-4 sm:px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto flex items-center gap-3">
+      {/* Log buttons */}
+      <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
             form="activity-log-form"
@@ -593,7 +592,6 @@ export function ActivityNew() {
           >
             Cancel
           </Link>
-        </div>
       </div>
     </div>
   );
