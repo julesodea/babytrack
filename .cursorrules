@@ -1,0 +1,26 @@
+# Commit Message Rules
+
+Follow the Conventional Commits standard.
+
+All commit messages must start with one of:
+
+- feat: for new features
+- fix: for bug fixes
+- refactor: for code refactoring without behavior changes
+- docs: for documentation changes
+- style: for formatting changes only
+- test: for tests
+- chore: for maintenance tasks
+
+Format:
+
+<type>: <short description>
+
+Examples:
+feat: add map marker clustering
+fix: correct distance calculation bug
+refactor: simplify sidebar state logic
+
+Keep descriptions under 72 characters.
+Use present tense.
+Do not capitalize the first letter unless necessary.

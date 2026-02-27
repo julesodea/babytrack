@@ -21,6 +21,7 @@ export function Weight() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"stats" | "graph">("stats");
   const itemsPerPage = 24;
 
   const { data = [], isLoading: loading } = useQuery({
@@ -38,7 +39,7 @@ export function Weight() {
     },
   });
 
-  // Sort chronologically (oldest first) for stats calculations
+  // Sort chronologically (oldest first) for stats and graph
   const chronological = [...data].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
     return a.time < b.time ? -1 : 1;
@@ -59,6 +60,23 @@ export function Weight() {
           return null;
         })()
       : null;
+
+  // Graph: up to last 10 entries with the same unit as the latest
+  const graphEntries = latestEntry
+    ? chronological
+        .filter((e) => e.unit === latestEntry.unit)
+        .slice(-10)
+    : [];
+
+  const graphValues = graphEntries.map((e) => parseFloat(e.value));
+  const minVal = graphValues.length > 0 ? Math.min(...graphValues) : 0;
+  const maxVal = graphValues.length > 0 ? Math.max(...graphValues) : 1;
+  const range = maxVal - minVal;
+
+  const barHeightPct = (val: number) => {
+    if (range === 0) return 70;
+    return 15 + ((val - minVal) / range) * 80;
+  };
 
   const filteredData = data.filter((item) => {
     if (!searchQuery) return true;
@@ -122,8 +140,30 @@ export function Weight() {
         </p>
       </div>
 
-      {/* Add Button */}
-      <div className="flex justify-end">
+      {/* View Toggle + Add Button */}
+      <div className="flex items-center justify-between flex-wrap gap-y-3">
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setViewMode("stats")}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "stats"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Stats
+          </button>
+          <button
+            onClick={() => setViewMode("graph")}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "graph"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Graph
+          </button>
+        </div>
         <Link
           to="/weight/new"
           className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
@@ -138,138 +178,207 @@ export function Weight() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Latest Weight */}
-        <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
-        >
+      {viewMode === "stats" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Latest Weight */}
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
               colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
             }`}
           >
-            <IconScale
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+                colorScheme.id === "default"
+                  ? "bg-gray-50 border border-gray-100"
+                  : "bg-white/20"
               }`}
-            />
-          </div>
-          <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
-          >
-            Latest Weight
-          </p>
-          {latestEntry ? (
-            <>
-              <div className="flex items-baseline gap-2">
-                <span
-                  className={`text-4xl font-semibold tracking-tight ${
-                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
+            >
+              <IconScale
+                className={`w-7 h-7 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+            </div>
+            <p
+              className={`text-sm font-medium mb-2 ${
+                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
+            >
+              Latest Weight
+            </p>
+            {latestEntry ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`text-4xl font-semibold tracking-tight ${
+                      colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                    }`}
+                  >
+                    {latestEntry.value}
+                  </span>
+                  <span
+                    className={`text-xl font-medium ${
+                      colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                    }`}
+                  >
+                    {latestEntry.unit}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm mt-2 ${
+                    colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
                   }`}
                 >
-                  {latestEntry.value}
-                </span>
-                <span
-                  className={`text-xl font-medium ${
-                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-                  }`}
-                >
-                  {latestEntry.unit}
-                </span>
-              </div>
+                  {latestEntry.name} &mdash; {latestEntry.date}
+                </p>
+              </>
+            ) : (
               <p
-                className={`text-sm mt-2 ${
+                className={`text-lg ${
                   colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
                 }`}
               >
-                {latestEntry.name} &mdash; {latestEntry.date}
+                No entries yet
               </p>
-            </>
-          ) : (
-            <p
-              className={`text-lg ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-              }`}
-            >
-              No entries yet
-            </p>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Total Gain */}
+          {/* Total Gain */}
+          <div
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+              colorScheme.id === "default"
+                ? "bg-white border-gray-100"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+            }`}
+          >
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+                colorScheme.id === "default"
+                  ? "bg-gray-50 border border-gray-100"
+                  : "bg-white/20"
+              }`}
+            >
+              <IconCalendar
+                className={`w-7 h-7 ${
+                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
+              />
+            </div>
+            <p
+              className={`text-sm font-medium mb-2 ${
+                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
+            >
+              Total Gain
+            </p>
+            {totalGain ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`text-4xl font-semibold tracking-tight ${
+                      colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                    }`}
+                  >
+                    {totalGain.value >= 0 ? "+" : ""}
+                    {totalGain.value.toFixed(3).replace(/\.?0+$/, "")}
+                  </span>
+                  <span
+                    className={`text-xl font-medium ${
+                      colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                    }`}
+                  >
+                    {totalGain.unit}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm mt-2 ${
+                    colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  }`}
+                >
+                  Since {chronological[0]?.name} ({chronological[0]?.date})
+                </p>
+              </>
+            ) : (
+              <p
+                className={`text-lg ${
+                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
+              >
+                {data.length < 2 ? "Add more entries to see gain" : "Mixed units"}
+              </p>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Graph View */
         <div
           className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+              : `${colorScheme.cardBg} border-transparent`
           }`}
         >
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
-            }`}
-          >
-            <IconCalendar
-              className={`w-7 h-7 ${
+          <div className="flex items-center gap-3 mb-8">
+            <IconScale
+              className={`w-6 h-6 ${
                 colorScheme.id === "default" ? "text-gray-700" : "text-white"
               }`}
             />
+            <h3
+              className={`text-base font-semibold ${
+                colorScheme.id === "default" ? "text-gray-900" : "text-white"
+              }`}
+            >
+              Weight Over Time{latestEntry ? ` (${latestEntry.unit})` : ""}
+            </h3>
           </div>
-          <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
-          >
-            Total Gain
-          </p>
-          {totalGain ? (
-            <>
-              <div className="flex items-baseline gap-2">
-                <span
-                  className={`text-4xl font-semibold tracking-tight ${
-                    colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                  }`}
-                >
-                  {totalGain.value >= 0 ? "+" : ""}
-                  {totalGain.value.toFixed(3).replace(/\.?0+$/, "")}
-                </span>
-                <span
-                  className={`text-xl font-medium ${
-                    colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-                  }`}
-                >
-                  {totalGain.unit}
-                </span>
-              </div>
-              <p
-                className={`text-sm mt-2 ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-                }`}
-              >
-                Since {chronological[0]?.name} ({chronological[0]?.date})
-              </p>
-            </>
+
+          {graphEntries.length > 0 ? (
+            <div className="flex items-end gap-2 h-48">
+              {graphEntries.map((entry) => {
+                const pct = barHeightPct(parseFloat(entry.value));
+                return (
+                  <div
+                    key={entry.id}
+                    className="flex-1 flex flex-col items-center justify-end gap-1 h-full min-w-0"
+                  >
+                    <span
+                      className={`text-[10px] font-semibold leading-none ${
+                        colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                      }`}
+                    >
+                      {entry.value}
+                    </span>
+                    <div
+                      className={`w-full rounded-t-md transition-all ${
+                        colorScheme.id === "default" ? "bg-gray-600" : "bg-white/30"
+                      }`}
+                      style={{ height: `${pct}%` }}
+                    />
+                    <span
+                      className={`text-[10px] truncate w-full text-center leading-none pt-1 ${
+                        colorScheme.id === "default" ? "text-gray-500" : "text-white/70"
+                      }`}
+                    >
+                      {entry.date.slice(5)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <p
               className={`text-lg ${
                 colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
               }`}
             >
-              {data.length < 2 ? "Add more entries to see gain" : "Mixed units"}
+              No entries to display
             </p>
           )}
         </div>
-      </div>
+      )}
 
       {/* List Section */}
       <div className="space-y-6 pt-4">
