@@ -336,13 +336,13 @@ export function Weight() {
           </div>
 
           {graphEntries.length > 0 ? (
-            <div className="flex items-end gap-2 h-48">
+            <div className="flex items-end gap-2 h-48 justify-center">
               {graphEntries.map((entry) => {
                 const pct = barHeightPct(parseFloat(entry.value));
                 return (
                   <div
                     key={entry.id}
-                    className="flex-1 flex flex-col items-center justify-end gap-1 h-full min-w-0"
+                    className="flex-1 max-w-14 flex flex-col items-center justify-end gap-1 h-full min-w-0"
                   >
                     <span
                       className={`text-[10px] font-semibold leading-none ${
