@@ -53,6 +53,15 @@ const BabyManage = lazy(() =>
 const Profile = lazy(() =>
   import("./pages/Profile").then((m) => ({ default: m.Profile }))
 );
+const Weight = lazy(() =>
+  import("./pages").then((m) => ({ default: m.Weight }))
+);
+const WeightEdit = lazy(() =>
+  import("./pages").then((m) => ({ default: m.WeightEdit }))
+);
+const WeightNew = lazy(() =>
+  import("./pages").then((m) => ({ default: m.WeightNew }))
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,6 +104,9 @@ function App() {
                   <Route path="/settings" element={<Preferences />} />
                   <Route path="/activity/new" element={<ActivityNew />} />
                   <Route path="/activity/:id" element={<ActivityDetail />} />
+                  <Route path="/weight" element={<Weight />} />
+                  <Route path="/weight/new" element={<WeightNew />} />
+                  <Route path="/weight/:id/edit" element={<WeightEdit />} />
                   <Route path="/babies/new" element={<BabyNew />} />
                   <Route path="/babies/manage" element={<BabyManage />} />
                   <Route path="/profile" element={<Profile />} />

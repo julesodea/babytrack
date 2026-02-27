@@ -91,14 +91,11 @@ export function Diaper() {
   const getDiaperAlertMessage = () => {
     const hours = Math.floor(hoursSinceLastDiaper);
     if (hours === Infinity)
-      return `${
-        selectedBaby?.name || "Baby"
-      }'s diaper hasn't been checked yet. Please check!`;
-    return `${
-      selectedBaby?.name || "Baby"
-    }'s diaper hasn't been changed in ${hours} ${
-      hours === 1 ? "hour" : "hours"
-    }. Please check!`;
+      return `${selectedBaby?.name || "Baby"
+        }'s diaper hasn't been checked yet. Please check!`;
+    return `${selectedBaby?.name || "Baby"
+      }'s diaper hasn't been changed in ${hours} ${hours === 1 ? "hour" : "hours"
+      }. Please check!`;
   };
 
   const filteredData = data.filter((item) => {
@@ -154,7 +151,7 @@ export function Diaper() {
     const counts = [];
     const wetCounts = [];
     const dirtyCounts = [];
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
@@ -162,16 +159,16 @@ export function Diaper() {
       const dayDiapers = data.filter(d => d.date === dateStr);
       const wet = dayDiapers.filter(d => d.type === "wet" || d.type === "both").length;
       const dirty = dayDiapers.filter(d => d.type === "dirty" || d.type === "both").length;
-      
+
       days.push(dateStr.slice(5)); // MM-DD format
       counts.push(dayDiapers.length);
       wetCounts.push(wet);
       dirtyCounts.push(dirty);
     }
-    
+
     const maxCount = Math.max(...counts, 1);
     const maxTypeCount = Math.max(...wetCounts, ...dirtyCounts, 1);
-    
+
     return { days, counts, wetCounts, dirtyCounts, maxCount, maxTypeCount };
   };
 
@@ -235,9 +232,8 @@ export function Diaper() {
                       setStatsDate(today);
                       setShowStatsDateDropdown(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${
-                      statsDate === today ? "bg-gray-100 font-medium" : ""
-                    }`}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-xl ${statsDate === today ? "bg-gray-100 font-medium" : ""
+                      }`}
                   >
                     Today ({today})
                   </button>
@@ -250,9 +246,8 @@ export function Diaper() {
                           setStatsDate(date);
                           setShowStatsDateDropdown(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${
-                          statsDate === date ? "bg-gray-100 font-medium" : ""
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 last:rounded-b-xl ${statsDate === date ? "bg-gray-100 font-medium" : ""
+                          }`}
                       >
                         {date}
                       </button>
@@ -264,21 +259,19 @@ export function Diaper() {
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode("stats")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                viewMode === "stats"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "stats"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               Stats
             </button>
             <button
               onClick={() => setViewMode("graph")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                viewMode === "graph"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "graph"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               Graph
             </button>
@@ -286,11 +279,10 @@ export function Diaper() {
         </div>
         <Link
           to="/diaper/new"
-          className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
-            colorScheme.id === "default"
-              ? "bg-gray-900 hover:bg-gray-800"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-          }`}
+          className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${colorScheme.id === "default"
+            ? "bg-gray-900 hover:bg-gray-800"
+            : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            }`}
         >
           <span className="text-lg leading-none">+</span>
           Add Change
@@ -302,52 +294,45 @@ export function Diaper() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Card 1 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-            }`}
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+              }`}
           >
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-                colorScheme.id === "default"
-                  ? "bg-gray-50 border border-gray-100"
-                  : "bg-white/20"
-              }`}
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+                }`}
             >
               <IconDiaper
-                className={`w-7 h-7 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
             </div>
             <p
-              className={`text-sm font-medium mb-2 ${
-                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-              }`}
+              className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+                }`}
             >
               Changes {statsDate === today ? "Today" : `on ${statsDate}`}
             </p>
             <div className="flex items-baseline gap-2">
               <span
-                className={`text-4xl font-semibold tracking-tight ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
                 {totalChanges}
               </span>
               <span
-                className={`text-xl font-medium ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-                }`}
+                className={`text-xl font-medium ${colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                  }`}
               >
                 Changes
               </span>
             </div>
             <p
-              className={`text-sm mt-2 ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-              }`}
+              className={`text-sm mt-2 ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                }`}
             >
               {wetCount} Wet, {dirtyCount} Dirty
             </p>
@@ -355,29 +340,25 @@ export function Diaper() {
 
           {/* Card 2 */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-            }`}
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+              }`}
           >
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-                colorScheme.id === "default"
-                  ? "bg-gray-50 border border-gray-100"
-                  : "bg-white/20"
-              }`}
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
+                }`}
             >
               <IconCalendar
-                className={`w-7 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-7 h-6 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
             </div>
             <p
-              className={`text-sm font-medium mb-2 ${
-                colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-              }`}
+              className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+                }`}
             >
               Last Change
             </p>
@@ -385,39 +366,35 @@ export function Diaper() {
               <>
                 <div className="flex items-baseline gap-2">
                   <span
-                    className={`text-4xl font-semibold tracking-tight ${
-                      colorScheme.id === "default"
-                        ? "text-gray-900"
-                        : "text-white"
-                    }`}
+                    className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default"
+                      ? "text-gray-900"
+                      : "text-white"
+                      }`}
                   >
                     {lastChange.time.split(" ")[0]}
                   </span>
                   <span
-                    className={`text-xl font-medium ${
-                      colorScheme.id === "default"
-                        ? "text-gray-400"
-                        : "text-white/70"
-                    }`}
+                    className={`text-xl font-medium ${colorScheme.id === "default"
+                      ? "text-gray-400"
+                      : "text-white/70"
+                      }`}
                   >
                     {lastChange.time.split(" ")[1] || ""}
                   </span>
                 </div>
                 <p
-                  className={`text-sm mt-2 ${
-                    colorScheme.id === "default"
-                      ? "text-gray-400"
-                      : "text-white/60"
-                  }`}
+                  className={`text-sm mt-2 ${colorScheme.id === "default"
+                    ? "text-gray-400"
+                    : "text-white/60"
+                    }`}
                 >
                   {lastChange.detail} diaper
                 </p>
               </>
             ) : (
               <p
-                className={`text-lg ${
-                  colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-                }`}
+                className={`text-lg ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+                  }`}
               >
                 No changes logged yet
               </p>
@@ -428,22 +405,19 @@ export function Diaper() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Graph Card 1: Total Changes */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} border-transparent`
-            }`}
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} border-transparent`
+              }`}
           >
             <div className="flex items-center gap-3 mb-6">
               <IconDiaper
-                className={`w-6 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-6 h-6 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
               <h3
-                className={`text-base font-semibold ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-base font-semibold ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
                 Total Changes - 7 Days
               </h3>
@@ -452,32 +426,29 @@ export function Diaper() {
               {graphData.days.map((day, i) => (
                 <div key={day} className="flex items-center gap-2">
                   <span
-                    className={`text-xs font-medium w-12 flex-shrink-0 ${
-                      colorScheme.id === "default"
-                        ? "text-gray-500"
-                        : "text-white/70"
-                    }`}
+                    className={`text-xs font-medium w-12 flex-shrink-0 ${colorScheme.id === "default"
+                      ? "text-gray-500"
+                      : "text-white/70"
+                      }`}
                   >
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2 min-w-0">
                     <div
-                      className={`h-8 rounded-md transition-all ${
-                        colorScheme.id === "default"
-                          ? "bg-gray-600"
-                          : "bg-white/30"
-                      }`}
+                      className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
+                        ? "bg-gray-600"
+                        : "bg-white/30"
+                        }`}
                       style={{
                         width: `${(graphData.counts[i] / graphData.maxCount) * 100}%`,
                         minWidth: graphData.counts[i] > 0 ? "24px" : "0px",
                       }}
                     ></div>
                     <span
-                      className={`text-sm font-semibold min-w-[24px] flex-shrink-0 ${
-                        colorScheme.id === "default"
-                          ? "text-gray-900"
-                          : "text-white"
-                      }`}
+                      className={`text-sm font-semibold min-w-[24px] flex-shrink-0 ${colorScheme.id === "default"
+                        ? "text-gray-900"
+                        : "text-white"
+                        }`}
                     >
                       {graphData.counts[i]}
                     </span>
@@ -489,22 +460,19 @@ export function Diaper() {
 
           {/* Graph Card 2: Wet vs Dirty */}
           <div
-            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
-              colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} border-transparent`
-            }`}
+            className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} border-transparent`
+              }`}
           >
             <div className="flex items-center gap-3 mb-6">
               <IconCalendar
-                className={`w-6 h-6 ${
-                  colorScheme.id === "default" ? "text-gray-700" : "text-white"
-                }`}
+                className={`w-6 h-6 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                  }`}
               />
               <h3
-                className={`text-base font-semibold ${
-                  colorScheme.id === "default" ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-base font-semibold ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                  }`}
               >
                 Wet vs Dirty - 7 Days
               </h3>
@@ -513,55 +481,50 @@ export function Diaper() {
               {graphData.days.map((day, i) => (
                 <div key={day} className="flex items-center gap-2">
                   <span
-                    className={`text-xs font-medium w-12 flex-shrink-0 ${
-                      colorScheme.id === "default"
-                        ? "text-gray-500"
-                        : "text-white/70"
-                    }`}
+                    className={`text-xs font-medium w-12 flex-shrink-0 ${colorScheme.id === "default"
+                      ? "text-gray-500"
+                      : "text-white/70"
+                      }`}
                   >
                     {day}
                   </span>
                   <div className="flex-1 flex items-center gap-2 min-w-0">
                     <div className="flex-1 flex items-center gap-1 min-w-0">
                       <div
-                        className={`h-8 rounded-md transition-all ${
-                          colorScheme.id === "default"
-                            ? "bg-gray-400"
-                            : "bg-white/30"
-                        }`}
+                        className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
+                          ? "bg-gray-400"
+                          : "bg-white/30"
+                          }`}
                         style={{
                           width: `${(graphData.wetCounts[i] / graphData.maxTypeCount) * 100}%`,
                           minWidth: graphData.wetCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>
                       <span
-                        className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${
-                          colorScheme.id === "default"
-                            ? "text-gray-900"
-                            : "text-white"
-                        }`}
+                        className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${colorScheme.id === "default"
+                          ? "text-gray-900"
+                          : "text-white"
+                          }`}
                       >
                         {graphData.wetCounts[i]}W
                       </span>
                     </div>
                     <div className="flex-1 flex items-center gap-1 min-w-0">
                       <div
-                        className={`h-8 rounded-md transition-all ${
-                          colorScheme.id === "default"
-                            ? "bg-gray-500"
-                            : "bg-white/30"
-                        }`}
+                        className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
+                          ? "bg-gray-500"
+                          : "bg-white/30"
+                          }`}
                         style={{
                           width: `${(graphData.dirtyCounts[i] / graphData.maxTypeCount) * 100}%`,
                           minWidth: graphData.dirtyCounts[i] > 0 ? "20px" : "0px",
                         }}
                       ></div>
                       <span
-                        className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${
-                          colorScheme.id === "default"
-                            ? "text-gray-900"
-                            : "text-white"
-                        }`}
+                        className={`text-xs font-semibold min-w-[20px] flex-shrink-0 ${colorScheme.id === "default"
+                          ? "text-gray-900"
+                          : "text-white"
+                          }`}
                       >
                         {graphData.dirtyCounts[i]}D
                       </span>
@@ -595,9 +558,8 @@ export function Diaper() {
                   setShowDateDropdown(!showDateDropdown);
                   setShowTypeDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  dateFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconCalendar className="w-5 h-5 text-gray-400" />
                 {dateFilter || "Show by date"}
@@ -634,9 +596,8 @@ export function Diaper() {
                   setShowTypeDropdown(!showTypeDropdown);
                   setShowDateDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  typeFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconFilter className="w-5 h-5 text-gray-400" />
                 {typeFilter
@@ -680,7 +641,7 @@ export function Diaper() {
           {selectedIds.size > 0 && (
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
             >
               Delete ({selectedIds.size})
             </button>
@@ -757,7 +718,7 @@ export function Diaper() {
               <button
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {deleteMutation.isPending ? "Deleting..." : "Delete"}
               </button>

@@ -203,8 +203,8 @@ export function Medicine() {
             <button
               onClick={() => setViewMode("stats")}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "stats"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
                 }`}
             >
               Stats
@@ -212,8 +212,8 @@ export function Medicine() {
             <button
               onClick={() => setViewMode("graph")}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "graph"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
                 }`}
             >
               Graph
@@ -223,8 +223,8 @@ export function Medicine() {
         <Link
           to="/medicine/new"
           className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${colorScheme.id === "default"
-              ? "bg-gray-900 hover:bg-gray-800"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+            ? "bg-gray-900 hover:bg-gray-800"
+            : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
             }`}
         >
           <span className="text-lg leading-none">+</span>
@@ -238,14 +238,14 @@ export function Medicine() {
           {/* Card 1 - Total Medicines */}
           <div
             className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
               }`}
           >
             <div
               className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
-                  ? "bg-gray-50 border border-gray-100"
-                  : "bg-white/20"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
                 }`}
             >
               <IconPill
@@ -268,8 +268,8 @@ export function Medicine() {
               </span>
               <span
                 className={`text-xl font-medium ${colorScheme.id === "default"
-                    ? "text-gray-400"
-                    : "text-white/70"
+                  ? "text-gray-400"
+                  : "text-white/70"
                   }`}
               >
                 Doses
@@ -290,14 +290,14 @@ export function Medicine() {
           {/* Card 2 - Last Medicine */}
           <div
             className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
               }`}
           >
             <div
               className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
-                  ? "bg-gray-50 border border-gray-100"
-                  : "bg-white/20"
+                ? "bg-gray-50 border border-gray-100"
+                : "bg-white/20"
                 }`}
             >
               <IconCalendar
@@ -316,16 +316,16 @@ export function Medicine() {
                 <div className="flex items-baseline gap-2">
                   <span
                     className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default"
-                        ? "text-gray-900"
-                        : "text-white"
+                      ? "text-gray-900"
+                      : "text-white"
                       }`}
                   >
                     {lastMedicine.time.split(" ")[0]}
                   </span>
                   <span
                     className={`text-xl font-medium ${colorScheme.id === "default"
-                        ? "text-gray-400"
-                        : "text-white/70"
+                      ? "text-gray-400"
+                      : "text-white/70"
                       }`}
                   >
                     {lastMedicine.time.split(" ")[1] || ""}
@@ -333,8 +333,8 @@ export function Medicine() {
                 </div>
                 <p
                   className={`text-sm mt-2 ${colorScheme.id === "default"
-                      ? "text-gray-400"
-                      : "text-white/60"
+                    ? "text-gray-400"
+                    : "text-white/60"
                     }`}
                 >
                   {lastMedicine.medicine_name} - {lastMedicine.dosage}
@@ -343,8 +343,8 @@ export function Medicine() {
             ) : (
               <p
                 className={`text-lg ${colorScheme.id === "default"
-                    ? "text-gray-400"
-                    : "text-white/60"
+                  ? "text-gray-400"
+                  : "text-white/60"
                   }`}
               >
                 No medicines logged yet
@@ -357,8 +357,8 @@ export function Medicine() {
           {/* Graph Card: Medicine Count */}
           <div
             className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${colorScheme.id === "default"
-                ? "bg-white border-gray-100"
-                : `${colorScheme.cardBg} border-transparent`
+              ? "bg-white border-gray-100"
+              : `${colorScheme.cardBg} border-transparent`
               }`}
           >
             <div className="flex items-center gap-3 mb-6">
@@ -378,8 +378,8 @@ export function Medicine() {
                 <div key={day} className="flex items-center gap-3">
                   <span
                     className={`text-xs font-medium w-12 ${colorScheme.id === "default"
-                        ? "text-gray-500"
-                        : "text-white/70"
+                      ? "text-gray-500"
+                      : "text-white/70"
                       }`}
                   >
                     {day}
@@ -387,8 +387,8 @@ export function Medicine() {
                   <div className="flex-1 flex items-center gap-2">
                     <div
                       className={`h-8 rounded-md transition-all ${colorScheme.id === "default"
-                          ? "bg-gray-600"
-                          : "bg-white/30"
+                        ? "bg-gray-600"
+                        : "bg-white/30"
                         }`}
                       style={{
                         width: `${(graphData.counts[i] / graphData.maxCount) * 100
@@ -398,8 +398,8 @@ export function Medicine() {
                     ></div>
                     <span
                       className={`text-sm font-semibold min-w-[24px] ${colorScheme.id === "default"
-                          ? "text-gray-900"
-                          : "text-white"
+                        ? "text-gray-900"
+                        : "text-white"
                         }`}
                     >
                       {graphData.counts[i]}
@@ -473,7 +473,7 @@ export function Medicine() {
           {selectedIds.size > 0 && (
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
             >
               Delete ({selectedIds.size})
             </button>
@@ -548,7 +548,7 @@ export function Medicine() {
               <button
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {deleteMutation.isPending ? "Deleting..." : "Delete"}
               </button>

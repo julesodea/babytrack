@@ -181,25 +181,20 @@ export function Dashboard() {
   const getFeedReminderMessage = () => {
     const hours = Math.floor(hoursSinceLastFeed);
     if (hours === Infinity)
-      return `No feed recorded yet for ${
-        selectedBaby?.name || "Baby"
+      return `No feed recorded yet for ${selectedBaby?.name || "Baby"
+        }. Time for a feed!`;
+    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${hours === 1 ? "hour" : "hours"
       }. Time for a feed!`;
-    return `${selectedBaby?.name || "Baby"} hasn't been fed in ${hours} ${
-      hours === 1 ? "hour" : "hours"
-    }. Time for a feed!`;
   };
 
   const getDiaperAlertMessage = () => {
     const hours = Math.floor(hoursSinceLastDiaper);
     if (hours === Infinity)
-      return `No diaper change recorded yet for ${
-        selectedBaby?.name || "Baby"
+      return `No diaper change recorded yet for ${selectedBaby?.name || "Baby"
+        }. Time for a check!`;
+    return `${selectedBaby?.name || "Baby"
+      }'s diaper hasn't been changed in ${hours} ${hours === 1 ? "hour" : "hours"
       }. Time for a check!`;
-    return `${
-      selectedBaby?.name || "Baby"
-    }'s diaper hasn't been changed in ${hours} ${
-      hours === 1 ? "hour" : "hours"
-    }. Time for a check!`;
   };
 
   const uniqueDates = [...new Set(data.map((a) => a.date))];
@@ -369,52 +364,45 @@ export function Dashboard() {
         {/* Card 1 */}
         <Link
           to="/feed"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${colorScheme.id === "default"
+            ? "bg-white border-gray-100"
+            : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+            }`}
         >
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
-            }`}
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
+              ? "bg-gray-50 border border-gray-100"
+              : "bg-white/20"
+              }`}
           >
             <IconBottle
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
-              }`}
+              className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
             />
           </div>
           <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
+            className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
           >
             Total Feeds Today
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-semibold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
-              }`}
+              className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
             >
               {totalFeedsCount}
             </span>
             <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
+              className={`text-xl font-medium ${colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                }`}
             >
               Feeds
             </span>
           </div>
           <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
+            className={`text-sm mt-2 ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+              }`}
           >
             {totalFeedsRecorded} Total Feeds Recorded
           </p>
@@ -423,52 +411,45 @@ export function Dashboard() {
         {/* Card 2 */}
         <Link
           to="/diaper"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${colorScheme.id === "default"
+            ? "bg-white border-gray-100"
+            : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+            }`}
         >
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
-            }`}
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
+              ? "bg-gray-50 border border-gray-100"
+              : "bg-white/20"
+              }`}
           >
             <IconDiaper
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
-              }`}
+              className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
             />
           </div>
           <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
+            className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
           >
             Total Diapers Today
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-semibold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
-              }`}
+              className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
             >
               {totalDiapersCount}
             </span>
             <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
+              className={`text-xl font-medium ${colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                }`}
             >
               Changes
             </span>
           </div>
           <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
+            className={`text-sm mt-2 ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+              }`}
           >
             {totalDiapersRecorded} Total Diaper Changes Recorded
           </p>
@@ -477,52 +458,45 @@ export function Dashboard() {
         {/* Card 3 */}
         <Link
           to="/sleep"
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${
-            colorScheme.id === "default"
-              ? "bg-white border-gray-100"
-              : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
-          }`}
+          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 cursor-pointer ${colorScheme.id === "default"
+            ? "bg-white border-gray-100"
+            : `${colorScheme.cardBg} ${colorScheme.cardBgHover} border-transparent`
+            }`}
         >
           <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              colorScheme.id === "default"
-                ? "bg-gray-50 border border-gray-100"
-                : "bg-white/20"
-            }`}
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${colorScheme.id === "default"
+              ? "bg-gray-50 border border-gray-100"
+              : "bg-white/20"
+              }`}
           >
             <IconMoon
-              className={`w-7 h-7 ${
-                colorScheme.id === "default" ? "text-gray-700" : "text-white"
-              }`}
+              className={`w-7 h-7 ${colorScheme.id === "default" ? "text-gray-700" : "text-white"
+                }`}
             />
           </div>
           <p
-            className={`text-sm font-medium mb-2 ${
-              colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
-            }`}
+            className={`text-sm font-medium mb-2 ${colorScheme.id === "default" ? "text-gray-500" : "text-white/80"
+              }`}
           >
             Total Sleep Today
           </p>
           <div className="flex items-baseline gap-2">
             <span
-              className={`text-4xl font-semibold tracking-tight ${
-                colorScheme.id === "default" ? "text-gray-900" : "text-white"
-              }`}
+              className={`text-4xl font-semibold tracking-tight ${colorScheme.id === "default" ? "text-gray-900" : "text-white"
+                }`}
             >
               {totalSleepLogs}
             </span>
             <span
-              className={`text-xl font-medium ${
-                colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
-              }`}
+              className={`text-xl font-medium ${colorScheme.id === "default" ? "text-gray-400" : "text-white/70"
+                }`}
             >
               Naps
             </span>
           </div>
           <p
-            className={`text-sm mt-2 ${
-              colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
-            }`}
+            className={`text-sm mt-2 ${colorScheme.id === "default" ? "text-gray-400" : "text-white/60"
+              }`}
           >
             {todaySleeps.length} Sleep Logs Today
           </p>
@@ -550,9 +524,8 @@ export function Dashboard() {
                   setShowDateDropdown(!showDateDropdown);
                   setShowTypeDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  dateFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${dateFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconCalendar className="w-5 h-5 text-gray-400" />
                 {dateFilter || "Show by date"}
@@ -583,9 +556,8 @@ export function Dashboard() {
                   setShowTypeDropdown(!showTypeDropdown);
                   setShowDateDropdown(false);
                 }}
-                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${
-                  typeFilter ? "border-gray-900" : "border-gray-200"
-                }`}
+                className={`flex items-center gap-2 h-10 px-4 bg-white border rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm ${typeFilter ? "border-gray-900" : "border-gray-200"
+                  }`}
               >
                 <IconFilter className="w-5 h-5 text-gray-400" />
                 {typeFilter
@@ -624,18 +596,17 @@ export function Dashboard() {
             {selectedIds.size > 0 && (
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Delete ({selectedIds.size})
               </button>
             )}
             <Link
               to="/activity/new"
-              className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
-                colorScheme.id === "default"
-                  ? "bg-gray-900 hover:bg-gray-800"
-                  : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
-              }`}
+              className={`inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors ${colorScheme.id === "default"
+                ? "bg-gray-900 hover:bg-gray-800"
+                : `${colorScheme.cardBg} ${colorScheme.cardBgHover}`
+                }`}
             >
               <span className="text-lg leading-none">+</span>
               Add Activity
@@ -714,7 +685,7 @@ export function Dashboard() {
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-red-300 bg-red-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>

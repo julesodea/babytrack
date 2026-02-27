@@ -13,3 +13,6 @@ export { Preferences } from "./Preferences";
 export { Search } from "./Search";
 export { Sleep } from "./Sleep";
 export { SleepNew } from "./SleepNew";
+export { Weight } from "./Weight";
+export { WeightEdit } from "./WeightEdit";
+export { WeightNew } from "./WeightNew";

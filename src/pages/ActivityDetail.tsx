@@ -9,12 +9,13 @@ import { getFeed, updateFeed } from "../lib/api/feeds";
 import { getDiaper, updateDiaper } from "../lib/api/diapers";
 import { getSleep, updateSleep } from "../lib/api/sleeps";
 import { getMedicine, updateMedicine } from "../lib/api/medicines";
-import type { Feed, Diaper, Sleep, Medicine } from "../types/database";
+import { getWeight, updateWeight } from "../lib/api/weights";
+import type { Feed, Diaper, Sleep, Medicine, Weight } from "../types/database";
 import { Select } from "../components/Select";
 import { DatePicker } from "../components/DatePicker";
 import { TimePicker } from "../components/TimePicker";
 
-type Activity = Feed | Diaper | Sleep | Medicine;
+type Activity = Feed | Diaper | Sleep | Medicine | Weight;
 
 export function ActivityDetail() {
   const { id } = useParams();
@@ -75,6 +76,13 @@ export function ActivityDetail() {
           setLoading(false);
           return;
         }
+      } else if (typeHint === 'weight') {
+        data = await getWeight(id).catch(() => null);
+        if (data) {
+          setActivity(data);
+          setLoading(false);
+          return;
+        }
       }
 
       // If type hint didn't work or wasn't provided, try all tables
@@ -120,8 +128,13 @@ export function ActivityDetail() {
     }
   };
 
-  const getActivityType = (): 'feed' | 'diaper' | 'sleep' | 'medicine' | null => {
+  const getActivityType = (): 'feed' | 'diaper' | 'sleep' | 'medicine' | 'weight' | null => {
     if (!activity) return null;
+
+    // Check for weight (has value and unit fields)
+    if ('value' in activity && 'unit' in activity) {
+      return 'weight';
+    }
 
     // Check for medicine (has medicine_name and dosage fields)
     if ('medicine_name' in activity && 'dosage' in activity) {
@@ -239,6 +252,8 @@ export function ActivityDetail() {
         await updateSleep(id, activity as Sleep);
       } else if (activityType === 'medicine') {
         await updateMedicine(id, activity as Medicine);
+      } else if (activityType === 'weight') {
+        await updateWeight(id, activity as Weight);
       }
 
       // Invalidate queries to refresh the data everywhere
@@ -247,6 +262,7 @@ export function ActivityDetail() {
       await queryClient.invalidateQueries({ queryKey: ["diapers", selectedBaby?.id] });
       await queryClient.invalidateQueries({ queryKey: ["sleeps", selectedBaby?.id] });
       await queryClient.invalidateQueries({ queryKey: ["medicines", selectedBaby?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["weights", selectedBaby?.id] });
 
       setIsEditing(false);
       await loadActivity(); // Reload to get updated data
@@ -262,8 +278,8 @@ export function ActivityDetail() {
   };
 
   const activityType = getActivityType();
-  const title = 'title' in activity ? activity.title : 'Activity';
-  const detail = 'detail' in activity ? activity.detail : '';
+  const title = 'title' in activity ? activity.title : ('name' in activity ? (activity as Weight).name : 'Activity');
+  const detail = 'detail' in activity ? activity.detail : ('value' in activity ? `${(activity as Weight).value} ${(activity as Weight).unit}` : '');
   const time = 'time' in activity ? activity.time : ('start_time' in activity ? activity.start_time : '');
   const caregiver = 'caregiver' in activity ? activity.caregiver : '';
 
@@ -306,10 +322,10 @@ export function ActivityDetail() {
           </p>
           {!isEditing && (
             <Link
-              to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : activityType === 'sleep' ? '/sleep' : '/medicine'}
+              to={activityType === 'feed' ? '/feed' : activityType === 'diaper' ? '/diaper' : activityType === 'sleep' ? '/sleep' : activityType === 'weight' ? '/weight' : '/medicine'}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors mt-3"
             >
-              ← Back to {activityType === 'feed' ? 'Feed Logs' : activityType === 'diaper' ? 'Diaper Changes' : activityType === 'sleep' ? 'Sleep Logs' : 'Medicine Logs'}
+              ← Back to {activityType === 'feed' ? 'Feed Logs' : activityType === 'diaper' ? 'Diaper Changes' : activityType === 'sleep' ? 'Sleep Logs' : activityType === 'weight' ? 'Weight' : 'Medicine Logs'}
             </Link>
           )}
         </div>
@@ -338,6 +354,21 @@ export function ActivityDetail() {
             className="space-y-6"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {activityType === 'weight' && 'name' in activity && (
+                <div>
+                  <label htmlFor="weightName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Name
+                  </label>
+                  <input
+                    id="weightName"
+                    type="text"
+                    required
+                    value={(activity as Weight).name}
+                    onChange={(e) => setActivity({ ...(activity as Weight), name: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                  />
+                </div>
+              )}
               {'date' in activity && (
                 <div>
                   <label
@@ -355,6 +386,41 @@ export function ActivityDetail() {
                     required
                   />
                 </div>
+              )}
+              {activityType === 'weight' && 'value' in activity && (
+                <>
+                  <div>
+                    <label htmlFor="weightValue" className="block text-sm font-medium text-gray-700 mb-2">
+                      Weight
+                    </label>
+                    <input
+                      id="weightValue"
+                      type="number"
+                      step="0.001"
+                      min="0"
+                      required
+                      value={(activity as Weight).value}
+                      onChange={(e) => setActivity({ ...(activity as Weight), value: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="weightUnit" className="block text-sm font-medium text-gray-700 mb-2">
+                      Unit
+                    </label>
+                    <Select
+                      id="weightUnit"
+                      value={(activity as Weight).unit}
+                      onChange={(unit) => setActivity({ ...(activity as Weight), unit })}
+                      options={[
+                        { value: "kg", label: "kg" },
+                        { value: "g", label: "g" },
+                        { value: "lbs", label: "lbs" },
+                        { value: "oz", label: "oz" },
+                      ]}
+                    />
+                  </div>
+                </>
               )}
               {'type' in activity && getActivityType() === 'diaper' && (
                 <div>
@@ -759,6 +825,20 @@ export function ActivityDetail() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {activityType === 'weight' && 'name' in activity && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Name</p>
+                  <p className="text-lg font-medium text-gray-900">{(activity as Weight).name}</p>
+                </div>
+              )}
+              {activityType === 'weight' && 'value' in activity && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Weight</p>
+                  <p className="text-lg font-medium text-gray-900">
+                    {(activity as Weight).value} {(activity as Weight).unit}
+                  </p>
+                </div>
+              )}
               {'date' in activity && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Date</p>

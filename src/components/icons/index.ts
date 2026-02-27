@@ -11,5 +11,6 @@ export { IconMenu } from "./IconMenu";
 export { IconMoon } from "./IconMoon";
 export { IconPill } from "./IconPill";
 export { IconRefresh } from "./IconRefresh";
+export { IconScale } from "./IconScale";
 export { IconSearch } from "./IconSearch";
 export { IconUser } from "./IconUser";

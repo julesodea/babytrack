@@ -250,6 +250,43 @@ export interface Database {
           updated_at?: string;
         };
       };
+      weights: {
+        Row: {
+          id: string;
+          user_id: string;
+          baby_id: string;
+          created_by_user_id: string | null;
+          name: string;
+          value: string;
+          unit: string;
+          notes: string | null;
+          date: string;
+          time: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          baby_id: string;
+          created_by_user_id?: string | null;
+          name: string;
+          value: string;
+          unit: string;
+          notes?: string | null;
+          date: string;
+          time: string;
+        };
+        Update: {
+          name?: string;
+          value?: string;
+          unit?: string;
+          notes?: string | null;
+          date?: string;
+          time?: string;
+          updated_at?: string;
+        };
+      };
       preferences: {
         Row: {
           id: string;
@@ -305,6 +342,7 @@ export type Diaper = Database['public']['Tables']['diapers']['Row'];
 export type Sleep = Database['public']['Tables']['sleeps']['Row'];
 export type Medicine = Database['public']['Tables']['medicines']['Row'];
 export type Preferences = Database['public']['Tables']['preferences']['Row'];
+export type Weight = Database['public']['Tables']['weights']['Row'];
 
 export type BabyShareInsert = Database['public']['Tables']['baby_shares']['Insert'];
 export type BabyShareUpdate = Database['public']['Tables']['baby_shares']['Update'];
@@ -318,3 +356,5 @@ export type MedicineInsert = Database['public']['Tables']['medicines']['Insert']
 export type MedicineUpdate = Database['public']['Tables']['medicines']['Update'];
 export type PreferencesInsert = Database['public']['Tables']['preferences']['Insert'];
 export type PreferencesUpdate = Database['public']['Tables']['preferences']['Update'];
+export type WeightInsert = Database['public']['Tables']['weights']['Insert'];
+export type WeightUpdate = Database['public']['Tables']['weights']['Update'];

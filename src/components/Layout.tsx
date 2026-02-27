@@ -13,6 +13,7 @@ import {
   IconMenu,
   IconMoon,
   IconPill,
+  IconScale,
   IconSearch,
 } from "./icons";
 
@@ -147,6 +148,12 @@ export function Layout() {
             to="/medicine"
             icon={<IconPill className="w-5 h-5" />}
             label="Medicine"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <NavItem
+            to="/weight"
+            icon={<IconScale className="w-5 h-5" />}
+            label="Weight"
             onClick={() => setSidebarOpen(false)}
           />
 
