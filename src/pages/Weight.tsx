@@ -313,8 +313,9 @@ export function Weight() {
         </div>
       ) : (
         /* Graph View */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          className={`p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
+          className={`md:col-span-2 p-8 rounded-3xl border shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] transition-all duration-300 ${
             colorScheme.id === "default"
               ? "bg-white border-gray-100"
               : `${colorScheme.cardBg} border-transparent`
@@ -377,6 +378,7 @@ export function Weight() {
               No entries to display
             </p>
           )}
+        </div>
         </div>
       )}
 
