@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { IconSearch, IconDashboard } from "../components/icons";
@@ -23,17 +23,16 @@ interface ActivityItem {
 export function Search() {
   const { selectedBaby } = useBaby();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const searchQuery = searchParams.get("q") || "";
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // Update URL when search query changes
-  useEffect(() => {
-    if (searchQuery) {
-      setSearchParams({ q: searchQuery });
+  const handleSearchChange = (value: string) => {
+    if (value) {
+      setSearchParams({ q: value });
     } else {
       setSearchParams({});
     }
-  }, [searchQuery, setSearchParams]);
+  };
 
   // Query for activities
   const { data: activities = [], isLoading: loadingActivities } = useQuery({
@@ -172,7 +171,7 @@ export function Search() {
           type="text"
           placeholder="Search by activity, caregiver, type, date, time, or notes..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           autoFocus
           className="w-full bg-white pl-12 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none shadow-sm placeholder-gray-400"
         />
