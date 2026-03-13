@@ -16,15 +16,21 @@ export async function getBabyShares(babyId: string): Promise<BabyShare[]> {
 }
 
 /**
- * Get pending invitations for the current user's email
+ * Get pending invitations for the current user's email or user ID
  */
-export async function getPendingInvites(userEmail: string): Promise<any[]> {
-  const { data, error } = await supabase
+export async function getPendingInvites(userEmail: string, userId?: string): Promise<any[]> {
+  let query = supabase
     .from("baby_shares")
     .select("*, babies(*)")
-    .eq("invited_email", userEmail)
     .eq("status", "pending");
 
+  if (userId) {
+    query = query.or(`invited_email.eq.${userEmail},user_id.eq.${userId}`);
+  } else {
+    query = query.eq("invited_email", userEmail);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
@@ -51,7 +57,8 @@ export async function inviteUser(
     invited_email: email,
     invited_by: invitedBy,
     role: "caregiver",
-    status: "pending",
+    // Auto-accept if the user already has an account
+    status: existingUser ? "active" : "pending",
   };
 
   const { data, error } = await supabase

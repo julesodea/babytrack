@@ -130,9 +130,13 @@ export function BabyManage() {
       setInviteEmail('');
       await loadSharedUsers();
       alert('Invitation sent successfully!');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to invite user:', err);
-      setError('Failed to send invitation. The user may already have access.');
+      if (err?.code === '23505') {
+        setError('This person has already been invited or already has access.');
+      } else {
+        setError('Failed to send invitation. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

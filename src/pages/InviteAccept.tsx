@@ -17,7 +17,7 @@ export function InviteAccept() {
   }, [user, profile]);
 
   const handleInviteAcceptance = async () => {
-    if (!user || !profile?.email) {
+    if (!user) {
       setStatus('loading');
       return;
     }
@@ -32,7 +32,7 @@ export function InviteAccept() {
 
     try {
       // Find pending invite for this user's email and baby
-      const pendingInvites = await getPendingInvites(profile.email);
+      const pendingInvites = await getPendingInvites(user.email ?? '', user.id);
       const invite = pendingInvites.find((inv: any) => inv.baby_id === babyId);
 
       if (!invite) {

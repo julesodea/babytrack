@@ -28,14 +28,31 @@ export function PendingInvites() {
   }, [user, profile]);
 
   const loadInvites = async () => {
-    if (!profile?.email) {
+    if (!user?.id) {
       setLoading(false);
       return;
     }
 
     try {
-      const pending = await getPendingInvites(profile.email);
-      setInvites(pending);
+      const pending = await getPendingInvites(user.email ?? '', user.id);
+
+      // Auto-accept all pending invites — if the user is logged in,
+      // they clearly have an account and no manual step is needed
+      let anyAccepted = false;
+      for (const inv of pending) {
+        try {
+          await acceptInvite(inv.id, user.id);
+          anyAccepted = true;
+        } catch (e) {
+          console.error('Failed to auto-accept invite:', e);
+        }
+      }
+
+      if (anyAccepted) {
+        await refreshBabies();
+      }
+
+      setInvites([]);
     } catch (error) {
       console.error('Failed to load invites:', error);
     } finally {
