@@ -210,7 +210,7 @@ export function Layout() {
               >
                 <IconUser className="w-4 h-4" />
               </div>
-              <div className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+              <div className="text-sm font-medium text-gray-700 truncate max-w-30">
                 {displayName}
               </div>
             </div>
