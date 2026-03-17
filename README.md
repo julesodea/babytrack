@@ -7,5 +7,7 @@ Provide monitoring for:
 - Diaper Changes
 - Sleeps
 - Child sharing with Parents
+- Medicine
+- Weight
 
 [Baby Track](https://babytrackapp.vercel.app)
